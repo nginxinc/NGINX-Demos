@@ -1,0 +1,18 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.network "private_network", :ip => "10.2.2.70"
+
+  config.vm.synced_folder "docker_base/", "/srv/NGINX-Demos/autoscaling-demo/docker_base"
+  config.vm.synced_folder "docker_lb/", "/srv/NGINX-Demos/autoscaling-demo/docker_lb"
+  config.vm.synced_folder "docker_ws/", "/srv/NGINX-Demos/autoscaling-demo/docker_ws"
+  config.vm.synced_folder "scripts/", "/srv/NGINX-Demos/autoscaling-demo/scripts"
+  config.vm.synced_folder "nginx_config/", "/srv/NGINX-Demos/autoscaling-demo/nginx_config"
+  config.vm.synced_folder "nginx_www/", "/srv/NGINX-Demos/autoscaling-demo/nginx_www"
+
+  config.vm.provision :ansible do |ansible|
+    ansible.playbook = "../ansible/setup_autoscaling_demo.yml"
+  end
+end

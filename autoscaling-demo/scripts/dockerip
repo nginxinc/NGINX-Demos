@@ -1,0 +1,4 @@
+# The IP address of the Docker host
+# This file is meant to be included in other shell scripts.
+
+ip=`ifconfig docker0 | grep "inet addr" | awk -F '[: ]+' '{print $4}'`

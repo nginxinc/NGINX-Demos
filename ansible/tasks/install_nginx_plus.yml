@@ -1,0 +1,28 @@
+  - name: NGINX Plus | Creating NGINX Plus ssl cert repo directory
+    file: path=/etc/ssl/nginx state=directory group=root mode=0700
+ 
+  - name: NGINX Plus | Copying NGINX Plus repository certificate
+    copy: src=files/nginx-repo.crt dest=/etc/ssl/nginx/nginx-repo.crt owner=root group=root mode=0700
+ 
+  - name: NGINX Plus | Copying NGINX Plus repository key
+    copy: src=files/nginx-repo.key dest=/etc/ssl/nginx/nginx-repo.key owner=root group=root mode=0700
+ 
+  - name: NGINX Plus | Downloading NGINX Plus CA certificate
+    get_url: url=http://cs.nginx.com/static/files/CA.crt dest=/etc/ssl/nginx/CA.crt mode=0700
+ 
+  - name: NGINX Plus | Adding NGINX Plus signing key
+    apt_key: url=http://nginx.org/keys/nginx_signing.key state=present
+ 
+  - name: NGINX Plus | Downloading Apt-Get NGINX Plus repository
+    get_url: url=http://cs.nginx.com/static/files/90nginx dest=/etc/apt/apt.conf.d/90nginx mode=0700
+ 
+  - name: NGINX Plus | Adding sources.list url for NGINX Plus
+    shell: printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\n" >/etc/apt/sources.list.d/nginx-plus.list
+ 
+  - name: NGINX Plus | Installing NGINX Plus via apt-get
+    apt: update_cache=yes pkg=nginx-plus state=latest
+ 
+  - name: NGINX Plus | Start NGINX Plus
+    service:
+      name: nginx
+      state: started
