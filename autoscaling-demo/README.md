@@ -26,32 +26,32 @@ http://www.vagrantup.com/downloads
 
 1. Install provider for vagrant to use to start VM's.  
 
-The default provider is VirtualBox [Note that only VirtualBox versions 4.0, 4.1, 4.2, 4.3 are supported], which can be downloaded from the following link:
+	The default provider is VirtualBox [Note that only VirtualBox versions 4.0, 4.1, 4.2, 4.3 are supported], which can be downloaded from the following link:
 
-https://www.virtualbox.org/wiki/Downloads
+	https://www.virtualbox.org/wiki/Downloads
 
-A full list of providers can be found at the following page, if you do not want to use VirtualBox:
+	A full list of providers can be found at the following page, if you do not want to use VirtualBox:
 
-https://docs.vagrantup.com/v2/providers/
+	https://docs.vagrantup.com/v2/providers/
 
-2. Install Ansible:
+1. Install Ansible:
 
-http://docs.ansible.com/ansible/intro_installation.html
+	http://docs.ansible.com/ansible/intro_installation.html
 
-3. Clone demo repo
+1. Clone demo repo
 
-git clone git@github.com:nginxinc/NGINX-Demos.git
+	git clone git@github.com:nginxinc/NGINX-Demos.git
 
-4. Copy nginx-repo.key and nginx-repo.crt files for your account to ~/autoscaling-demo/ansible/files/ [Remove the files that are in there now]
+1. Copy nginx-repo.key and nginx-repo.crt files for your account to ~/autoscaling-demo/ansible/files/ [Remove the files that are in there now]
 
-5. Move into the directory and start the Vagrant vm:
+1. Move into the directory and start the Vagrant vm:
 
-cd ~/NGINX-Demos/autoscaling-demo
-vagrant up
+	cd ~/NGINX-Demos/autoscaling-demo
+	vagrant up
 
-5. Login in the newly created virtual machine:
+1. Login in the newly created virtual machine:
 
-Vagrant ssh
+	Vagrant ssh
 
 The demo files will be in /srv/NGINX-Demos/autoscaling-demo/scripts
 
@@ -59,20 +59,20 @@ The demo files will be in /srv/NGINX-Demos/autoscaling-demo/scripts
 
 1. Create Ubuntu 14.04 VM
 
-2. Install Ansible on Ubuntu VM
+1. Install Ansible on Ubuntu VM
 
-sudo apt-get install ansible
+	sudo apt-get install ansible
 
-3. Clone demo repo into /srv on Ubuntu VM:
+1. Clone demo repo into /srv on Ubuntu VM:
 
-cd /srv
-sudo git clone git@github.com:nginxinc/NGINX-Demos.git
+	cd /srv
+	sudo git clone git@github.com:nginxinc/NGINX-Demos.git
 
-4. Copy nginx-repo.key and nginx-repo.crt files for your account to /srv/autoscaling-demo/ansible/files/
+1. Copy nginx-repo.key and nginx-repo.crt files for your account to /srv/autoscaling-demo/ansible/files/
 
-5. Run ansible playbook against localhost on Ubuntu VM:
+1. Run ansible playbook against localhost on Ubuntu VM:
 
-sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/autoscaling-demo/ansible/setup_autoscaling_demo.yml
+	sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/autoscaling-demo/ansible/setup_autoscaling_demo.yml
 
 The demo files will be in /srv/NGINX-Demos/autoscaling-demo/scripts
 
