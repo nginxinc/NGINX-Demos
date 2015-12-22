@@ -8,11 +8,11 @@ The demo uses both the upstream_con and status api's.  If shows creating a new N
 
 The demo runs on a single Docker host.  It has been tested with Ubuntu 14.04, Docker 1.7.0 and 1.8.1, NGINX Plus R7(1.9.4) and ElasticSearch 1.4.4.  siege 3.0.5 is used for generating load.
 
-The base NGINX Plus Docker image, nginxplus, is created using docker_base/Dockefile which closely matches the Dockerfile from the blog post http://nginx.com/blog/deploying-nginx-nginx-plus-docker/.  This image exposes ports 80 and 443.  For the NGINX Plus load balancer we want to also expose ports 8080 for the status API and 9200 for Elasticsearch.  For this a new image, nginxpluslb, is created using docker_lb/Dockerfile which is based on the nginxplus image.  For the NGINX Plus web server instances, we want to copy the html files to each container because they contain two versions of a health check page, one with an OK message and one with an error message and we want to be able to change the files on each container independently, so another Docker images, nginxplusws, is created using docker_ws/Dockerfile.
+The base NGINX Plus Docker image, nginxplus, is created using ```docker_base/Dockefile``` which closely matches the Dockerfile from the blog post http://nginx.com/blog/deploying-nginx-nginx-plus-docker/.  This image exposes ports ```80``` and ```443```.  For the NGINX Plus load balancer we want to also expose ports ```8080``` for the status API and ```9200``` for Elasticsearch.  For this a new image, nginxpluslb, is created using ```docker_lb/Dockerfile``` which is based on the nginxplus image.  For the NGINX Plus web server instances, we want to copy the html files to each container because they contain two versions of a health check page, one with an OK message and one with an error message and we want to be able to change the files on each container independently, so another Docker images, nginxplusws, is created using ```docker_ws/Dockerfile```.
 
-For its configuration file, the NGINX Plus load balancing container links /etc/nginx/conf.d in the container to a directory on the Docker host, /root/nginxdemos/r-autoscaling/nginx_config by default.   For the web content (status.html), it links /usr/share/nginx/html to /root/nginxdemos/r-autoscaling/nginx_www by default. The default /usr/share/nginx/html directory is not used so that this demo can take advantage of the newer version of the status page.
+For its configuration file, the NGINX Plus load balancing container links ```/etc/nginx/conf.d``` in the container to a directory on the Docker host, ```/root/nginxdemos/r-autoscaling/nginx_config``` by default.   For the web content (```status.html```), it links ```/usr/share/nginx/html``` to ```/root/nginxdemos/r-autoscaling/nginx_www``` by default. The default ```/usr/share/nginx/html``` directory is not used so that this demo can take advantage of the newer version of the status page.
 
-The NGINX Plus web server containers have the content directory in the Docker context for that container copied to /usr/share/nginx/html.
+The NGINX Plus web server containers have the content directory in the Docker context for that container copied to ```/usr/share/nginx/html```.
 
 The NGINX Plus web server containers and Elasticsearch containers use default configurations.
 
@@ -40,20 +40,24 @@ http://www.vagrantup.com/downloads
 
 1. Clone demo repo
 
-	git clone git@github.com:nginxinc/NGINX-Demos.git
+	```$ git clone git@github.com:nginxinc/NGINX-Demos.git```
 
-1. Copy nginx-repo.key and nginx-repo.crt files for your account to ~/autoscaling-demo/ansible/files/ [Remove the files that are in there now]
+1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/autoscaling-demo/ansible/files/``` [Remove the files that are in there now]
 
 1. Move into the directory and start the Vagrant vm:
 
-	cd ~/NGINX-Demos/autoscaling-demo
-	vagrant up
+	```
+	$ cd ~/NGINX-Demos/autoscaling-demo
+	$ vagrant up
+	```
 
 1. Login in the newly created virtual machine:
 
-	Vagrant ssh
+	```
+	$ vagrant ssh
+	```
 
-The demo files will be in /srv/NGINX-Demos/autoscaling-demo/scripts
+The demo files will be in ```/srv/NGINX-Demos/autoscaling-demo/scripts```
 
 ### Ansible only deployment
 
@@ -61,20 +65,26 @@ The demo files will be in /srv/NGINX-Demos/autoscaling-demo/scripts
 
 1. Install Ansible on Ubuntu VM
 
-	sudo apt-get install ansible
+	```
+	$ sudo apt-get install ansible
+	```
 
-1. Clone demo repo into /srv on Ubuntu VM:
+1. Clone demo repo into ```/srv``` on Ubuntu VM:
 
-	cd /srv
-	sudo git clone git@github.com:nginxinc/NGINX-Demos.git
+	```
+	$ cd /srv
+	$ sudo git clone git@github.com:nginxinc/NGINX-Demos.git
+	```
 
-1. Copy nginx-repo.key and nginx-repo.crt files for your account to /srv/autoscaling-demo/ansible/files/
+1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/autoscaling-demo/ansible/files/```
 
 1. Run ansible playbook against localhost on Ubuntu VM:
 
-	sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/autoscaling-demo/ansible/setup_autoscaling_demo.yml
+	```
+	$ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/autoscaling-demo/ansible/setup_autoscaling_demo.yml
+	```
 
-The demo files will be in /srv/NGINX-Demos/autoscaling-demo/scripts
+The demo files will be in ```/srv/NGINX-Demos/autoscaling-demo/scripts```
 
 ### Manual Install
 
