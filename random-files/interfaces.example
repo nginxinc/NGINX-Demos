@@ -1,0 +1,78 @@
+# Example content for /etc/network/interfaces
+
+auto lo
+iface lo inet loopback
+
+auto eth1
+iface eth1 inet static
+address 10.2.2.90
+netmask 255.255.255.0
+gateway 10.2.2.1
+
+
+auto eth1:0
+iface eth1:0 inet static
+address 10.2.2.91
+netmask 255.255.255.0
+
+auto eth1:1
+iface eth1:1 inet static
+address 10.2.2.92
+netmask 255.255.255.0
+
+auto eth1:2
+iface eth1:2 inet static
+address 10.2.2.93
+netmask 255.255.255.0
+
+auto eth1:3
+iface eth1:3 inet static
+address 10.2.2.94
+netmask 255.255.255.0
+
+auto eth1:4
+iface eth1:4 inet static
+address 10.2.2.95
+netmask 255.255.255.0
+
+auto eth1:5
+iface eth1:5 inet static
+address 10.2.2.96
+netmask 255.255.255.0
+
+auto eth1:6
+iface eth1:6 inet static
+address 10.2.2.97
+netmask 255.255.255.0
+
+auto eth1:7
+iface eth1:7 inet static
+address 10.2.2.98
+netmask 255.255.255.0
+
+auto eth1:8
+iface eth1:8 inet static
+address 10.2.2.99
+netmask 255.255.255.0
+
+auto eth1:9
+iface eth1:9 inet static
+address 10.2.2.100
+netmask 255.255.255.0
+
+auto eth1:10
+iface eth1:10 inet static
+address 10.2.2.101
+netmask 255.255.255.0
+
+auto eth1:11
+iface eth1:11 inet static
+address 10.2.2.102
+netmask 255.255.255.0
+
+auto eth1:12
+iface eth1:12 inet static
+address 10.2.2.102
+netmask 255.255.255.0
+
+

@@ -1,0 +1,25 @@
+- hosts: all
+  sudo: true
+  tasks:
+
+    - name: Setup Random Files Demo | Update Interfaces Config
+      command: perl -p -i -e 's/eth0/eth1/g' /srv/NGINX-Demos/random-files/interfaces.example
+
+    - name: Setup Random Files Demo | Update run-containers.sh script
+      command: perl -p -i -e 's/eth0/eth1/g' /srv/NGINX-Demos/random-files/backend/run-containers.sh
+
+    - name: Setup Random Files Demo | Copy Interfaces config from git repo
+      file: src=/srv/NGINX-Demos/random-files/interfaces.example dest=/etc/network/interfaces state=link force=yes
+
+    - name: Setup Random Files Demo | Bring up New Sub Interfaces
+      shell: ifup eth1:{{ item }}
+      with_sequence: start=0 end=12
+      
+    - name: Setup Random Files Demo | Install docker.io from apt
+      shell: curl -sSL https://get.docker.com/ | sh
+
+    - name: Setup Random Files Demo | Execute build containers
+      #running this here since it is rather long running
+      shell: /usr/bin/docker build -t random-nginx-demo .
+      args:
+        chdir: /srv/NGINX-Demos/random-files/backend

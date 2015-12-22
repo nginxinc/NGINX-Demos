@@ -1,0 +1,11 @@
+- hosts: all
+  sudo: true
+  handlers:
+    - include: handlers/handlers.yml
+  tasks:
+    - include: tasks/install_nginx_plus.yml
+
+    - name: Setup Random Files Demo | Copy nginx config from git repo
+      file: src=/srv/NGINX-Demos/random-files/nginx.conf dest=/etc/nginx/nginx.conf state=link force=yes
+      notify: reload nginx
+
