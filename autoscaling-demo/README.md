@@ -159,6 +159,36 @@ The following additional files are used:
 
 # Demo Script
 
-1.	If the demo as been run previously, cleanup all the containers:./removecontainers.sh2.	Run: docker ps.  Show that there are no containers running.3.	Show http://[docker host]:8080/status.html.  There will be an error in the browser because NGINX PLUS is not yet running.  Continue to show status.html after each action that effects the NGINX Plus configuration.4.	Run: ./createenv.sh.  This will setup an environment with one NGINX PLUS load balancer container, one NGINX PLUS web server container and upstream server and one Elasticsearch container and upstream server. 5.	Run: docker ps.6.	Create some more Elasticsearch containers:./addes [number of containers]7.	Remove some Elasticsearch containers:./removes [number of containers]8.	Create some more NGINX web server containers:./addnginxws [number of containers]9.	Remove some NGINX web server containers:./removnginxws [number of containers]10.	Show script createenv.sh.  This script calls the following 3 scripts.11.	Show script addnginxlb.sh.  This script creates a container with NGINX PLUS configured as a load balancer with an upstream for NGINX PLUS as a web server and one for Elasticsearch.12.	Show /var/nginx/config/docker.conf13.	Show script addnginxws.sh. This script adds a container with NGINX Plus, using the default configuration and adds it as an upstream server.  If copies the html content from the Docker host.14.	Show script addes.sh. This script adds a container with Elasticsearch and adds it as an upstream server.15.	Show script addnode.sh.  This script is called by the previous two scripts and does the actual container creation and upstream server additions.16.	Show script removenginxws.sh.  This script removes one or more NGINX Plus nodes and their containers.17.	Show [path]/docker_base/Dockerfile.18.	Show [path]/docker_lb/Dockerfile.19.	Show [path]/docker_ws/Dockerfile.20.	Generate load: ./runsiege.sh21.	Run: ./autoscale.py.  Explain that the program will try and keep the requests per second per active node to between 10 and 12.  It will add at most 4 nodes on scale up and remove at most 2 nodes on scale down.  It is checking every 2 seconds.  There can be a maximum of 10 total nodes and a minimum of 2 active nodes.22.	Run: ./seterror.sh [port] for two NGINX Plus web server instances to cause the health checks to fail.  Explain that the autoscaling algorithm will take into account which servers are actually up.23.	Show autoscale.py24.	Stop the load generator when there are more then 2 active nodes.  Show that the program will scale down to two active nodes.25.	Run: ./fixerror [port] for the two nodes that are failing the health checks and show that two nodes are removed to the minimum of 2 active nodes.
+1.	If the demo as been run previously, cleanup all the containers:
+./removecontainers.sh
+2.	Run: docker ps.  Show that there are no containers running.
+3.	Show http://[docker host]:8080/status.html.  There will be an error in the browser because NGINX PLUS is not yet running.  Continue to show status.html after each action that effects the NGINX Plus configuration.
+4.	Run: ./createenv.sh.  This will setup an environment with one NGINX PLUS load balancer container, one NGINX PLUS web server container and upstream server and one Elasticsearch container and upstream server. 
+5.	Run: docker ps.
+6.	Create some more Elasticsearch containers:
+./addes [number of containers]
+7.	Remove some Elasticsearch containers:
+./removes [number of containers]
+8.	Create some more NGINX web server containers:
+./addnginxws [number of containers]
+9.	Remove some NGINX web server containers:
+./removnginxws [number of containers]
+10.	Show script createenv.sh.  This script calls the following 3 scripts.
+11.	Show script addnginxlb.sh.  This script creates a container with NGINX PLUS configured as a load balancer with an upstream for NGINX PLUS as a web server and one for Elasticsearch.
+12.	Show /var/nginx/config/docker.conf
+13.	Show script addnginxws.sh. This script adds a container with NGINX Plus, using the default configuration and adds it as an upstream server.  If copies the html content from the Docker host.
+14.	Show script addes.sh. This script adds a container with Elasticsearch and adds it as an upstream server.
+15.	Show script addnode.sh.  This script is called by the previous two scripts and does the actual container creation and upstream server additions.
+16.	Show script removenginxws.sh.  This script removes one or more NGINX Plus nodes and their containers.
+17.	Show [path]/docker_base/Dockerfile.
+18.	Show [path]/docker_lb/Dockerfile.
+19.	Show [path]/docker_ws/Dockerfile.
+20.	Generate load: ./runsiege.sh
+21.	Run: ./autoscale.py.  Explain that the program will try and keep the requests per second per active node to between 10 and 12.  It will add at most 4 nodes on scale up and remove at most 2 nodes on scale down.  It is checking every 2 seconds.  There can be a maximum of 10 total nodes and a minimum of 2 active nodes.
+22.	Run: ./seterror.sh [port] for two NGINX Plus web server instances to cause the health checks to fail.  Explain that the autoscaling algorithm will take into account which servers are actually up.
+23.	Show autoscale.py
+24.	Stop the load generator when there are more then 2 active nodes.  Show that the program will scale down to two active nodes.
+25.	Run: ./fixerror [port] for the two nodes that are failing the health checks and show that two nodes are removed to the minimum of 2 active nodes.
+
 
 
