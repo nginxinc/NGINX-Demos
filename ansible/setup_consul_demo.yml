@@ -26,7 +26,7 @@
     - name: NGINX Plus | Copying NGINX Plus repository key
       copy: src=files/nginx-repo.key dest=/vagrant/nginxplus/nginx-repo.key
 
-    - name: Setup Consul Demo | Build the container images and spin them up
+    - name: Setup Consul Demo | Build the container images and spin them up (Please have some patience, this step is going to take a while)
       shell: /usr/local/bin/docker-compose up -d
       args:
         chdir: /vagrant/
