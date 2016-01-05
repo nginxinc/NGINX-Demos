@@ -2,7 +2,7 @@
 
 This demo uses one NGINX Plus instance as a load balancer with two upstream groups, one for NGINX Plus web servers and one for Elasticsearch nodes.  All of the instances run in Docker containers.
 
-The demo uses both the upstream_con and status api's.  If shows creating a new NGINX Plus environment and adding and removing containers manually and with autoscaling.
+The demo uses both the upstream_conf and status api's.  If shows creating a new NGINX Plus environment and adding and removing containers manually and with autoscaling.
 
 ## System requirements and setup
 
@@ -10,7 +10,7 @@ The demo runs on a single Docker host.  It has been tested with Ubuntu 14.04, Do
 
 The base NGINX Plus Docker image, nginxplus, is created using ```docker_base/Dockefile``` which closely matches the Dockerfile from the blog post http://nginx.com/blog/deploying-nginx-nginx-plus-docker/.  This image exposes ports ```80``` and ```443```.  For the NGINX Plus load balancer we want to also expose ports ```8080``` for the status API and ```9200``` for Elasticsearch.  For this a new image, nginxpluslb, is created using ```docker_lb/Dockerfile``` which is based on the nginxplus image.  For the NGINX Plus web server instances, we want to copy the html files to each container because they contain two versions of a health check page, one with an OK message and one with an error message and we want to be able to change the files on each container independently, so another Docker images, nginxplusws, is created using ```docker_ws/Dockerfile```.
 
-For its configuration file, the NGINX Plus load balancing container links ```/etc/nginx/conf.d``` in the container to a directory on the Docker host, ```/root/nginxdemos/r-autoscaling/nginx_config``` by default.   For the web content (```status.html```), it links ```/usr/share/nginx/html``` to ```/root/nginxdemos/r-autoscaling/nginx_www``` by default. The default ```/usr/share/nginx/html``` directory is not used so that this demo can take advantage of the newer version of the status page.
+For its configuration file, the NGINX Plus load balancing container links ```/etc/nginx/conf.d``` in the container to a directory on the Docker host, ```/srv/NGINX-Demos/autoscaling-demo/nginx_config``` by default.   For the web content (```status.html```), it links ```/usr/share/nginx/html``` to ```/srv/NGINX-Demos/autoscaling-demo/nginx_www``` by default. The default ```/usr/share/nginx/html``` directory is not used so that this demo can take advantage of the newer version of the status page.
 
 The NGINX Plus web server containers have the content directory in the Docker context for that container copied to ```/usr/share/nginx/html```.
 
@@ -42,7 +42,7 @@ http://www.vagrantup.com/downloads
 
 	```$ git clone git@github.com:nginxinc/NGINX-Demos.git```
 
-1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/autoscaling-demo/ansible/files/``` [Remove the files that are in there now]
+1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/autoscaling-demo/ansible/files/``` [Remove the files that are in there now]
 
 1. Move into the directory and start the Vagrant vm:
 
@@ -63,10 +63,10 @@ The demo files will be in ```/srv/NGINX-Demos/autoscaling-demo/scripts```
 
 1. Create Ubuntu 14.04 VM
 
-1. Install Ansible on Ubuntu VM
+1. Install Ansible and Giton Ubuntu VM
 
 	```
-	$ sudo apt-get install ansible
+	$ sudo apt-get install ansible git
 	```
 
 1. Clone demo repo into ```/srv``` on Ubuntu VM:
@@ -76,7 +76,7 @@ The demo files will be in ```/srv/NGINX-Demos/autoscaling-demo/scripts```
 	$ sudo git clone git@github.com:nginxinc/NGINX-Demos.git
 	```
 
-1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/autoscaling-demo/ansible/files/```
+1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/NGINX-Demos/autoscaling-demo/ansible/files/```
 
 1. Run ansible playbook against localhost on Ubuntu VM:
 
@@ -92,23 +92,23 @@ The script installautoscale.sh can be used to install the demo.  The script requ
 
 To manually install the demo (assuming the default directories), follow these steps: 
 
-1. Extract the files from Github into ```~/nginxdemos/r-autoscaling``` 
-2. Copy ```nginx-repo.crt``` and ```nginx-repo.key``` to ```~/nginxdemos/r-autoscaling/docker_base```
+1. Extract the files from Github into ```/srv/NGINX-Demos/autoscaling-demo``` 
+2. Copy ```nginx-repo.crt``` and ```nginx-repo.key``` to ```/srv/NGINX-Demos/autoscaling-demo/docker_base```
 3. Create the base NGINX Plus image
 	```
-	$ cd to ~/nginxdemos/r-autoscaling/docker_base
+	$ cd to /srv/NGINX-Demos/autoscaling-demo/docker_base
 	./createbaseimage.sh
     ```
     This runs the command: ```docker build -t nginxplus .```
 4. Create the load balancer NGINX Plus image
 	```
-	$ cd ~/nginxdemos/r-autoscaling/docker_lb
+	$ cd /srv/NGINX-Demos/autoscaling-demo/docker_lb
 	$ ./createlbimages.sh
 	```
     This runs the command: ```docker build -t nginxpluslb .```
 5. Create the web server NGINX Plus image
 	```
-	$ cd ~/nginxdemos/r-autoscaling/docker_ws
+	$ cd /srv/NGINX-Demos/autoscaling-demo/docker_ws
 	$ ./createwsimages.sh
 	```
     This runs the command: ```docker build -t nginxplusws```.
@@ -119,7 +119,7 @@ To manually install the demo (assuming the default directories), follow these st
 
 ## Shell Scripts and Programs
 
-The following scripts are available in cd ```~/nginxdemos/r-autoscaling/scripts```
+The following scripts are available in cd ```/srv/NGINX-Demos/autoscaling-demo/scripts```
 
 * **addes.sh**: Create one or more Elasticsearch containers and adds them to the upstream group.  There is one optional input parameter, the number of containers to create, which defaults to one.  Calls ```addnode.sh```.
 
@@ -207,6 +207,3 @@ The following additional files are used:
 1.	Show ```autoscale.py```
 1.	Stop the load generator when there are more then 2 active nodes.  Show that the program will scale down to two active nodes.
 1.	Run: ```./fixerror [port]``` for the two nodes that are failing the health checks and show that two nodes are removed to the minimum of 2 active nodes.
-
-
-

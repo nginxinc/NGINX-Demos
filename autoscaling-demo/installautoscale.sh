@@ -28,9 +28,9 @@
 #                            not already installed)
 #####################################################################
 
-checkoutDir=~/nginxdemos
-autoscaleDir=r-autoscaling
-remoteHTTPS=https://github.com/nginxinc/show-demos.git
+checkoutDir=/srv/NGINX-Demos
+autoscaleDir=autoscaling-demo
+remoteHTTPS=https://github.com/nginxinc/NGINX-Demos.git
 
 #####################################################################
 # Function getCheckoutDir
