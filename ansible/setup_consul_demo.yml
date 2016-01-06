@@ -30,4 +30,3 @@
       shell: /usr/local/bin/docker-compose up -d
       args:
         chdir: /vagrant/
-     

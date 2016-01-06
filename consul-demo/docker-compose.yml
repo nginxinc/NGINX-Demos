@@ -8,7 +8,7 @@ nginx:
   - "8080:8080"
 
 consul:
-  command: -server -bootstrap -advertise 10.0.2.15
+  command: -server -bootstrap -node consul -advertise 10.0.2.15 -config-file /etc/consul.d/config.json
   image: progrium/consul:latest
   container_name: consul
   ports:
@@ -16,6 +16,11 @@ consul:
   - "8400:8400"
   - "8500:8500"
   - "8600:53/udp"
+  volumes:
+  - "./consul_watches_config.json:/etc/consul.d/config.json"
+  - "./script.sh:/tmp/script.sh"
+  environment:
+  - HOST_IP
 
 registrator:
   command: consul://consul:8500

@@ -54,7 +54,19 @@ http://www.vagrantup.com/downloads
      $ cd /vagrant
      ```
 
-1. NGINX Plus will be listening on IP address 10.2.2.70 (assigned in Vagrantfile) and port 80. Export this IP into an environment variable HOST_IP on the VM `export HOST_IP=10.2.2.70` (used by script.sh below) and now follow the steps under section 'Running the demo'.
+1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once this issue https://github.com/docker/compose/issues/593 is resolved)
+     ```
+     docker exec -ti consul apk update
+     docker exec -ti consul apk add jq
+     ```
+
+1. NGINX Plus will be listening on IP address 10.2.2.70 (assigned in Vagrantfile) and port 80.Execute the following command inside the consul container to set the environment var HOST_IP to the above IP
+     ```
+     root@vagrant-ubuntu-trusty-64:/vagrant# docker exec -ti consul bash
+     bash-4.3# export HOST_IP=10.2.2.70 > ~/.profile
+     ``` 
+
+1. Now simply follow the steps under section 'Running the demo'.
 
 
 ### Ansible only deployment
@@ -83,7 +95,19 @@ http://www.vagrantup.com/downloads
      $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_demo.yml
      ```
 
-1. NGINX Plus will listening on one of the IP addresses on port 80. Export this IP into an environment variable HOST_IP on the VM `export HOST_IP=a.b.c.d` (used by script.sh below) and now follow the steps under section 'Running the demo'.
+1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once this issue https://github.com/docker/compose/issues/593 is resolved)
+     ```
+     docker exec -ti consul apk update
+     docker exec -ti consul apk add jq
+     ```
+
+1. NGINX Plus will be listening on one of the IP addresses and port 80. Execute the following command inside the consul container to set the environment var HOST_IP to this IP
+     ```
+     root@vagrant-ubuntu-trusty-64:/vagrant# docker exec -ti consul bash
+     bash-4.3# export HOST_IP=a.b.c.d > ~/.profile
+     ``` 
+
+1. Now simply follow the steps under section 'Running the demo'.
 
 
 ### Manual Install
@@ -145,6 +169,12 @@ The following software needs to be installed on your laptop:
      service2                 /bin/go-run              Up                       0.0.0.0:8082->8080/tcp
      ```
 
+1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once this issue https://github.com/docker/compose/issues/593 is resolved)
+     ```
+     docker exec -ti consul apk update
+     docker exec -ti consul apk add jq
+     ```
+
 1. NGINX Plus will be listening on port 80, and you can get the IP address by running 
      ```
      $ docker-machine ip default
@@ -152,16 +182,11 @@ The following software needs to be installed on your laptop:
      ```
      Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by script.sh below) and now follow the steps under section 'Running the demo'.
 
+1. Now simply follow the steps below under section 'Running the demo'.
 
 ## Running the demo
 
 * Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers.
-
-* Execute script.sh. This script runs infinitely and gets the list of all Nginx Plus upstreams using its status and upstream_conf APIs, loops through all the containers registered with consul which are tagged with SERVICE_TAG "production" using this [Consul API](https://www.consul.io/docs/agent/http/catalog.html#catalog_services) and adds them to the upstream group using upstream_conf API if not present already. It also removes the upstreams from Nginx upstream group which are not registered in Consul. It repeats this process every 2 seconds.
-
-     ```
-     $ ./script.sh
-     ```
 
 * Now in a different tab, spin up two more containers named service3 and service4 which are the same [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) and [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
      ```
@@ -174,5 +199,7 @@ The following software needs to be installed on your laptop:
      ```
 
 * Play with starting and stopping multiple containers. Starting a new container with SERVICE_TAG "production" will add that container to the Nginx upstream group automatically. Stopping a container will make the health checks to fail and removes that container from the upstream group.
+
+* The way this works is using [Watches](https://www.consul.io/docs/agent/watches.html) feature of Consul, eveytime there is a change in the list of services, a handler (script.sh) is invoked. This script gets the list of all Nginx Plus upstreams using its status and upstream_conf APIs, loops through all the containers registered with consul which are tagged with SERVICE_TAG "production" using this [Consul API](https://www.consul.io/docs/agent/http/catalog.html#catalog_services) and adds them to the upstream group using upstream_conf API if not present already. It also removes the upstreams from Nginx upstream group which are not registered in Consul. 
 
 All the changes should be automatically reflected in the NGINX config and show up on the NGINX Plus Dashboard.
