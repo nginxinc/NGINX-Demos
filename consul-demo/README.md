@@ -51,6 +51,7 @@ http://www.vagrantup.com/downloads
 
      ```
      $ vagrant ssh
+     $ sudo su
      $ cd /vagrant
      ```
 
@@ -60,13 +61,7 @@ http://www.vagrantup.com/downloads
      docker exec -ti consul apk add jq
      ```
 
-1. NGINX Plus will be listening on IP address 10.2.2.70 (assigned in Vagrantfile) and port 80.Execute the following command inside the consul container to set the environment var HOST_IP to the above IP
-     ```
-     root@vagrant-ubuntu-trusty-64:/vagrant# docker exec -ti consul bash
-     bash-4.3# export HOST_IP=10.2.2.70 > ~/.profile
-     ``` 
-
-1. Now simply follow the steps under section 'Running the demo'.
+1. Now simply follow the steps listed under section 'Running the demo'.
 
 
 ### Ansible only deployment
@@ -101,13 +96,7 @@ http://www.vagrantup.com/downloads
      docker exec -ti consul apk add jq
      ```
 
-1. NGINX Plus will be listening on one of the IP addresses and port 80. Execute the following command inside the consul container to set the environment var HOST_IP to this IP
-     ```
-     root@vagrant-ubuntu-trusty-64:/vagrant# docker exec -ti consul bash
-     bash-4.3# export HOST_IP=a.b.c.d > ~/.profile
-     ``` 
-
-1. Now simply follow the steps under section 'Running the demo'.
+1. Now simply follow the steps listed under section 'Running the demo'.
 
 
 ### Manual Install
@@ -139,14 +128,32 @@ The following software needs to be installed on your laptop:
      $ ./clean-containers.sh
      ```
 
+1. NGINX Plus will be listening on port 80 on docker host, and you can get the IP address by running 
+     ```
+     $ docker-machine ip default
+     192.168.99.100
+     ```
+     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by docker-compose.yml below)
+
 1. To spin up the containers run: 
 
      ```
      $ docker-compose build
      $ docker-compose up -d
      ```
+     `docker-compose build` only needs to be run only once to build the environment.
 
-1. `docker-compose build` only needs to be run once to build the environment.  From here you should have a bunch of containers up and running:
+1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once this issue https://github.com/docker/compose/issues/593 is resolved)
+     ```
+     docker exec -ti consul apk update
+     docker exec -ti consul apk add jq
+     ```
+
+1. Now follow the steps under section 'Running the demo'
+
+## Running the demo
+
+* You should have a bunch of containers up and running now:
 
      ```
      $ docker-compose ps
@@ -168,38 +175,20 @@ The following software needs to be installed on your laptop:
                               vari ...  
      service2                 /bin/go-run              Up                       0.0.0.0:8082->8080/tcp
      ```
+     Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers.
 
-1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once this issue https://github.com/docker/compose/issues/593 is resolved)
+* Now spin up two more containers named service3 and service4 which are the same [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) and [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
      ```
-     docker exec -ti consul apk update
-     docker exec -ti consul apk add jq
-     ```
-
-1. NGINX Plus will be listening on port 80, and you can get the IP address by running 
-     ```
-     $ docker-machine ip default
-     192.168.99.100
-     ```
-     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by script.sh below) and now follow the steps under section 'Running the demo'.
-
-1. Now simply follow the steps below under section 'Running the demo'.
-
-## Running the demo
-
-* Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers.
-
-* Now in a different tab, spin up two more containers named service3 and service4 which are the same [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) and [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
-     ```
-     $ sudo docker-compose -f add-services.yml up -d
+     $ docker-compose -f add-services.yml up -d
      ```
 
 * Now try stopping two services and observe that they get removed from the upstream group on Nginx Plus dashboard automatically
      ```
-     $ sudo docker stop service2 service4
+     $ docker stop service2 service4
      ```
 
-* Play with starting and stopping multiple containers. Starting a new container with SERVICE_TAG "production" will add that container to the Nginx upstream group automatically. Stopping a container will make the health checks to fail and removes that container from the upstream group.
+* Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAG "production" or starting a stopped container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
 
-* The way this works is using [Watches](https://www.consul.io/docs/agent/watches.html) feature of Consul, eveytime there is a change in the list of services, a handler (script.sh) is invoked. This script gets the list of all Nginx Plus upstreams using its status and upstream_conf APIs, loops through all the containers registered with consul which are tagged with SERVICE_TAG "production" using this [Consul API](https://www.consul.io/docs/agent/http/catalog.html#catalog_services) and adds them to the upstream group using upstream_conf API if not present already. It also removes the upstreams from Nginx upstream group which are not registered in Consul. 
+* The way this works is using [Watches](https://www.consul.io/docs/agent/watches.html) feature of Consul, eveytime there is a change in the list of services, a handler (script.sh) is invoked. This bash script gets the list of all Nginx Plus upstreams using its status and upstream_conf APIs, loops through all the containers registered with consul which are tagged with SERVICE_TAG "production" using this [Consul API](https://www.consul.io/docs/agent/http/catalog.html#catalog_services) and adds them to the upstream group using upstream_conf API if not present already. It also removes the upstreams from Nginx upstream group which are not registered in Consul. 
 
 All the changes should be automatically reflected in the NGINX config and show up on the NGINX Plus Dashboard.

@@ -1,4 +1,10 @@
 #!/bin/bash
+# Check if env var HOST_IP is set, set it if its not
+if [[ -z "$HOST_IP" ]]; then
+    echo "Error: HOST_IP not set inside consul container. Setting it to 10.2.2.70 (IP address assigned in the Vagrantfile)"
+    HOST_IP=10.2.2.70
+fi
+
 CURL='/usr/bin/curl'
 OPTIONS='-s'
 CONSUL_SERVICES_API="http://$HOST_IP:8500/v1/catalog/services"
