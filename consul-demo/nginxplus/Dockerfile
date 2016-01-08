@@ -29,7 +29,7 @@ RUN ln -sf /dev/stderr /var/log/nginx/error.log
 EXPOSE 80 8080 443
 
 RUN rm -v /etc/nginx/conf.d/*
-ADD nginx.conf /etc/nginx/conf.d/app.conf
+ADD app.conf /etc/nginx/conf.d/app.conf
 ADD logo.png /usr/share/nginx/html/logo.png
 
 CMD ["nginx", "-g", "daemon off;"]
