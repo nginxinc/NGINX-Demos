@@ -2,7 +2,7 @@
 
 * **autoscaling-demo**: This demo uses one NGINX Plus instance as a load balancer with two upstream groups, one for NGINX Plus web servers and one for Elasticsearch nodes.  All of the instances run in Docker containers. The demo uses both the upstream_conf and status api's.  If shows creating a new NGINX Plus environment and adding and removing containers manually and with autoscaling.
 
-* **consul-demo**: This demo shows NGINX Plus being used in conjuction with Consul, a service discovery platform. This demo is based on docker.
+* **consul-demo**: This demo which spins up a bunch of docker containers shows NGINX Plus being used in conjuction with Consul, a service discovery platform. It uses the upstream_conf API in NGINX Plus to add or remove servers registered with Consul without the need for reloading the NGINX configuration. This automates the process of upstream reconfiguration in NGINX Plus based on Consul data using a simple bash script and Consul watches.
 
 * **random-files**: 
 
