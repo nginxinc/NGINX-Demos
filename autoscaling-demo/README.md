@@ -22,7 +22,7 @@ The NGINX Plus web server containers and Elasticsearch containers use default co
 
 1. Install Vagrant using the necessary package for your OS:
 
-        http://www.vagrantup.com/downloads
+	http://www.vagrantup.com/downloads
 
 1. Install provider for vagrant to use to start VM's.  
 
@@ -123,9 +123,7 @@ The following scripts are available in cd ```/srv/NGINX-Demos/autoscaling-demo/s
 
 Please note these scripts will need to be executed with root privileges. If you do not have root privileges, you will see the following somewhat cryptic error below:
 
-       ```
        Cannot connect to the Docker daemon. Is the docker daemon running on this host?
-       ```
 
 * **addes.sh**: Create one or more Elasticsearch containers and adds them to the upstream group.  There is one optional input parameter, the number of containers to create, which defaults to one.  Calls ```addnode.sh```.
 
