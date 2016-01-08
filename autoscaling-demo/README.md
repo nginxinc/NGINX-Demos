@@ -20,7 +20,7 @@ The NGINX Plus web server containers and Elasticsearch containers use default co
 
 ### Fully automated Vagrant/Ansible setup:
 
-Install Vagrant using the necessary package for your OS:
+1. Install Vagrant using the necessary package for your OS:
 
 http://www.vagrantup.com/downloads
 
@@ -42,7 +42,7 @@ http://www.vagrantup.com/downloads
 
 	```$ git clone git@github.com:nginxinc/NGINX-Demos.git```
 
-1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/autoscaling-demo/ansible/files/``` [Remove the files that are in there now]
+1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/autoscaling-demo/ansible/files/```
 
 1. Move into the directory and start the Vagrant vm:
 
@@ -120,6 +120,10 @@ To manually install the demo (assuming the default directories), follow these st
 ## Shell Scripts and Programs
 
 The following scripts are available in cd ```/srv/NGINX-Demos/autoscaling-demo/scripts```
+
+Please note these scripts will need to be executed with root privileges. If you do not have root privileges, you will see the following somewhat cryptic error below:
+
+        ```Cannot connect to the Docker daemon. Is the docker daemon running on this host?```
 
 * **addes.sh**: Create one or more Elasticsearch containers and adds them to the upstream group.  There is one optional input parameter, the number of containers to create, which defaults to one.  Calls ```addnode.sh```.
 
