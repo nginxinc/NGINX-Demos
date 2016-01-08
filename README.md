@@ -4,7 +4,7 @@
 
 * **consul-demo**: This demo which spins up a bunch of docker containers shows NGINX Plus being used in conjuction with Consul, a service discovery platform. It uses the upstream_conf API in NGINX Plus to add the servers registered with Consul and remove the ones which got deregistered without the need for reloading the NGINX configuration. This automates the process of upstream reconfiguration in NGINX Plus based on Consul data using a simple bash script and Consul watches.
 
-* **random-files**: 
+* **random-files**: Demo to show random content and upstream_conf. Nick to add more description here
 
 All of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
 
