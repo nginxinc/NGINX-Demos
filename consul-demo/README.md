@@ -4,7 +4,7 @@ This demo shows NGINX Plus being used in conjuction with Consul, a service disco
 up the following containers:
 
 * [Consul](http://www.consul.io) for service discovery
-* [Registrator](https://github.com/gliderlabs/registrator) to register services with Consol.  Registrator monitors for containers being started and stopped and updates Consul when a container changes state.
+* [Registrator](https://github.com/gliderlabs/registrator) to register services with Consul.  Registrator monitors for containers being started and stopped and updates Consul when a container changes state.
 * [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) is a simple hello world container to simulate a service
 * [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) a second simple hello world container to simulate another service
 * and of course [NGINX Plus](http://www.nginx.com/products)
@@ -83,10 +83,14 @@ http://www.vagrantup.com/downloads
 
 1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/NGINX-Demos/ansible/files/```
 
-1. Move into the consul-demo directory which contains the demo files and run the ansible playbook against localhost on Ubuntu VM:
-
+1. Move into the consul-demo directory which contains the demo files and set HOST_IP on line 5 in script.sh to the IP of your Ubuntu VM on which NGINX Plus will be listening.
      ```
      $ cd /srv/NGINX-Demos/consul-demo
+     ```
+
+1. Run the ansible playbook against localhost on Ubuntu VM:
+
+     ```
      $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_demo.yml
      ```
 
