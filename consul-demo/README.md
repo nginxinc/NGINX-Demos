@@ -55,7 +55,7 @@ http://www.vagrantup.com/downloads
      $ cd /vagrant
      ```
 
-1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once this issue https://github.com/docker/compose/issues/593 is resolved)
+1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once https://github.com/docker/compose/issues/593 gets resolved)
      ```
      docker exec -ti consul apk update
      docker exec -ti consul apk add jq
@@ -99,7 +99,7 @@ http://www.vagrantup.com/downloads
      $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_demo.yml
      ```
 
-1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once this issue https://github.com/docker/compose/issues/593 is resolved)
+1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once https://github.com/docker/compose/issues/593 gets resolved)
      ```
      docker exec -ti consul apk update
      docker exec -ti consul apk add jq
