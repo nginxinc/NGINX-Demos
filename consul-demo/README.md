@@ -7,7 +7,7 @@ up the following containers:
 * [Registrator](https://github.com/gliderlabs/registrator) to register services with Consul.  Registrator monitors for containers being started and stopped and updates Consul when a container changes state.
 * [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) is a simple hello world container to simulate a service
 * [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) a second simple hello world container to simulate another service
-* and of course [NGINX Plus](http://www.nginx.com/products)
+* and of course [NGINX Plus](http://www.nginx.com/products) (R8 or higher)
 
 The demo is based off the work done in this blog post (to be written :P)
  
@@ -60,6 +60,11 @@ http://www.vagrantup.com/downloads
      docker exec -ti consul apk update
      docker exec -ti consul apk add jq
      ```
+     
+1. Spin up the two hello-world containers which will act as NGINX Plus upstreams
+     ```
+     $ docker-compose -f create-services.yml up -d
+     ```
 
 1. Now simply follow the steps listed under section 'Running the demo'.
 
@@ -98,6 +103,11 @@ http://www.vagrantup.com/downloads
      ```
      docker exec -ti consul apk update
      docker exec -ti consul apk add jq
+     ```
+
+1. Spin up the two hello-world containers which will act as NGINX Plus upstreams
+     ```
+     $ docker-compose -f create-services.yml up -d
      ```
 
 1. Now simply follow the steps listed under section 'Running the demo'.
@@ -153,6 +163,11 @@ The following software needs to be installed on your laptop:
      docker exec -ti consul apk add jq
      ```
 
+1. Spin up the two hello-world containers which will act as NGINX Plus upstreams
+     ```
+     $ docker-compose -f create-services.yml up -d
+     ```
+
 1. Now follow the steps under section 'Running the demo'
 
 ## Running the demo
@@ -182,7 +197,8 @@ The following software needs to be installed on your laptop:
 
 1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
 
-1. Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers.
+1. Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers. We are also using the persistent 
+on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.
 
 1. Now spin up two more containers named service3 and service4 which are the same [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) and [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
      ```
