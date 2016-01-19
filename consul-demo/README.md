@@ -55,17 +55,6 @@ http://www.vagrantup.com/downloads
      $ cd /vagrant
      ```
 
-1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once https://github.com/docker/compose/issues/593 gets resolved)
-     ```
-     docker exec -ti consul apk update
-     docker exec -ti consul apk add jq
-     ```
-
-1. Spin up the two hello-world containers which will act as NGINX Plus upstreams
-     ```
-     $ docker-compose -f create-services.yml up -d
-     ```
-
 1. Now simply follow the steps listed under section 'Running the demo'.
 
 
@@ -97,17 +86,6 @@ http://www.vagrantup.com/downloads
 
      ```
      $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_demo.yml
-     ```
-
-1. Execute the following two `docker exec` commands to install [jq](https://stedolan.github.io/jq/) inside consul container (This step will not be needed once https://github.com/docker/compose/issues/593 gets resolved)
-     ```
-     docker exec -ti consul apk update
-     docker exec -ti consul apk add jq
-     ```
-
-1. Spin up the two hello-world containers which will act as NGINX Plus upstreams
-     ```
-     $ docker-compose -f create-services.yml up -d
      ```
 
 1. Now simply follow the steps listed under section 'Running the demo'.

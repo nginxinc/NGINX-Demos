@@ -30,3 +30,14 @@
       shell: /usr/local/bin/docker-compose up -d
       args:
         chdir: /vagrant/
+
+    - name: Setup Consul Demo | apk update in consul container
+      shell: docker exec -ti consul apk update
+
+    - name: Setup Consul Demo | Install jq in the consul container
+      shell: docker exec -ti consul apk add jq
+
+    - name: Setup Consul Demo | Spin up the two hello-world containers which will act as NGINX Plus upstreams
+      shell: /usr/local/bin/docker-compose -f create-services.yml up -d
+      args:
+        chdir: /vagrant/
