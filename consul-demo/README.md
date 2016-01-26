@@ -9,7 +9,7 @@ up the following containers:
 * [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) a second simple hello world container to simulate another service
 * and of course [NGINX Plus](http://www.nginx.com/products) (R8 or higher)
 
-The demo is based off the work done in this blog post (to be written :P)
+The demo is based off the work described in this blog post: [Service Discovery with NGINX Plus and Consul](https://www.nginx.com/blog/service-discovery-with-nginx-plus-and-consul/)
  
 ## Setup Options:
 
