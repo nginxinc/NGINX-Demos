@@ -151,24 +151,13 @@ The following software needs to be installed on your laptop:
 1. You should have a bunch of containers up and running now:
 
      ```
-     $ docker-compose ps
-         Name                   Command                   State                    Ports
-     -------------------------------------------------------------------------------------------------
-     consul                   /bin/start -server       Up                       53/tcp,
-                              -bootst ...                                       0.0.0.0:8600->53/udp,
-                                                                                0.0.0.0:8300->8300/tcp
-                                                                                , 8301/tcp, 8301/udp,
-                                                                                8302/tcp, 8302/udp, 0.
-                                                                                0.0.0:8400->8400/tcp,
-                                                                                0.0.0.0:8500->8500/tcp
-     nginx                    nginx -g daemon off;     Up                       443/tcp,
-                                                                                0.0.0.0:80->80/tcp,
-                                                                                0.0.0.0:8080->8080/tcp
-     registrator              /bin/registrator         Up
-                              consul:// ...
-     service1                 /bin/sh -c php-fpm -d    Up                       0.0.0.0:8081->80/tcp
-                              vari ...  
-     service2                 /bin/go-run              Up                       0.0.0.0:8082->8080/tcp
+     $ docker ps
+     CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                                                                                                NAMES
+     4b9fbae59e75        tutum/hello-world:latest        "/bin/sh -c 'php-fpm "   15 seconds ago      Up 14 seconds       0.0.0.0:8081->80/tcp                                                                                                                 service1
+     c93a8d1b2c7f        google/golang-hello:latest      "/bin/go-run"            15 seconds ago      Up 14 seconds       0.0.0.0:8082->8080/tcp                                                                                                               service2
+     8149e12fb77c        consuldemo_nginxplus            "nginx -g 'daemon off"   54 seconds ago      Up 53 seconds       0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp, 443/tcp                                                                                  nginxplus
+     04d0a6a4bfcc        gliderlabs/registrator:latest   "/bin/registrator con"   54 seconds ago      Up 53 seconds                                                                                                                                            registrator
+     76c4645a2338        progrium/consul:latest          "/bin/start -server -"   55 seconds ago      Up 54 seconds       53/tcp, 0.0.0.0:8300->8300/tcp, 0.0.0.0:8400->8400/tcp, 8301-8302/tcp, 0.0.0.0:8500->8500/tcp, 8301-8302/udp, 0.0.0.0:8600->53/udp   consul
      ```
 
 1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
