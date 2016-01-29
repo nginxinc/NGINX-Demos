@@ -1,0 +1,51 @@
+- hosts: all
+  sudo: true
+  tasks:
+
+    - name: Setup Etcd Demo | Install curl from apt
+      apt: update_cache=yes pkg=curl
+
+    - name: Setup Etcd Demo | Install git from apt
+      apt: update_cache=yes pkg=git
+
+    - name: Setup Etcd Demo | Install jq from apt
+      apt: update_cache=yes pkg=jq
+
+    - name: Setup Etcd Demo | Install docker.io from apt
+      shell: curl -sSL https://get.docker.com/ | sh      
+
+    - name: Setup Etcd Demo | Install docker-compose
+      shell: curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+
+    - name: Setup Etcd Demo | Apply executable permissions to the docker-compose binary
+      shell: chmod +x /usr/local/bin/docker-compose
+
+    - name: NGINX Plus | Copying NGINX Plus repository certificate
+      copy: src=files/nginx-repo.crt dest=/vagrant/nginxplus/nginx-repo.crt
+
+    - name: NGINX Plus | Copying NGINX Plus repository key
+      copy: src=files/nginx-repo.key dest=/vagrant/nginxplus/nginx-repo.key
+
+    - name: Setup Etcd Demo | Build the container images and spin them up (Please have some patience, this step is going to take a while)
+      shell: /usr/local/bin/docker-compose up -d
+      args:
+        chdir: /vagrant/
+
+    - name: Setup Etcd Demo | Install etcd and etcdctl
+      command: "{{item}}"
+      with_items:
+        - curl -L https://github.com/coreos/etcd/releases/download/v2.2.4/etcd-v2.2.4-linux-amd64.tar.gz -o etcd-v2.2.4-linux-amd64.tar.gz
+        - tar xzvf etcd-v2.2.4-linux-amd64.tar.gz
+        - cp etcd-v2.2.4-linux-amd64/etcdctl /usr/local/bin/ 
+      args: 
+        chdir: /vagrant/
+
+    - name: Setup Etcd Demo | Execute etcd_exec_watch.sh script
+      shell: nohup ./etcd_exec_watch.sh &
+      args:
+        chdir: /vagrant/
+
+    - name: Setup Etcd Demo | Spin up the two hello-world containers which will act as NGINX Plus upstreams
+      shell: /usr/local/bin/docker-compose -f create-services.yml up -d
+      args:
+        chdir: /vagrant/

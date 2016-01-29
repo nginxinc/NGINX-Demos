@@ -93,7 +93,6 @@ http://www.vagrantup.com/downloads
 
 ### Manual Install
 
-This section assumes that you are installing the demo on MAC OSX
 #### Prerequisites and Required Software
 
 The following software needs to be installed on your laptop:
@@ -160,7 +159,7 @@ The following software needs to be installed on your laptop:
      76c4645a2338        progrium/consul:latest          "/bin/start -server -"   55 seconds ago      Up 54 seconds       53/tcp, 0.0.0.0:8300->8300/tcp, 0.0.0.0:8400->8400/tcp, 8301-8302/tcp, 0.0.0.0:8500->8500/tcp, 8301-8302/udp, 0.0.0.0:8600->53/udp   consul
      ```
 
-1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
+1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. Make sure you set the HOST_IP in script.sh to the IP of your Vagrant VM or the VM you ran the ansible playbook directly on. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
 
 1. Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers. **We are also using the persistent 
 on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**

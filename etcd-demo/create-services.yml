@@ -1,0 +1,17 @@
+service1:
+  image: tutum/hello-world:latest
+  container_name: service1
+  labels:
+    SERVICE_NAME: service1
+    SERVICE_TAGS: production
+  ports:
+  - "8081:80"
+
+service2:
+  image: google/golang-hello:latest
+  container_name: service2
+  labels:
+    SERVICE_NAME: service2
+    SERVICE_TAGS: production
+  ports:
+  - "8082:8080"
