@@ -1,10 +1,10 @@
-# Demo to show Nginx Plus Dynamic Reconfiguration API (upstream_conf) with Etcd
+# Demo to show Nginx Plus Dynamic Reconfiguration API (upstream_conf) with etcd
 
-This demo shows NGINX Plus being used in conjuction with Etcd, a distributed, consistent key-value store for shared configuration and service discovery. This demo is based on docker and spins'
+This demo shows NGINX Plus being used in conjuction with etcd, a distributed, consistent key-value store for shared configuration and service discovery. This demo is based on docker and spins'
 up the following containers:
 
-* [Etcd](https://github.com/coreos/etcd) for service discovery
-* [Registrator](https://github.com/gliderlabs/registrator) to register services with Etcd. Registrator monitors for containers being started and stopped and updates key-value pairs in Etcd when a container changes state.
+* [etcd](https://github.com/coreos/etcd) for service discovery
+* [Registrator](https://github.com/gliderlabs/registrator) to register services with etcd. Registrator monitors for containers being started and stopped and updates key-value pairs in etcd when a container changes state.
 * [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) is a simple hello world container to simulate a service
 * [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) a second simple hello world container to simulate another service
 * and of course [NGINX Plus](http://www.nginx.com/products) R8
@@ -127,7 +127,7 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
      ```
      Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by script.sh & run.sh)
 
-1. Spin up the Etcd, Registrator and NGINX Plus containers first: 
+1. Spin up the etcd, Registrator and NGINX Plus containers first: 
 
      ```
      $ docker-compose up -d
@@ -158,7 +158,7 @@ b2e990528008        quay.io/coreos/etcd:v2.0.8        "/etcd -name etcd0 -a"   3
 
 1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. Make sure you set the HOST_IP in both the scripts (etcd_exec_watch.sh & script.sh) to the IP of your Vagrant VM or the VM you ran the ansible playbook directly on. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
 
-1. Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with Etcd you could do a `curl http://$HOST_IP:4001/v2/keys | jq '.'`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers. **We are also using the persistent on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**
+1. Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with etcd you could do a `curl http://$HOST_IP:4001/v2/keys | jq '.'`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers. **We are also using the persistent on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**
 
 1. Now spin up two more containers named service3 and service4 which are the same [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) and [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
      ```
@@ -172,6 +172,6 @@ b2e990528008        quay.io/coreos/etcd:v2.0.8        "/etcd -name etcd0 -a"   3
 
 1. Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAG "production" or starting a stopped container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
 
-1. The way this works is everytime there is a change in etcd, script.sh gets invoked (through etcd_exec_watch.sh) which checks some of the environment variables set by etcd and adds the server specified by ETCD_WATCH_VALUE to the NGINX upstream block if ETCD_WATCH_ACTION is 'set' and removes it if ETCD_WATCH_ACTION is 'delete'. The removal happens by traversing through all NGINX Plus upstreams and removing the ones not present in Etcd.
+1. The way this works is everytime there is a change in etcd, script.sh gets invoked (through etcd_exec_watch.sh) which checks some of the environment variables set by etcd and adds the server specified by ETCD_WATCH_VALUE to the NGINX upstream block if ETCD_WATCH_ACTION is 'set' and removes it if ETCD_WATCH_ACTION is 'delete'. The removal happens by traversing through all NGINX Plus upstreams and removing the ones not present in etcd.
 
 All the changes should be automatically reflected in the NGINX config and show up on the NGINX Plus Dashboard.
