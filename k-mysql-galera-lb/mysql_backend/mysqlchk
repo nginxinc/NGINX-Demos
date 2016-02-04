@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+# This script checks if a mysql server is healthy running on localhost. It will
+# return:
+#
+# "HTTP/1.x 200 OKr" (if mysql is running smoothly)
+#
+# - OR -
+#
+# "HTTP/1.x 500 Internal Server Errorr" (else)
+#
+# The purpose of this script is to make NGINX capable of monitoring mysql properly
+
+MYSQL_HOST="localhost"
+MYSQL_PORT="3306"
+MYSQL_USERNAME="root"
+
+TMP_FILE="/tmp/mysqlchk.out"
+ERR_FILE="/tmp/mysqlchk.err"
+
+#
+# We perform a simple query that should return a few results :-p
+#
+/usr/bin/mysql --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME -e"show databases;" > $TMP_FILE 2> $ERR_FILE
+
+#
+# Check the output. If it is not empty then everything is fine and we return
+# something. Else, we just do not return anything.
+#
+if [ "$(/bin/cat $TMP_FILE)" != "" ]
+then
+# mysql is fine, return http 200
+/bin/echo -e "HTTP/1.1 200 OKrn"
+/bin/echo -e "Content-Type: text/plainrn"
+/bin/echo -e "rn"
+/bin/echo -e "MySQL is running.rn"
+/bin/echo -e "rn"
+else
+# mysql is fine, return http 503
+/bin/echo -e "HTTP/1.1 503 Service Unavailablern"
+/bin/echo -e "Content-Type: text/plainrn"
+/bin/echo -e "rn"
+/bin/echo -e "MySQL is *down*.rn"
+/bin/echo -e "rn"
+fi

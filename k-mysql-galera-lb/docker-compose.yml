@@ -1,0 +1,25 @@
+nginxplus:
+  build: ./nginxplus
+  container_name: nginxplus
+  volumes:
+  - "./nginxplus/conf:/etc/nginx"
+  ports:
+  - "3306:3306"
+  - "8080:8080"
+  - "9200:9200"
+
+mysqld1:
+  build: ./mysql_backend
+  container_name: mysqld1
+  command: --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://
+  ports:
+  - "3307:3306"
+  - "9201:9200"
+
+mysqld2:
+  build: ./mysql_backend
+  container_name: mysqld2
+  command: --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://mysqld1
+  ports:
+  - "3308:3306"
+  - "9202:9200"
