@@ -6,6 +6,8 @@
 
 * **etcd-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with etcd for service discovery. It uses the upstream_conf API in NGINX Plus to add the servers registered with etcd and remove the ones which get deregistered without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on etcd data using a simple bash script and 'etcdctl exec-watch'.
 
+* **mysql-galera-demo**: This demo uses NGINX Plus as a TCP load balancer for a MySQL Galera cluster consisting of two mysqld servers. It does round-robin load balancing between the 2 mysqld servers and also does active health checks using an xinetd script running on port 9200 inside each mysqld container.
+
 * **random-files**: Demo to show random content and upstream_conf. Nick to add more description here
 
 All of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
