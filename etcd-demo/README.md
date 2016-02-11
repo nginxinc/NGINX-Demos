@@ -5,10 +5,8 @@ up the following containers:
 
 * [etcd](https://github.com/coreos/etcd) for service discovery
 * [Registrator](https://github.com/gliderlabs/registrator) to register services with etcd. Registrator monitors for containers being started and stopped and updates key-value pairs in etcd when a container changes state.
-* [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) is a simple hello world container to simulate a service
-* [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) a second simple hello world container to simulate another service
+* [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as a NGINX webserver that serves a simple page containing its hostname, IP address and port to simulate backend servers
 * and of course [NGINX Plus](http://www.nginx.com/products) R8
-
 The demo is based off the work described in this blog post (to be written :P)
  
 ## Setup Options:
@@ -148,19 +146,19 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
 1. You should have a bunch of containers up and running now:
     ```
     $ docker ps
-    CONTAINER ID        IMAGE                             COMMAND                  CREATED             STATUS              PORTS                                                                NAMES
-47d47fd55c35        tutum/hello-world:latest          "/bin/sh -c 'php-fpm "   2 minutes ago       Up 2 minutes        0.0.0.0:8081->80/tcp                                                 service1
-29e056bc93f8        google/golang-hello:latest        "/bin/go-run"            2 minutes ago       Up 2 minutes        0.0.0.0:8082->8080/tcp                                               service2
-022c7daded6e        gliderlabs/registrator:latest     "/bin/registrator etc"   3 minutes ago       Up 3 minutes                                                                             registrator
-8f106b666703        ketcdwithupstreamconf_nginxplus   "nginx -g 'daemon off"   3 minutes ago       Up 3 minutes        0.0.0.0:80->80/tcp, 443/tcp, 0.0.0.0:8080->8080/tcp                  nginxplus
-b2e990528008        quay.io/coreos/etcd:v2.0.8        "/etcd -name etcd0 -a"   3 minutes ago       Up 3 minutes        0.0.0.0:2379-2380->2379-2380/tcp, 7001/tcp, 0.0.0.0:4001->4001/tcp   etcd
+    CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                                NAMES
+26544538c3ec        nginxdemos/hello:latest         "nginx -g 'daemon off"   2 hours ago         Up 2 hours          443/tcp, 0.0.0.0:8081->80/tcp                                        service1
+27abd73b4621        nginxdemos/hello:latest         "nginx -g 'daemon off"   2 hours ago         Up About an hour    443/tcp, 0.0.0.0:8082->80/tcp                                        service2
+9b976338829b        etcddemo_nginxplus              "nginx -g 'daemon off"   2 hours ago         Up 2 hours          0.0.0.0:80->80/tcp, 443/tcp, 0.0.0.0:8080->8080/tcp                  nginxplus
+d9806ab06d05        gliderlabs/registrator:latest   "/bin/registrator etc"   2 hours ago         Up 2 hours                                                                               registrator
+8f8f1c80c7e4        quay.io/coreos/etcd:v2.0.8      "/etcd -name etcd0 -a"   2 hours ago         Up 2 hours          0.0.0.0:2379-2380->2379-2380/tcp, 0.0.0.0:4001->4001/tcp, 7001/tcp   etcd
     ```
 
 1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. Make sure you set the HOST_IP in both the scripts (etcd_exec_watch.sh & script.sh) to the IP of your Vagrant VM or the VM you ran the ansible playbook directly on. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
 
 1. Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with etcd you could do a `curl http://$HOST_IP:4001/v2/keys | jq '.'`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers. **We are also using the persistent on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**
 
-1. Now spin up two more containers named service3 and service4 which are the same [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) and [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
+1. Now spin up two more containers named service3 and service4 which use the same [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
      ```
      $ docker-compose -f add-services.yml up -d
      ```
