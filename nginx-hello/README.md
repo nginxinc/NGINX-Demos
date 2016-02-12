@@ -1,8 +1,6 @@
 
 # NGINX webserver that serves a simple page containing its hostname, IP address and port.
 
-The image is uploaded to Docker Hub -- https://hub.docker.com/r/nginxdemos/hello/
-
 How to run:
 ```
 $ docker run -P -d nginxdemos/hello
@@ -37,4 +35,4 @@ and the value of an address by combining [server_addr](http://nginx.org/en/docs/
 [server_port](http://nginx.org/en/docs/http/ngx_http_core_module.html#var_server_port) variables.
 
 
-The image was created to be used as a simple backend for various load balancing demos.
+The image was created to be used as a simple backend for various load balancing [demos](https://github.com/nginxinc/NGINX-Demos).
