@@ -93,11 +93,13 @@ http://www.vagrantup.com/downloads
 
 #### Prerequisites and Required Software
 
-The following software needs to be installed on your laptop:
+The following section assumes you are running on Mac OSX. The following software needs to be installed on your machine:
 
-* [Docker Toolbox](https://www.docker.com/docker-toolbox)
+* [Docker Toolbox](https://www.docker.com/docker-toolbox) if running on OSX
 * [docker-compose](https://docs.docker.com/compose/install). I used [Homebrew](http://brew.sh) to install it: `brew install docker-compose`
 * [jq](https://stedolan.github.io/jq/), I used [brew](http://brew.sh) to install it: `brew install jq`
+* [etcdctl](https://github.com/coreos/etcd/tree/master/etcdctl) is a command line client for etcd. Follow the steps under 'Getting etcdctl' section and and copy over etcdctl executable under /usr/local/bin
+
 As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be copied into the `nginxplus/` directory
 
 #### Setting up the demo
