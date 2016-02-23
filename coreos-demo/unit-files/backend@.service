@@ -1,0 +1,16 @@
+
+[Unit]
+Description=Backend Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill backend
+ExecStartPre=-/usr/bin/docker rm backend
+ExecStartPre=/usr/bin/docker pull nginxdemos/hello
+ExecStart=/usr/bin/docker run --name backend -p 8080:80 nginxdemos/hello
+ExecStop=/usr/bin/docker stop backend
+
+[X-Fleat]
+Conflicts=backend@*.service

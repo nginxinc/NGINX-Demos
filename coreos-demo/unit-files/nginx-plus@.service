@@ -1,0 +1,14 @@
+[Unit]
+Description=NGINX Load Balancer 
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill nginx-loadbalancer
+ExecStartPre=-/usr/bin/docker rm nginx-loadbalancer
+ExecStart=/usr/bin/docker run --name nginx-loadbalancer -p 80:80 nginxplus
+ExecStop=/usr/bin/docker stop nginx-loadbalancer
+
+[X-Fleat]
+Conflicts=nginx-loadbalancer@*.service

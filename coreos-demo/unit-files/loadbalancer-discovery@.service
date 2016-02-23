@@ -1,0 +1,42 @@
+[Unit]
+Description=Load Balancer Discovery Service
+BindsTo=loadbalancer@%i.service
+After=loadbalancer@%i.service
+
+[Service]
+EnvironmentFile=/etc/environment
+
+ExecStartPre=/bin/bash -c 'NGINX_ENDPOINT=127.0.0.1:8081; \
+SERVERS=$(etcdctl ls /services/backend --recursive | awk -F/ '\''{print $NF}'\''); \
+for s in $SERVERS; \
+do \
+   curl "$NGINX_ENDPOINT/upstream_conf?upstream=backend&add=&server=$s"; \
+done'
+
+ExecStart=/usr/bin/etcdctl exec-watch --recursive /services/backend -- /bin/bash -c 'NGINX_ENDPOINT=127.0.0.1:8081; \
+SERVER=$(echo $ETCD_WATCH_KEY | awk -F/ '\''{print $NF}'\''); \
+\
+function get_server_id () { \
+  ID=$(curl -s "$NGINX_ENDPOINT/upstream_conf?upstream=backend" | awk -v server="$SERVER;" '\''$2==server { print $4 }'\''); \
+  echo $ID; \
+}; \
+\
+if [ $ETCD_WATCH_ACTION == '\''set'\'' ]; \
+then \
+  echo "Adding $SERVER server"; \
+  ID=$(get_server_id); \
+  if [ -z $ID ]; \
+  then \
+    curl -s "$NGINX_ENDPOINT/upstream_conf?upstream=backend&add=&server=$SERVER"; \
+  fi \
+elif [ $ETCD_WATCH_ACTION == '\''delete'\'' ] || [ $ETCD_WATCH_ACTION == '\''expire'\'' ]; \
+then \
+  echo "Removing $SERVER server"; \
+  ID=$(get_server_id); \
+  echo "Server has $ID"; \
+  curl -s "$NGINX_ENDPOINT/upstream_conf?upstream=backend&remove=&$ID"; \
+fi'
+ExecStop=
+
+[X-Fleet]
+MachineOf=loadbalancer@%i.service

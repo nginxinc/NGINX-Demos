@@ -1,0 +1,15 @@
+[Unit]
+Description=Load Balancer Service 
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill loadbalancer
+ExecStartPre=-/usr/bin/docker rm loadbalancer
+ExecStart=/usr/bin/docker run --name loadbalancer -p 80:80 -p 8081:8081 nginxplus-coreos
+ExecStop=/usr/bin/docker stop loadbalancer
+
+[X-Fleat]
+Conflicts=loadbalancer@*.service
+Conflicts=backend@*.service
