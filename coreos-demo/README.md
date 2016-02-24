@@ -1,5 +1,11 @@
 # Load Balancing Applications with NGINX Plus in a CoreOS Cluster
 
+**Note**: To run the demo, you don't have to use Vagrant. Copy the template unit files to each machine of 
+your CoreOS cluster,
+and also make the NGINX Plus Docker image available on each machine.
+
+See the [blog post]() for more details.
+
 ## Prerequisites
 
 The following software must be installed on your machine:
@@ -53,7 +59,7 @@ You must also have an NGINX Plus license. If you don’t have one, you can sign 
 
 ## Demo
 
-You can find more details about the demo in the [blog post]().
+Full demo instructions are available in the [blog post]().
 
 Unit files are located in the ```/home/core/unit-files``` folder.
 

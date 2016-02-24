@@ -6,7 +6,7 @@ After=backend@%i.service
 [Service]
 EnvironmentFile=/etc/environment
 
-ExecStart=/bin/sh -c "while true; do etcdctl set /services/backend/${COREOS_PRIVATE_IPV4}:8080 server --ttl 120; sleep 100; done"
+ExecStart=/bin/sh -c "while true; do etcdctl set /services/backend/${COREOS_PRIVATE_IPV4}:8080 lazy-unicorn --ttl 120; sleep 100; done"
 ExecStop=/usr/bin/etcdctl rm /services/backend/${COREOS_PRIVATE_IPV4}:8080
 
 [X-Fleet]
