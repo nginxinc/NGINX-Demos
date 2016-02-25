@@ -10,6 +10,9 @@
 
 * **random-files**: Demo to show random content and upstream_conf. Nick to add more description here
 
+* **coreos-demo**: Shows how to use NGINX Plus to load balance an application running in a CoreOS cluster, 
+utilizing *fleet* and *etcd*.
+
 All of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
 
 ## Prerequisites for Vagrant/Ansible deploymnets
