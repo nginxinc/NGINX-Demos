@@ -1,12 +1,23 @@
 # Load Balancing Applications with NGINX Plus in a CoreOS Cluster
 
-**Note**: To run the demo, you don't have to use Vagrant. Copy the template unit files to each machine of 
-your CoreOS cluster,
-and also make the NGINX Plus Docker image available on each machine.
+The demo shows how to load balance a web application running in a CoreOS cluster
+with NGINX Plus.
 
-See the [blog post]() for more details.
+To run the demo you need have a CoreOS cluster:
 
-## Prerequisites
+* You can use our automated Vagrant setup, described below, to create a CoreOS cluster locally. Each machine will have the required files copied to it and be ready for the demo.
+* Run the demo in your existing CoreOS cluster. Make sure:
+  * The cluster has at least 4 machines
+  * To copy the template unit files to one of the machine of
+  your CoreOS cluster
+  * To have the NGINX Plus Docker image available on *each* machine.
+
+
+The project accompanies the [blog post](https://www.nginx.com/blog/load-balancing-applications-nginx-plus-coreos-cluster/) that provides more details and instructions.
+
+## Automated Vagrant Setup
+
+### Prerequisites
 
 The following software must be installed on your machine:
 
@@ -15,9 +26,10 @@ The following software must be installed on your machine:
 
 You must also have an NGINX Plus license. If you don’t have one, you can sign up for a [free 30-day trial](https://www.nginx.com/#free-trial).
 
-**Note**: The demo creates 4 virtual machines with 1GB of RAM each.
 
-## Setup
+Please note that the demo creates 4 virtual machines with 1GB of RAM each.
+
+### Setting Up Cluster
 
 1. Clone the repo:
   ```
@@ -42,12 +54,18 @@ You must also have an NGINX Plus license. If you don’t have one, you can sign 
   ```
   A cluster with 4 machines will be created. This step might take a while. As you might notice from the output, we make the NGINX Plus Docker image available on each machine by building the image on each machine.
 
-1. Let's ssh into the first machine:
+
+1. Add the Vagrant key to the ssh-agent:
   ```
-  $ vagrant ssh core-01
+  $ ssh-add ~/.vagrant.d/insecure_private_key
   ```
 
-1. Let's make sure that each machine is up and running:
+1. Ssh into the first machine:
+  ```
+  $ vagrant ssh core-01 -- -A
+  ```
+
+1. Make sure that each machine is up and running:
   ```
   $ fleetctl list-machines
   MACHINE		IP		METADATA
@@ -57,11 +75,11 @@ You must also have an NGINX Plus license. If you don’t have one, you can sign 
   f7672f06...	172.17.8.103	-
   ```
 
-## Demo
+## Running the Demo
 
-Full demo instructions are available in the [blog post]().
+**Note**: This is a short version of the demo. The full version is available in the [blog post](https://www.nginx.com/blog/load-balancing-applications-nginx-plus-coreos-cluster/).
 
-Unit files are located in the ```/home/core/unit-files``` folder.
+In our Vagrant setup unit files are located in the ```/home/core/unit-files``` folder.
 
 1. We've already sshed into the first machine. Let's go to the ```unit-files``` folder:
   ```
@@ -132,5 +150,5 @@ We got the response from one of the backends.
 
 ## Links
 
-1. For more information about the demo see the [blog post]().
+1. For more information about the demo see the [blog post](https://www.nginx.com/blog/load-balancing-applications-nginx-plus-coreos-cluster/).
 1. For details on how to create a CoreOS cluster with Vargant, see [CoreOS documentation](https://coreos.com/blog/coreos-clustering-with-vagrant/).
