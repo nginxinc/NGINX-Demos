@@ -1,0 +1,278 @@
+#!/usr/bin/env ruby
+
+require 'thor'
+require 'zk'
+
+class ZkAgent
+  def initialize
+    host = ENV['ZK_HOST'] ? ENV['ZK_HOST'] : 'localhost:2181'
+    zk = ZK.new(host)
+    yield zk
+  end
+end
+
+
+class ChildrenWatcher
+  attr_accessor :zk, :path, :rewatch_on_deletion, :initial_exists_watch_set, :ignore_events, :debug
+
+  def initialize(zk, path, rewatch_on_deletion)
+    @zk = zk
+    @path = path
+    @rewatch_on_deletion = rewatch_on_deletion
+    @initial_initial_exists_watch_set = false
+    @debug = false
+    @ignore_events = false
+  end
+
+  def yield_children(blk, set_watch)
+    puts "in yield_children. ignore_events is: #{ignore_events}" if debug
+    blk.call([path, zk.children(path, :watch => set_watch)]) unless ignore_events
+  end
+
+  def do_we_rewatch?
+    (rewatch_on_deletion && !ignore_events)
+  end
+
+  def watch(&blk)
+    ev_sub = zk.register(path) do |event|
+      if event.node_created?
+        puts "#{path} node_created?" if debug
+        yield_children(blk, true)
+      elsif event.node_changed?
+        puts "#{path} node_created?" if debug
+        # we dont need to watch. this is already done
+        yield_children(blk, false)
+      elsif event.node_child?
+        puts "#{path} node_child?" if debug
+        yield_children(blk, true)
+      elsif event.node_deleted?
+        puts "#{path} node_deleted?" if debug
+        if do_we_rewatch?
+          puts "re-watching for existence...." if debug
+          zk.exists?(path, :watch => do_we_rewatch?) 
+        end
+      elsif event.session_event?
+        puts "WE GOT A SESSION EVENT!!!!, dont know what to do here...?" if debug
+      else
+        puts "yolo got a very odd event: #{event.class::EVENT_MAP[event.type]}." if debug
+      end
+    end
+    unless zk.exists?(path)
+      if do_we_rewatch?
+        puts "path does not exist, we're going to watch it now." if debug
+        zk.exists?(path, :watch => true)
+      else
+        puts "path does not initially exist. Do not watch because we dont care that much." if debug
+      end
+    else
+      puts "path exists, initial watch on children...." if debug
+      yield_children(blk, true)
+    end
+  end
+end
+
+
+# Straight out of the zk gems example dir, with tweaks
+class BlockUntilNodeDeleted
+  attr_reader :zk
+
+  def initialize(zk, path)
+    @zk = zk
+    @path = path
+  end
+
+  def block_until_node_deleted
+    queue = Queue.new
+    # Register a callback function for the path
+    ev_sub = zk.register(@path) do |event|
+      # If callback event is a node deletion, then push to the queue unblocking the function
+      if event.node_deleted?
+        queue.enq(:deleted) 
+      else
+        # we have a node event. Check if the node exists, while re-setting a watch event.
+        # remember, there is a race here where the node might change. between re-watching...
+        if zk.exists?(@path, :watch => true)
+          # if its a node change event, print.
+          if event.node_changed?
+            puts "Node changed: '#{zk.get(@path)[0]}'"
+          end
+        else
+          # The node actually doesn't exist, even if the event is not a node deleted event,
+          # we check if the node exists for re-watching, so handle the case in which the node
+          # was deleted
+          queue.enq(:deleted) 
+        end
+      end
+    end
+    # set up the callback, but bail if we don't need to wait
+    unless zk.exists?(@path, :watch => true)  
+      puts "Node does not exist"
+      return false 
+    end
+    queue.pop # block waiting for node deletion
+    puts "Node has been deleted."
+    true
+  ensure
+    ev_sub.unsubscribe
+  end
+
+  def run
+    waiter = Thread.new do
+      puts "Watching node '#{@path}' for changes or deletion"
+      block_until_node_deleted
+    end
+    waiter.join
+  end
+end
+
+class ZkTool < Thor
+
+  GENERIC_LONG_DESC = 'The $ZK_HOST env variable is the host:port for the zk connection.'
+
+  no_tasks do
+
+    # Helper method to print znodes
+    def print_children(path, indent_size)
+      indent = "--" * indent_size
+      begin
+        #puts "#{indent}#{path} data: #{@zk.get(path)[0]}"
+        puts "#{@zk.get(path)[0]}"
+        children = @zk.children(path) #.each do |child_path|
+        unless children.empty?
+          puts "#{indent}#{path} has #{children.size} children"
+          children.each do |child|
+            if path != '/'
+              child_path = "#{path}/#{child}"
+            else
+              child_path = "/#{child}"
+            end
+            print_children(child_path, indent_size+1)
+          end
+        end
+      rescue ZK::Exceptions::NoNode
+
+      end
+    end	
+
+    # Helper method to delete znodes
+    def delete_node(path, force = false)
+      while true
+        begin
+          @zk.delete(path)
+          puts "Deleted #{path}"
+        rescue ZK::Exceptions::NotEmpty
+          # Catch node exists, walk lower, call delete_node w/ args on it. 
+          # This will recursively delete nodes under a path.
+          if force
+            children = @zk.children(path)
+            children.each do |child_path|
+              delete_node("#{path}/#{child_path}", force)
+            end
+          else
+            puts "ERROR: Cannot delete #{path} as it is not empty. Delete with force to recursively delete"
+            break
+          end
+        rescue ZK::Exceptions::NoNode
+          # break the while loop if no node is reported
+          break
+        end
+      end
+    end
+
+    def workaround_paths(path)
+      # workaround paths w/ trailing /
+      if path[-1] == '/'
+        unless path == '/'
+          path[0..-2]
+        end
+        path
+      end
+      path
+    end
+  end
+
+  desc 'list PATH', 'List zookeeper heirarchy at given PATH'
+  long_desc GENERIC_LONG_DESC
+  def list(path)
+    path = workaround_paths(path)
+    ZkAgent.new do |zk|
+      @zk = zk
+      print_children(path, 1)
+    end
+  end
+
+  desc 'delete PATH', 'Delete a znode at a given path. This will error if the znode has children, but can recursively delete with -f'
+  long_desc GENERIC_LONG_DESC
+  method_option :force, :aliases => '-f', :type => :boolean, :optional => true, :default => false, :desc => "Forcefully delete this znode and all children"
+  def delete(path)
+    path = workaround_paths(path)
+    ZkAgent.new do |zk|
+      @zk = zk
+      delete_node(path, options[:force])
+    end
+  end
+
+  desc 'set PATH', 'Set a znodes data at a given path.'
+  long_desc GENERIC_LONG_DESC
+  method_option :data, :aliases => '-d', :type => :string, :required => true, :default => nil, :desc => "The data for this znode as a string."
+  def set(path)
+    path = workaround_paths(path)
+    ZkAgent.new do |zk|
+      @zk = zk
+      @zk.set(path, options[:data])
+    end
+  end
+
+  desc 'create PATH', 'Create a znode at the given PATH.'
+  long_desc GENERIC_LONG_DESC
+  method_option :data, :aliases => '-d', :type => :string, :required => true, :default => nil, :desc => "The data for this znode as a string."
+  method_option :ephemeral, :aliases => '-e', :type => :boolean, :optional => true, :default => false, :desc => "Mark this znode as ephemeral. This prevents children, and will block the CLI tool in an infinte sleep"
+  def create(path)
+    path = workaround_paths(path)
+    ZkAgent.new do |zk|
+      begin
+        path = zk.create(path, ephemeral: options[:ephemeral]) 
+        if !options[:data].nil?
+          zk.set(path, options[:data])
+        end
+        puts "Created #{path} as ephemeral=#{options[:ephemeral].to_s} with data: #{options[:data]}"
+        if options[:ephemeral] == true
+          puts "Sleeping forever"
+          while true
+            sleep 1
+          end
+        end
+      rescue ZK::Exceptions::NodeExists
+        puts "ERROR: Node exists at path: #{path}"
+      end
+    end
+  end
+
+  desc 'watch PATH', "Watch a path. print when it changes, and return when it is deleted."
+  def watch(path)
+    ZkAgent.new do |zk|
+      BlockUntilNodeDeleted.new(zk, path).run
+    end
+  end
+
+  desc 'watch-children PATH', "Watch a path. print when it changes, and return when it is deleted."
+  def watch_children(path)
+    ZkAgent.new do |zk|
+      cw = ChildrenWatcher.new(zk, path, true)
+      q = Queue.new
+      cw.watch do |things|
+        puts Time.now.to_s
+        things.last.each do |child_path|
+          #puts "#{path}/#{child_path}"
+        end
+        puts "============================"
+	system("/bin/bash script.sh")
+	puts "============================"
+      end
+      q.pop
+    end
+  end
+
+end
+
+ZkTool.start

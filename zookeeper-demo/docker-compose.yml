@@ -1,0 +1,31 @@
+nginxplus:
+  build: ./nginxplus
+  container_name: nginxplus
+  links:
+  - zookeeper
+  ports:
+  - "80:80"
+  - "8080:8080"
+
+zookeeper:
+  build: ./zookeeper
+  container_name: zookeeper
+  ports:
+  - "2181:2181"
+  - "2888:2888"
+  - "3888:3888"
+  - "9998:9998"
+  environment:
+    ZK_DATADIR: /var/log/zookeeper
+  environment:
+  - HOST_IP
+
+registrator:
+  command: zookeeper://zookeeper:2181/services
+  image: gliderlabs/registrator:master
+  container_name: registrator
+  links:
+  - zookeeper
+  volumes:
+  - "/var/run/docker.sock:/tmp/docker.sock"
+
