@@ -10,86 +10,6 @@ up the following containers:
 
 The demo is based off the work described in this blog post: [Service Discovery with NGINX Plus and Zookeeper](To be added)
  
-## Setup Options:
-
-### Fully automated Vagrant/Ansible setup:
-
-Install Vagrant using the necessary package for your OS:
-
-http://www.vagrantup.com/downloads
-
-1. Install provider for vagrant to use to start VM's.  
-
-     The default provider is VirtualBox [Note that only VirtualBox versions 4.0, 4.1, 4.2, 4.3 are supported], which can be downloaded from the following link:
-
-     https://www.virtualbox.org/wiki/Downloads
-
-     A full list of providers can be found at the following page, if you do not want to use VirtualBox:
-
-     https://docs.vagrantup.com/v2/providers/
-
-1. Install Ansible:
-
-     http://docs.ansible.com/ansible/intro_installation.html
-
-1. Clone demo repo
-
-     ```$ git clone git@github.com:nginxinc/NGINX-Demos.git```
-
-1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/ansible/files/```
-
-1. Move into the zookeeper-demo directory and start the Vagrant vm:
-
-     ```
-     $ cd ~/NGINX-Demos/zookeeper-demo
-     $ vagrant up
-     ```
-     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_zookeeper_demo.yml
-
-1. SSH into the newly created virtual machine and move into the /vagrant directory which contains the demo files:
-
-     ```
-     $ vagrant ssh
-     $ sudo su
-     $ cd /vagrant
-     ```
-
-1. Now simply follow the steps listed under section 'Running the demo'.
-
-
-### Ansible only deployment
-
-1. Create Ubuntu 14.04 VM
-
-1. Install Ansible on Ubuntu VM
-
-     ```
-     $ sudo apt-get install ansible
-     ```
-
-1. Clone demo repo into ```/srv``` on Ubuntu VM:
-
-     ```
-     $ cd /srv
-     $ sudo git clone git@github.com:nginxinc/NGINX-Demos.git
-     ```
-
-1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/NGINX-Demos/ansible/files/```
-
-1. Move into the zookeeper-demo directory which contains the demo files and set HOST_IP on line 5 in script.sh to the IP of your Ubuntu VM on which NGINX Plus will be listening.
-     ```
-     $ cd /srv/NGINX-Demos/zookeeper-demo
-     ```
-
-1. Run the ansible playbook against localhost on Ubuntu VM:
-
-     ```
-     $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_zookeeper_demo.yml
-     ```
-
-1. Now simply follow the steps listed under section 'Running the demo'.
-
-
 ### Manual Install
 
 #### Prerequisites and Required Software
@@ -130,12 +50,18 @@ The following software needs to be installed on your laptop:
      $ docker-compose up -d
      ```
 
-1. Execute the following `docker exec` command to start the 'zk-tool watch-children /services' command inside the Zookeeper container. This keeps watching for any change (additions/deletions under the /services path) and executes script.sh whenever a change is detected
+1. Now cd into zookeeper directoy and execute the following `docker exec` command 'zk-tool create /services -d abc' command to create a dummy Znode under /services path
      ```
-     docker exec -ti zookeeper ./zk-tool watch-children /services
+     $ cd zookeeper
+     $ docker exec -ti zookeeper ./zk-tool create /services -d abc
      ```
 
-1. Spin up the two hello-world containers which will act as NGINX Plus upstreams
+1. Execute the following `docker exec` command 'zk-tool watch-children /services' command to watch for changes (additions/deletions under the /services path). This executes script.sh whenever a change is detected
+     ```
+     $ docker exec -ti zookeeper ./zk-tool watch-children /services
+     ```
+
+1. Now in a different tab under the zookeeper-demo dir, spin up the two hello-world containers which will act as NGINX Plus upstreams
      ```
      $ docker-compose -f create-services.yml up -d
      ```
@@ -171,8 +97,8 @@ on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://
      $ docker stop service2 service4
      ```
 
-1. Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAG "production" or starting a stopped container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
+1. Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAGS "production" or starting a stopped container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
 
-1. The way this works is using [Watches](https://zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html#sc_zkDataMode_watches) feature of Zookeeper, eveytime there is a change in the list of services, a handler (script.sh) is invoked. This bash script gets the list of all Nginx Plus upstreams using its status and upstream_conf APIs, loops through all the containers registered with ZK which are tagged with SERVICE_TAG "production" using 'zk-tool list /services'. and adds them to the upstream group using upstream_conf API if not present already. It also removes the upstreams from Nginx upstream group which are not present in ZK. 
+1. The way this works is using [Watches](https://zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html#sc_zkDataMode_watches) feature of Zookeeper, eveytime there is a change in the list of services, a handler (script.sh) is invoked through zk-tool. This bash script gets the list of all Nginx Plus upstreams using its status and upstream_conf APIs, loops through all the containers registered with ZK which are tagged with SERVICE_TAG "production" using 'zk-tool list /services'. and adds them to the upstream group using upstream_conf API if not present already. It also removes the upstreams from Nginx upstream group which are not present in ZK. 
 
 All the changes should be automatically reflected in the NGINX config and show up on the NGINX Plus Dashboard.

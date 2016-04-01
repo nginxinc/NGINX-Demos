@@ -18,9 +18,7 @@ RUN wget -q -O - http://apache.mirrors.pair.com/zookeeper/zookeeper-3.4.8/zookee
     && cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg \
     && mkdir -p /tmp/zookeeper
 
-# Create the basepath (/entries) where the registrator would store the entries
-RUN mkdir -p /services
-# Copy over zk-tool 
+# Copy over zk-tool and script.sh 
 ADD zk-tool /opt/zookeeper/
 ADD script.sh /opt/zookeeper/
 
@@ -41,10 +39,8 @@ RUN gem install thor \
     && gem install zk
 
 EXPOSE 2181 2888 3888
-
 WORKDIR /opt/zookeeper
 
 VOLUME ["/opt/zookeeper/conf", "/tmp/zookeeper"]
-
 ENTRYPOINT ["/opt/zookeeper/bin/zkServer.sh"]
 CMD ["start-foreground"]

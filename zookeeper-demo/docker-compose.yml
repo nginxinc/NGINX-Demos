@@ -14,7 +14,7 @@ zookeeper:
   - "2181:2181"
   - "2888:2888"
   - "3888:3888"
-  - "9998:9998"
+  - "9888:9888"
   environment:
     ZK_DATADIR: /var/log/zookeeper
   environment:
