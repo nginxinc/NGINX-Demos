@@ -5,8 +5,7 @@ up the following containers:
 
 * [Consul](http://www.consul.io) for service discovery
 * [Registrator](https://github.com/gliderlabs/registrator) to register services with Consul.  Registrator monitors for containers being started and stopped and updates Consul when a container changes state.
-* [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) is a simple hello world container to simulate a service
-* [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) a second simple hello world container to simulate another service
+* [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as a NGINX webserver that serves a simple page containing its hostname, IP address and port to simulate backend servers
 * and of course [NGINX Plus](http://www.nginx.com/products) (R8 or higher)
 
 The demo is based off the work described in this blog post: [Service Discovery with NGINX Plus and Consul](https://www.nginx.com/blog/service-discovery-with-nginx-plus-and-consul/)
@@ -151,20 +150,20 @@ The following software needs to be installed on your laptop:
 
      ```
      $ docker ps
-     CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                                                                                                NAMES
-     4b9fbae59e75        tutum/hello-world:latest        "/bin/sh -c 'php-fpm "   15 seconds ago      Up 14 seconds       0.0.0.0:8081->80/tcp                                                                                                                 service1
-     c93a8d1b2c7f        google/golang-hello:latest      "/bin/go-run"            15 seconds ago      Up 14 seconds       0.0.0.0:8082->8080/tcp                                                                                                               service2
-     8149e12fb77c        consuldemo_nginxplus            "nginx -g 'daemon off"   54 seconds ago      Up 53 seconds       0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp, 443/tcp                                                                                  nginxplus
-     04d0a6a4bfcc        gliderlabs/registrator:latest   "/bin/registrator con"   54 seconds ago      Up 53 seconds                                                                                                                                            registrator
-     76c4645a2338        progrium/consul:latest          "/bin/start -server -"   55 seconds ago      Up 54 seconds       53/tcp, 0.0.0.0:8300->8300/tcp, 0.0.0.0:8400->8400/tcp, 8301-8302/tcp, 0.0.0.0:8500->8500/tcp, 8301-8302/udp, 0.0.0.0:8600->53/udp   consul
+     CONTAINER ID        IMAGE                           COMMAND                  CREATED              STATUS              PORTS                                                                                                                                NAMES
+     6c6c1aced828        nginxdemos/hello:latest         "nginx -g 'daemon off"   About a minute ago   Up 58 seconds       443/tcp, 0.0.0.0:8081->80/tcp                                                                                                        service1
+     9ee68cf9e14c        nginxdemos/hello:latest         "nginx -g 'daemon off"   About a minute ago   Up 59 seconds       443/tcp, 0.0.0.0:8082->80/tcp                                                                                                        service2
+     d860c3be16d6        consuldemo_nginxplus            "nginx -g 'daemon off"   7 minutes ago        Up 7 minutes        0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp, 443/tcp                                                                                  nginxplus
+     bee08a6837c2        gliderlabs/registrator:latest   "/bin/registrator con"   7 minutes ago        Up 7 minutes                                                                                                                                             registrator
+     5119a8418b88        progrium/consul:latest          "/bin/start -server -"   7 minutes ago        Up 7 minutes        53/tcp, 0.0.0.0:8300->8300/tcp, 0.0.0.0:8400->8400/tcp, 8301-8302/tcp, 0.0.0.0:8500->8500/tcp, 8301-8302/udp, 0.0.0.0:8600->53/udp   consul
      ```
 
 1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. Make sure you set the HOST_IP in script.sh to the IP of your Vagrant VM or the VM you ran the ansible playbook directly on. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
 
-1. Go to `http://<HOST_IP>` in your favorite browser window and the main index.html with 'Welcome to nginx!' should pop up. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. Going to `http://<HOST_IP>/service` will take you to one of the two hello world containers. **We are also using the persistent 
+1. Go to `http://<HOST_IP>` in your favorite browser window and that will take you to one of the nginx-hello containers printing its hostname, IP Address and the port of the container. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. **We are also using the persistent 
 on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**
 
-1. Now spin up two more containers named service3 and service4 which are the same [tutum/hello-world](https://registry.hub.docker.com/u/tutum/hello-world/) and [google/golang-hello](https://registry.hub.docker.com/u/google/golang-hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
+1. Now spin up two more containers named service3 and service4 which use the same [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
      ```
      $ docker-compose -f add-services.yml up -d
      ```

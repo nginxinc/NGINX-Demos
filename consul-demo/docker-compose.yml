@@ -8,7 +8,7 @@ nginxplus:
   - "8080:8080"
 
 consul:
-  command: -server -bootstrap -node consul -advertise 10.0.2.15 -config-file /etc/consul.d/config.json
+  command: "-server -bootstrap -node consul -advertise 10.0.2.15 -config-file /etc/consul.d/config.json"
   image: progrium/consul:latest
   container_name: consul
   ports:

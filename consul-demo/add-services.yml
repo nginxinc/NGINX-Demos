@@ -1,19 +1,17 @@
 service3:
-  image: tutum/hello-world:latest
+  image: nginxdemos/hello:latest
   container_name: service3
-  environment:
-    SERVICE_80_NAME: http
+  labels:
     SERVICE_NAME: service3
     SERVICE_TAGS: production
   ports:
   - "8083:80"
 
 service4:
-  image: google/golang-hello:latest
+  image: nginxdemos/hello:latest
   container_name: service4
-  environment:
-    SERVICE_80_NAME: http
+  labels:
     SERVICE_NAME: service4
     SERVICE_TAGS: production
   ports:
-  - "8084:8080"
+  - "8084:80"
