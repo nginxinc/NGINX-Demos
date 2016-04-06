@@ -8,7 +8,7 @@ nginxplus:
   - "8080:8080"
 
 etcd:
-  command: -name etcd0 -advertise-client-urls http://10.0.2.15:2379,http://10.0.2.15:4001 -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 -initial-advertise-peer-urls http://10.0.2.15:2380 -listen-peer-urls http://0.0.0.0:2380 -initial-cluster-token etcd-cluster-1 -initial-cluster etcd0=http://10.0.2.15:2380
+  command: "-name etcd0 -advertise-client-urls http://${HOST_IP}:2379,http://${HOST_IP}:4001 -listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 -initial-advertise-peer-urls http://${HOST_IP}:2380 -listen-peer-urls http://0.0.0.0:2380 -initial-cluster-token etcd-cluster-1 -initial-cluster etcd0=http://${HOST_IP}:2380"
   image: quay.io/coreos/etcd:v2.0.8
   container_name: etcd
   ports:
