@@ -4,14 +4,20 @@
 
 * **consul-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with Consul, a service discovery platform. It uses the upstream_conf API in NGINX Plus to add the servers registered with Consul and remove the ones which get deregistered without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on Consul data using a simple bash script and Consul watches.
 
+* **consul-dns-srv-demo**: This demo shows how to use Consul's DNS interface for load balancing with NGINX Plus. It uses the DNS SRV records using the "service" parameter for the [server](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server) directive of http upstream module and DNS lookups over TCP feature introduced in NGINX Plus R9. This means that NGINX Plus can now ask for the SRV record (port,weight etc) in the DNS query and also switch the DNS query over TCP automatically if it receives a truncated DNS response over UDP.
+
+* **coreos-demo**: Shows how to use NGINX Plus to load balance an application running in a CoreOS cluster, 
+utilizing *fleet* and *etcd*.
+
 * **etcd-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with etcd for service discovery. It uses the upstream_conf API in NGINX Plus to add the servers registered with etcd and remove the ones which get deregistered without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on etcd data using a simple bash script and 'etcdctl exec-watch'.
 
 * **mysql-galera-demo**: This demo uses NGINX Plus as a TCP load balancer for a MySQL Galera cluster consisting of two mysqld servers. It does round-robin load balancing between the 2 mysqld servers and also does active health checks using an xinetd script running on port 9200 inside each mysqld container.
 
+* **nginx-hello**: NGINX running as webserver in a docker container that serves a simple page containing the container's hostname, IP address and port
+
 * **random-files**: Demo to show random content and upstream_conf. Nick to add more description here
 
-* **coreos-demo**: Shows how to use NGINX Plus to load balance an application running in a CoreOS cluster, 
-utilizing *fleet* and *etcd*.
+* **zookeeper-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with Apache Zookeeper for service discovery. It uses the upstream_conf API in NGINX Plus to dynamically add or remove the servers without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on Zookeeper data using a simple bash script and Zookeeper watches.
 
 All of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
 
