@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: knsync
+spec:
+  replicas: 1
+  selector:
+    app: knsync
+  template:
+    metadata:
+      labels:
+        app: knsync
+    spec:
+      containers:
+      - command: ["/run.sh", "http://nginxplus:8080"]
+        name: kubensync
+        image: gcr.io/<project-id>/knsync
