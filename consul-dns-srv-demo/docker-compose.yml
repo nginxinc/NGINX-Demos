@@ -15,8 +15,8 @@ consul:
   - "8300:8300"
   - "8400:8400"
   - "8500:8500"
+  - "8600:53"
   - "8600:53/udp"
-  - "8600:53/tcp"
   volumes:
   - "./consul_dns_config.json:/etc/consul.d/config.json"
   environment:
