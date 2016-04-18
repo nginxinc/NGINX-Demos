@@ -9,7 +9,87 @@ up the following containers:
 * and of course [NGINX Plus](http://www.nginx.com/products) R9 which adds support for DNS lookups over TCP & DNS SRV records
 
 The demo is based off the work described in this blog post: TBD
- 
+
+## Setup Options:
+
+### Fully automated Vagrant/Ansible setup:
+
+Install Vagrant using the necessary package for your OS:
+
+http://www.vagrantup.com/downloads
+
+1. Install provider for vagrant to use to start VM's.  
+
+     The default provider is VirtualBox [Note that only VirtualBox versions 4.0 and higher are supported], which can be downloaded from the following link:
+
+     https://www.virtualbox.org/wiki/Downloads
+
+     A full list of providers can be found at the following page, if you do not want to use VirtualBox:
+
+     https://docs.vagrantup.com/v2/providers/
+
+1. Install Ansible:
+
+     http://docs.ansible.com/ansible/intro_installation.html
+
+1. Clone demo repo
+
+     ```$ git clone https://github.com/nginxinc/NGINX-Demos.git```
+
+1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/ansible/files/```
+
+1. Move into the consul-dns-srv-demo directory and start the Vagrant vm:
+
+     ```
+     $ cd ~/NGINX-Demos/consul-dns-srv-demo
+     $ vagrant up
+     ```
+     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_consul_dns_srv_demo.yml. The ansible playbook file also invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile)
+
+1. SSH into the newly created virtual machine and move into the /vagrant directory which contains the demo files:
+
+     ```
+     $ vagrant ssh
+     $ sudo su
+     ```
+The demo files will be in /srv/NGINX-Demos/consul-dns-srv-demo
+
+1. Now simply follow the steps listed under section 'Running the demo'.
+
+
+### Ansible only deployment
+
+1. Create Ubuntu 14.04 VM 
+
+1. Install Ansible on Ubuntu VM
+
+     ```
+     $ sudo apt-get install ansible
+     ```
+
+1. Clone demo repo into ```/srv``` on Ubuntu VM:
+
+     ```
+     $ cd /srv
+     $ sudo git clone https://github.com/nginxinc/NGINX-Demos.git
+     ```
+
+1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/NGINX-Demos/ansible/files/```
+
+1. Move into the consul-dns-srv-demo directory which contains the demo files and make sure the IP address of your Ubuntu VM on which NGINX Plus will be listening is assigned to the ```eth1``` interface. If in case you need to use IP of another interface, replace ```eth1``` on line 6 of provision.sh with the corresponding interface name
+     ```
+     $ cd /srv/NGINX-Demos/consul-dns-srv-demo
+     ```
+
+1. Run the ansible playbook against localhost on Ubuntu VM:
+
+     ```
+     $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_dns_srv_demo.yml
+     ```
+
+1. Now simply follow the steps listed under section 'Running the demo'.
+
+
 ### Manual Install
 
 #### Prerequisites and Required Software
@@ -73,10 +153,10 @@ The following software needs to be installed on your laptop:
      $ docker-compose scale http=3
      ```
 
-1. We are using the SRV RR support for the "server" directive of http upstream module and DNS lookups over TCP feature introduced in NGINX Plus R9. This means that NGINX Plus can now ask for the SRV record (port,weight etc) in the DNS query and also switch the DNS query over TCP automatically if it receives a truncated DNS response over UDP.
+1. We are using the DNS SRV records using the ```service``` parameter for the ```server``` directive of http upstream module and DNS lookups over TCP features introduced in NGINX Plus R9. This means that NGINX Plus can now ask for the SRV record (port,weight etc) in the DNS query and also switch the DNS query over TCP automatically if it receives a truncated DNS response over UDP.
      
      ```
-     resolver 172.17.42.1:8600 valid=10s;
+     resolver consul:53 valid=10s;
      upstream backend {
           zone upstream_backend 64k;
           server service.consul service=http resolve;

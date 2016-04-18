@@ -1,0 +1,33 @@
+- hosts: all
+  sudo: true
+  tasks:
+
+    - name: Setup Consul Demo | Install curl from apt
+      apt: update_cache=yes pkg=curl
+
+    - name: Setup Consul Demo | Install git from apt
+      apt: update_cache=yes pkg=git
+
+    - name: Setup Consul Demo | Install docker.io from apt
+      shell: curl -sSL https://get.docker.com/ | sh      
+
+    - name: Setup Consul Demo | Install docker-compose
+      shell: curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+
+    - name: Setup Consul Demo | Apply executable permissions to the docker-compose binary
+      shell: chmod +x /usr/local/bin/docker-compose
+
+    - name: Setup Consul Demo | Copy docker-compose under /etc/bash_completion.
+      shell: curl -L https://raw.githubusercontent.com/docker/compose/1.6.2/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
+
+    - name: NGINX Plus | Copying NGINX Plus repository certificate
+      copy: src=files/nginx-repo.crt dest=/srv/NGINX-Demos/consul-dns-srv-demo/nginxplus/nginx-repo.crt
+
+    - name: NGINX Plus | Copying NGINX Plus repository key
+      copy: src=files/nginx-repo.key dest=/srv/NGINX-Demos/consul-dns-srv-demo/nginxplus/nginx-repo.key
+
+    - name: Setup Consul Demo | Executing provision.sh (sets HOST_IP, builds the container images and starts them)
+      shell: ./provision.sh 
+      args:
+        chdir: /srv/NGINX-Demos/consul-dns-srv-demo/
+
