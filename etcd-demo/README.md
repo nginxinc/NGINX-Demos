@@ -19,7 +19,7 @@ http://www.vagrantup.com/downloads
 
 1. Install provider for vagrant to use to start VM's.  
 
-     The default provider is VirtualBox [Note that only VirtualBox versions 4.0, 4.1, 4.2, 4.3 are supported], which can be downloaded from the following link:
+     The default provider is VirtualBox [Note that only VirtualBox versions 4.0 and higher are supported], which can be downloaded from the following link:
 
      https://www.virtualbox.org/wiki/Downloads
 
@@ -33,7 +33,7 @@ http://www.vagrantup.com/downloads
 
 1. Clone demo repo
 
-     ```$ git clone git@github.com:nginxinc/NGINX-Demos.git```
+     ```$ git clone https://github.com/nginxinc/NGINX-Demos.git```
 
 1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/ansible/files/```
 
@@ -43,15 +43,15 @@ http://www.vagrantup.com/downloads
      $ cd ~/NGINX-Demos/etcd-demo
      $ vagrant up
      ```
-     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_etcd_demo.yml
+     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_etcd_demo.yml. The ansible playbook file also invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile) and invokes the ```docker-compose up -d``` command
 
 1. SSH into the newly created virtual machine and move into the /vagrant directory which contains the demo files:
 
      ```
      $ vagrant ssh
      $ sudo su
-     $ cd /vagrant
      ```
+The demo files will be in /srv/NGINX-Demos/etcd-demo
 
 1. Now simply follow the steps listed under section 'Running the demo'.
 
@@ -70,7 +70,7 @@ http://www.vagrantup.com/downloads
 
      ```
      $ cd /srv
-     $ sudo git clone git@github.com:nginxinc/NGINX-Demos.git
+     $ sudo git clone https://github.com/nginxinc/NGINX-Demos.git
      ```
 
 1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/NGINX-Demos/ansible/files/```
@@ -83,7 +83,7 @@ http://www.vagrantup.com/downloads
 1. Run the ansible playbook against localhost on Ubuntu VM:
 
      ```
-     $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_demo.yml
+     $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_etcd_demo.yml
      ```
 
 1. Now simply follow the steps listed under section 'Running the demo'.
@@ -106,7 +106,7 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
 
 1. Clone demo repo
 
-     ```$ git clone git@github.com:nginxinc/NGINX-Demos.git```
+     ```$ git clone https://github.com/nginxinc/NGINX-Demos.git```
 
 1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/etcd-demo/nginxplus/```
 
@@ -156,7 +156,7 @@ d9806ab06d05        gliderlabs/registrator:latest   "/bin/registrator etc"   2 h
 8f8f1c80c7e4        quay.io/coreos/etcd:v2.0.8      "/etcd -name etcd0 -a"   2 hours ago         Up 2 hours          0.0.0.0:2379-2380->2379-2380/tcp, 0.0.0.0:4001->4001/tcp, 7001/tcp   etcd
     ```
 
-1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening. Make sure you set the HOST_IP in both the scripts (etcd_exec_watch.sh & script.sh) to the IP of your Vagrant VM or the VM you ran the ansible playbook directly on. For the manual install option, HOST_IP was already set above to `docker-machine ip default`
+1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile) and is set already. And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening (IP of the interface set on line 6 of provision.sh, set to eth1 by default). For the manual install option, HOST_IP was already set above to `docker-machine ip default`
 
 1. Go to `http://<HOST_IP>` in your favorite browser window and that will take you to one of the nginx-hello containers printing its hostname, IP Address and the port of the container. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with etcd you could do a `curl http://$HOST_IP:4001/v2/keys | jq '.'`. **We are also using the persistent on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**
 
@@ -170,7 +170,7 @@ d9806ab06d05        gliderlabs/registrator:latest   "/bin/registrator etc"   2 h
      $ docker stop service2 service4
      ```
 
-1. Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAG "production" or starting a stopped container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
+1. Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAG "production" or starting a container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
 
 1. The way this works is everytime there is a change in etcd, script.sh gets invoked (through etcd_exec_watch.sh) which checks some of the environment variables set by etcd and adds the server specified by ETCD_WATCH_VALUE to the NGINX upstream block if ETCD_WATCH_ACTION is 'set' and removes it if ETCD_WATCH_ACTION is 'delete'. The removal happens by traversing through all NGINX Plus upstreams and removing the ones not present in etcd.
 

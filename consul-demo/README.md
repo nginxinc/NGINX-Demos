@@ -44,7 +44,7 @@ http://www.vagrantup.com/downloads
      $ cd ~/NGINX-Demos/consul-demo
      $ vagrant up
      ```
-     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_consul_demo.yml. The ansible playbook file also invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile)
+     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_consul_demo.yml. The ansible playbook file also invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile) and invokes the ```docker-compose up -d``` command
 
 1. SSH into the newly created virtual machine and move into the /vagrant directory which contains the demo files:
 
@@ -59,7 +59,7 @@ The demo files will be in /srv/NGINX-Demos/consul-demo
 
 ### Ansible only deployment
 
-1. Create Ubuntu 14.04 VM
+1. Create Ubuntu 14.04 VM 
 
 1. Install Ansible on Ubuntu VM
 
@@ -158,7 +158,7 @@ The following software needs to be installed on your laptop:
      5119a8418b88        progrium/consul:latest          "/bin/start -server -"   7 minutes ago        Up 7 minutes        53/tcp, 0.0.0.0:8300->8300/tcp, 0.0.0.0:8400->8400/tcp, 8301-8302/tcp, 0.0.0.0:8500->8500/tcp, 8301-8302/udp, 0.0.0.0:8600->53/udp   consul
      ```
 
-1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile). And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening (IP of the interface set on line 6 of provision.sh). For the manual install option, HOST_IP was already set above to `docker-machine ip default`
+1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile) and is set already. And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening (IP of the interface set on line 6 of provision.sh, set to eth1 by default). For the manual install option, HOST_IP was already set above to `docker-machine ip default`
 
 1. Go to `http://<HOST_IP>` in your favorite browser window and that will take you to one of the nginx-hello containers printing its hostname, IP Address and the port of the container. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`. **We are also using the persistent 
 on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**

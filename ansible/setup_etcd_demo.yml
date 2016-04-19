@@ -15,21 +15,24 @@
       shell: curl -sSL https://get.docker.com/ | sh      
 
     - name: Setup Etcd Demo | Install docker-compose
-      shell: curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+      shell: curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 
     - name: Setup Etcd Demo | Apply executable permissions to the docker-compose binary
       shell: chmod +x /usr/local/bin/docker-compose
 
+    - name: Setup Consul Demo | Copy docker-compose under /etc/bash_completion.
+      shell: curl -L https://raw.githubusercontent.com/docker/compose/1.6.2/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
+
     - name: NGINX Plus | Copying NGINX Plus repository certificate
-      copy: src=files/nginx-repo.crt dest=/vagrant/nginxplus/nginx-repo.crt
+      copy: src=files/nginx-repo.crt dest=/srv/NGINX-Demos/etcd-demo/nginxplus/nginx-repo.crt
 
     - name: NGINX Plus | Copying NGINX Plus repository key
-      copy: src=files/nginx-repo.key dest=/vagrant/nginxplus/nginx-repo.key
+      copy: src=files/nginx-repo.key dest=/srv/NGINX-Demos/etcd-demo/nginxplus/nginx-repo.key
 
-    - name: Setup Etcd Demo | Build the container images and spin them up (Please have some patience, this step is going to take a while)
-      shell: /usr/local/bin/docker-compose up -d
+    - name: Setup Etcd Demo | Executing provision.sh (sets HOST_IP, builds the container images and starts them)
+      shell: ./provision.sh
       args:
-        chdir: /vagrant/
+        chdir: /srv/NGINX-Demos/etcd-demo/
 
     - name: Setup Etcd Demo | Install etcd and etcdctl
       command: "{{item}}"
@@ -38,14 +41,14 @@
         - tar xzvf etcd-v2.2.4-linux-amd64.tar.gz
         - cp etcd-v2.2.4-linux-amd64/etcdctl /usr/local/bin/ 
       args: 
-        chdir: /vagrant/
+        chdir: /tmp/
 
     - name: Setup Etcd Demo | Execute etcd_exec_watch.sh script
       shell: nohup ./etcd_exec_watch.sh &
       args:
-        chdir: /vagrant/
+        chdir: /srv/NGINX-Demos/etcd-demo/
 
     - name: Setup Etcd Demo | Spin up the two hello-world containers which will act as NGINX Plus upstreams
       shell: /usr/local/bin/docker-compose -f create-services.yml up -d
       args:
-        chdir: /vagrant/
+        chdir: /srv/NGINX-Demos/etcd-demo/

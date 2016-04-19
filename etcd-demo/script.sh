@@ -1,10 +1,4 @@
 #!/bin/bash
-# Check if env var HOST_IP is set, set it if its not
-if [[ -z "$HOST_IP" ]]; then
-    echo "HOST_IP not set on the docker host. Setting it to 10.2.2.70 (IP address assigned in the Vagrantfile)"
-    HOST_IP=10.2.2.70
-fi
-
 CURL='/usr/bin/curl'
 OPTIONS='-s'
 ETCD_KEYS_API="http://$HOST_IP:4001/v2/keys"
