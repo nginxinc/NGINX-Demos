@@ -1,0 +1,47 @@
+- hosts: all
+  sudo: true
+  tasks:
+
+    - name: Setup Zookeeper Demo | Install curl from apt
+      apt: update_cache=yes pkg=curl
+
+    - name: Setup Zookeeper Demo | Install git from apt
+      apt: update_cache=yes pkg=git
+
+    - name: Setup Zookeeper Demo | Install docker.io from apt
+      shell: curl -sSL https://get.docker.com/ | sh      
+
+    - name: Setup Zookeeper Demo | Install docker-compose
+      shell: curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+
+    - name: Setup Zookeeper Demo | Apply executable permissions to the docker-compose binary
+      shell: chmod +x /usr/local/bin/docker-compose
+
+    - name: Setup Zookeeper Demo | Copy docker-compose under /etc/bash_completion.
+      shell: curl -L https://raw.githubusercontent.com/docker/compose/1.6.2/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
+
+    - name: NGINX Plus | Copying NGINX Plus repository certificate
+      copy: src=files/nginx-repo.crt dest=/srv/NGINX-Demos/zookeeper-demo/nginxplus/nginx-repo.crt
+
+    - name: NGINX Plus | Copying NGINX Plus repository key
+      copy: src=files/nginx-repo.key dest=/srv/NGINX-Demos/zookeeper-demo/nginxplus/nginx-repo.key
+
+    - name: Setup Zookeeper Demo | Executing provision.sh (sets HOST_IP, builds the container images and starts them)
+      shell: ./provision.sh 
+      args:
+        chdir: /srv/NGINX-Demos/zookeeper-demo/
+   
+    - name: Setup Zookeeper Demo | Create a dummy znode under /services path inside the zk container
+      shell: docker exec -i zookeeper ./zk-tool create /services -d abc
+      args:
+        chdir: /srv/NGINX-Demos/zookeeper-demo/zookeeper
+
+    - name: Setup Zookeeper Demo | Watch for changes under /services path inside the zk container
+      shell: docker exec -i zookeeper ./zk-tool watch-children /services &
+      args:
+        chdir: /srv/NGINX-Demos/zookeeper-demo/zookeeper
+
+    - name: Setup Zookeeper Demo | Spin up the two NGINX hello containers which will act as NGINX Plus upstreams
+      shell: /usr/local/bin/docker-compose -f create-services.yml up -d
+      args:
+        chdir: /srv/NGINX-Demos/zookeeper-demo/
