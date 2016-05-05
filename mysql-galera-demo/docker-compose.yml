@@ -20,6 +20,8 @@ mysqld2:
   build: ./mysql_backend
   container_name: mysqld2
   command: --wsrep-cluster-name=local-test --wsrep-cluster-address=gcomm://mysqld1
+  links:
+  - mysqld1
   ports:
   - "3308:3306"
   - "9202:9200"
