@@ -1,0 +1,65 @@
+heat_template_version: 2016-04-08
+
+description:
+  Deploys a backend instance
+
+parameters:
+  image_id:
+    type: string
+    default: trusty
+  flavor:
+    type: string
+
+resources:
+  wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: { get_resource: wait_handle }
+      count: 1
+      timeout: 900
+
+  wait_handle:
+    type: OS::Heat::WaitConditionHandle
+
+  backend_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image_id }
+      flavor: { get_param: flavor }
+      key_name: heat_key
+      user_data: 
+        str_replace:
+          params:
+            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
+          template: |
+            #!/bin/bash
+            set -e 
+            set -o pipefail
+
+            # install latest NGINX
+            wget http://nginx.org/keys/nginx_signing.key
+            sudo apt-key add nginx_signing.key
+            rm nginx_signing.key
+            printf "deb http://nginx.org/packages/mainline/ubuntu/ `lsb_release -cs` nginx\n" | sudo tee /etc/apt/sources.list.d/nginx.list
+            sudo apt-get update
+            sudo apt-get install nginx -y
+
+            # configuring NGINX
+            sudo apt-get install -y git
+            git clone https://github.com/nginxinc/NGINX-Demos/
+            cd NGINX-Demos/nginx-hello/
+            sudo rm /etc/nginx/conf.d/*
+            sudo cp hello.conf /etc/nginx/conf.d/
+            sudo cp index.html /usr/share/nginx/html
+
+            service nginx restart
+            wc_notify --data-binary '{"status": "SUCCESS"}'
+      user_data_format: RAW
+
+outputs:
+  instance_name:
+    description: Name of the instance
+    value: { get_attr: [backend_instance, name] }
+  instance_ip:
+    description: IP address of the instance
+    value: { get_attr: [backend_instance, first_address] }

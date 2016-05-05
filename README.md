@@ -19,7 +19,11 @@ utilizing *fleet* and *etcd*.
 
 * **zookeeper-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with Apache Zookeeper for service discovery. It uses the upstream_conf API in NGINX Plus to dynamically add or remove the servers without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on Zookeeper data using a simple bash script and Zookeeper watches.
 
-All of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
+* **nginx-openstack-heat** **(New!)**: Shows how to deploy and configure NGINX Plus to load balance a simple
+web application in OpenStack using Heat. Also the demo shows how NGINX Plus can be reconfigured so that
+whenever we create or delete our application instances, NGINX Plus is automatically reconfigured.
+
+Most of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
 
 ## Prerequisites for Vagrant/Ansible deploymnets
 

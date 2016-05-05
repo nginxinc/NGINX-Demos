@@ -1,0 +1,80 @@
+heat_template_version: 2016-04-08
+
+description:
+  Deploys an NGINX Plus instance
+
+parameters:
+  image_id:
+    type: string
+    default: trusty
+  flavor:
+    type: string
+    
+resources:
+  wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: { get_resource: wait_handle }
+      count: 1
+      timeout: 900
+
+  wait_handle:
+    type: OS::Heat::WaitConditionHandle
+
+  nginxplus_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image_id }
+      flavor: { get_param: flavor }
+      key_name: heat_key
+      personality:
+        "/etc/ssl/nginx/nginx-repo.key": { get_file: "nginx-repo.key"}
+        "/etc/ssl/nginx/nginx-repo.crt": { get_file: "nginx-repo.crt"}
+        "/etc/nginx/conf.d/backend.conf": { get_file: "backend.conf"}
+        "/usr/local/bin/sync.py": { get_file: "sync.py"}
+        "/etc/init/sync.conf": { get_file: "sync.conf"}
+      user_data: 
+        str_replace:
+          params:
+            wc_notify: { get_attr: ['wait_handle', 'curl_cli'] }
+          template: |
+            #!/bin/bash
+            set -e 
+            set -o pipefail
+            mkdir -p /etc/ssl/nginx
+            wget -P /etc/ssl/nginx https://cs.nginx.com/static/files/CA.crt
+            wget http://nginx.org/keys/nginx_signing.key && sudo apt-key add nginx_signing.key
+            apt-get install apt-transport-https libgnutls26 libcurl3-gnutls
+            printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nginx-plus.list
+            wget -P /etc/apt/apt.conf.d http://cs.nginx.com/static/files/90nginx
+            apt-get update
+            apt-get install nginx-plus
+            rm /etc/nginx/conf.d/default.conf
+            service nginx restart
+
+            apt-get install python3-pip -y
+            chmod +r /usr/local/bin/sync.py
+            start sync
+
+            apt-get install jq git zip -y
+            echo 'filetype plugin indent on
+            set tabstop=4
+            set shiftwidth=4
+            set expandtab' > .vimrc
+            git clone -v https://github.com/evanmiller/nginx-vim-syntax
+            rm nginx-vim-syntax/README.md
+            mkdir -v /home/ubuntu/.vim
+            cp -rv nginx-vim-syntax/* /home/ubuntu/.vim/
+            rm -rf nginx-vim-syntax/
+            chown -R ubuntu:ubuntu /home/ubuntu/.vim/
+
+            wc_notify --data-binary '{"status": "SUCCESS"}'
+      user_data_format: RAW
+
+outputs:
+  instance_name:
+    description: Name of the instance
+    value: { get_attr: [nginxplus_instance, name] }
+  instance_ip:
+    description: IP address of the instance
+    value: { get_attr: [nginxplus_instance, first_address] }

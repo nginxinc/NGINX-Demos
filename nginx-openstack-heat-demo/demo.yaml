@@ -1,0 +1,52 @@
+heat_template_version: 2016-04-08
+
+description:
+  Deploys an NGINX Plus load balancer instance with serveral backend instances
+
+parameters:
+  flavor:
+    type: string
+  backend_count:
+    type: number
+    default: 2
+
+resources:
+  backend_instances:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: backend_count }
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          image: backend_image
+          flavor: { get_param: flavor }
+
+  nginxplus_instance:
+    type: OS::Nova::Server
+    properties:
+      image: nginxplus_image
+      flavor: { get_param: flavor }
+      security_groups:
+      - nginxplus_sg
+      metadata:
+        backends: { get_attr: [backend_instances, first_address] }
+
+  nginxplus_floating_ip:
+    type: OS::Nova::FloatingIP
+
+  floating_ip_assoc:
+    type: OS::Nova::FloatingIPAssociation
+    properties:
+      floating_ip: { get_resource: nginxplus_floating_ip }
+      server_id: { get_resource: nginxplus_instance }
+
+outputs:
+  nginxplus_ip:
+    description: IP address of the NGINX Plus instance
+    value: { get_attr: [nginxplus_instance, first_address] }
+  floating_ip:
+    description: Floating IP of the NGINX Plus instance
+    value: { get_attr: [nginxplus_floating_ip, ip] }
+  backend_ip:
+    description: IP address of a Backend instance
+    value: { get_attr: [backend_instances, first_address] }
