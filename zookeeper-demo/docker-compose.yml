@@ -22,7 +22,7 @@ zookeeper:
 
 registrator:
   command: zookeeper://zookeeper:2181/services
-  image: gliderlabs/registrator:master
+  image: gliderlabs/registrator:latest
   container_name: registrator
   links:
   - zookeeper
