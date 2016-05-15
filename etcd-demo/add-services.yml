@@ -2,7 +2,7 @@ service3:
   image: nginxdemos/hello:latest
   container_name: service3
   labels:
-    SERVICE_NAME: service3
+    SERVICE_80_NAME: service3
     SERVICE_TAGS: production
   ports:
   - "8083:80"
@@ -11,7 +11,7 @@ service4:
   image: nginxdemos/hello:latest
   container_name: service4
   labels:
-    SERVICE_NAME: service4
+    SERVICE_80_NAME: service4
     SERVICE_TAGS: production
   ports:
   - "8084:80"

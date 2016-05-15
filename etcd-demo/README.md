@@ -125,7 +125,7 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
      $ docker-machine ip default
      192.168.99.100
      ```
-     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by script.sh & run.sh)
+     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by script.sh & etcd_exec_watch.sh scripts)
 
 1. Spin up the etcd, Registrator and NGINX Plus containers first: 
 
