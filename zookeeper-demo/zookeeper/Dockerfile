@@ -3,7 +3,7 @@ MAINTAINER Kunal Pariani <kunal.pariani@nginx.com>
 
 LABEL name="zookeeper" version="3.4.8"
 
-RUN apt-get install -y software-properties-common wget curl bash
+RUN apt-get update && apt-get install -y software-properties-common wget curl bash
 
 # Setup the openjdk 8 repo
 RUN add-apt-repository ppa:openjdk-r/ppa
