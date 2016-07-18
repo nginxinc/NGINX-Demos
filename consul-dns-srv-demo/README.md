@@ -8,7 +8,7 @@ up the following containers:
 * [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as a NGINX webserver that serves a simple page containing its hostname, IP address and port to simulate backend servers
 * and of course [NGINX Plus](http://www.nginx.com/products) R9 which adds support for DNS lookups over TCP & DNS SRV records
 
-The demo is based off the work described in this blog post: TBD
+The demo is based off the work described in this blog post: [Service Discovery for NGINX Plus Using DNS SRV Records from Consul](https://www.nginx.com/blog/service-discovery-nginx-plus-srv-records-consul-dns/)
 
 ## Setup Options:
 
