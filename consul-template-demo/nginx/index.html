@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+
+<h3>Discovered Services</h3>
+{{range services}} {{$name := .Name}} {{range $tag, $service := service .Name | byTag}} {{if eq $tag "production"}}
+<a href="http://127.0.0.1:8500/ui/#/dc1/services/{{$name}}">{{$name}}</a><br>
+{{end}} {{end}} {{end}}
+
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>      
+</html>
