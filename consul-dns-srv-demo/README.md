@@ -147,7 +147,7 @@ The following software needs to be installed on your laptop:
 
 1. Go to `http://<HOST_IP>` in your favorite browser window and that will take you to the nginx-hello container printing its hostname, IP Address and the port of the container. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard with the Server Zones & Upstreams tab. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with consul go to `http://<HOST_IP>:8500`.
 
-1. Now scale up and scale down the http service which is the same [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the change in the list of servers being added to the backend group.
+1. Now scale up and scale down the http service which is the same [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the change in the list of servers being added/removed from the backend group.
      ```
      $ docker-compose scale http=5
      $ docker-compose scale http=3

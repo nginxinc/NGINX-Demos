@@ -4,7 +4,8 @@
   "log_level": "DEBUG",
   "watches": [
     {
-      "type": "services",
+      "type": "service",
+      "service": "http",
       "handler": "/tmp/script.sh"
     }
   ]

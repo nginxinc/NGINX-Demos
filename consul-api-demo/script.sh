@@ -13,14 +13,13 @@ servers=$($CURL $OPTIONS {$UPSTREAM_CONF_API}upstream=$upstreams)
 echo "Nginx upstreams in $upstreams:"
 echo $servers
 
-# Loop through the registered servers in consul tagged with production (i.e backend servers to be proxied through nginx)
-# add the ones not present in the Nginx upstream block
+# Loop through the registered servers in consul tagged with production (i.e backend servers to be proxied through nginx) and add the ones not present in the Nginx upstream block
 echo "Servers registered with consul:"
-services=$($CURL $OPTIONS $CONSUL_SERVICES_API | jq --raw-output 'to_entries| .[] | select(.value[0] == "production") | .key')
-for key in ${services[@]}; do
-    ip=$($CURL $OPTIONS $CONSUL_SERVICE_API/${key} | jq -r '.[]|.Address')
-    port=$($CURL $OPTIONS $CONSUL_SERVICE_API/${key} | jq -r '.[]|.ServicePort')
-    entry=$ip:$port
+service=$($CURL $OPTIONS $CONSUL_SERVICES_API | jq --raw-output 'to_entries| .[] | select(.value[0] == "production") | .key')
+
+ports=$($CURL $OPTIONS $CONSUL_SERVICE_API/$service | jq -r '.[]|.ServicePort')
+for port in ${ports[@]}; do
+    entry=$HOST_IP:$port
     echo $entry
     if [[ ! $servers =~ $entry ]]; then
 	$CURL $OPTIONS "{$UPSTREAM_CONF_API}add=&upstream=$upstreams&server=$entry"
@@ -40,13 +39,12 @@ for params in ${servers[@]}; do
         continue
     fi
 
-    services=$($CURL $OPTIONS $CONSUL_SERVICES_API | jq --raw-output 'to_entries| .[] | select(.value[0] == "production") | .key')
+    service=$($CURL $OPTIONS $CONSUL_SERVICES_API | jq --raw-output 'to_entries| .[] | select(.value[0] == "production") | .key')
+    ports=$($CURL $OPTIONS $CONSUL_SERVICE_API/$service | jq -r '.[]|.ServicePort')
     found=0  
-    for key in ${services[@]}; do
-        ip=$($CURL $OPTIONS $CONSUL_SERVICE_API/${key} | jq -r '.[]|.Address')
-        port=$($CURL $OPTIONS $CONSUL_SERVICE_API/${key} | jq -r '.[]|.ServicePort')
-    	entry=$ip:$port
-        if [[ $server =~ $entry ]]; then
+    for port in ${ports[@]}; do
+        entry=$HOST_IP:$port
+       	if [[ $server =~ $entry ]]; then
             #echo "$server matches consul entry $entry"
             found=1
             break
