@@ -156,7 +156,9 @@ The following software needs to be installed on your laptop:
 1. We are using the DNS SRV records using the ```service``` parameter for the ```server``` directive of http upstream module and DNS lookups over TCP features introduced in NGINX Plus R9. This means that NGINX Plus can now ask for the SRV record (port,weight etc) in the DNS query and also switch the DNS query over TCP automatically if it receives a truncated DNS response over UDP.
      
      ```
-     resolver consul:53 valid=10s;
+     resolver consul:53 valid=2s;
+     resolver_timeout 2s;
+     
      upstream backend {
           zone upstream_backend 64k;
           server service.consul service=http resolve;

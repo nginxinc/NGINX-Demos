@@ -35,11 +35,11 @@ registrator:
   volumes:
   - "/var/run/docker.sock:/tmp/docker.sock"
 
-http:
+backend:
   image: nginxdemos/hello:latest
   labels:
-    SERVICE_80_NAME: http
-    SERVICE_80_CHECK_HTTP: /http
+    SERVICE_80_NAME: backend
+    SERVICE_80_CHECK_HTTP: /
     SERVICE_80_CHECK_INTERVAL: 5s
     SERVICE_443_IGNORE: 'yes'
     SERVICE_TAGS: production
