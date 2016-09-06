@@ -14,17 +14,9 @@ consul:
   image: progrium/consul
   container_name: consul
   labels:
-    SERVICE_53_IGNORE: 'yes'
-    SERVICE_8300_IGNORE: 'yes'
-    SERVICE_8301_IGNORE: 'yes'
-    SERVICE_8302_IGNORE: 'yes'
-    SERVICE_8400_IGNORE: 'yes'
-    SERVICE_8500_IGNORE: 'yes'
+    SERVICE_IGNORE: 'yes'
   ports:
-  - "8300:8300"
-  - "8400:8400"
   - "8500:8500"
-  - "8600:53/udp"
 
 registrator:
   command: "-internal consul://consul:8500"
@@ -35,10 +27,10 @@ registrator:
   volumes:
   - "/var/run/docker.sock:/tmp/docker.sock"
 
-backend:
+http:
   image: nginxdemos/hello:latest
   labels:
-    SERVICE_80_NAME: backend
+    SERVICE_80_NAME: http
     SERVICE_80_CHECK_HTTP: /
     SERVICE_80_CHECK_INTERVAL: 5s
     SERVICE_443_IGNORE: 'yes'
