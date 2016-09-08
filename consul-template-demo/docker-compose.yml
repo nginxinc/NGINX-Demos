@@ -6,8 +6,7 @@ nginx:
   ports:
   - "80:80"
   labels:
-    SERVICE_NAME: nginx
-    SERVICE_443_IGNORE: 'yes'
+    SERVICE_IGNORE: 'yes'
 
 consul:
   command: -server -bootstrap -advertise ${HOST_IP}
