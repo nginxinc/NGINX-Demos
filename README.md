@@ -15,13 +15,15 @@ utilizing *fleet* and *etcd*.
 
 * **nginx-hello**: NGINX running as webserver in a docker container that serves a simple page containing the container's hostname, IP address and port
 
+* **nginx-openstack-heat**: Shows how to deploy and configure NGINX Plus to load balance a simple
+web application in OpenStack using Heat. Also the demo shows how NGINX Plus can be reconfigured so that
+whenever we create or delete our application instances, NGINX Plus is automatically reconfigured.
+
+* **nginx-swarm-demo** **(New!)**: Shows how to use NGINX and NGINX Plus in a Docker Swarm, ultilizing the new features of Docker 1.12.  Demonstrates doing load balancing with just Docker Swarm, then with NGINX open source and then with NGINX Plus, including autoscaling the backend containers.
+
 * **random-files**: Demo to show random content and upstream_conf. Nick to add more description here
 
 * **zookeeper-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with Apache Zookeeper for service discovery. It uses the upstream_conf API in NGINX Plus to dynamically add or remove the servers without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on Zookeeper data using a simple bash script and Zookeeper watches.
-
-* **nginx-openstack-heat** **(New!)**: Shows how to deploy and configure NGINX Plus to load balance a simple
-web application in OpenStack using Heat. Also the demo shows how NGINX Plus can be reconfigured so that
-whenever we create or delete our application instances, NGINX Plus is automatically reconfigured.
 
 Most of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
 
