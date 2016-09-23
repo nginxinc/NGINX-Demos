@@ -10,7 +10,7 @@ This demo was shown as part of the 2016 NGINX conference session: *Load Balancin
 
 * Docker Swarm with NGINX F/OSS for SSL offload. Load balancing by the Swarm load balancer to the same simple web app backend.
 
-* Docker Swarm with NGINX Plus for SSL offload, NGINX Plus behind the Swarm load balancer doing the load balancing to two NGINX/PHPFPM services.  With autoscaling.
+* Docker Swarm with NGINX Plus for SSL offload, NGINX Plus behind the Swarm load balancer doing the load balancing to two NGINX/PHP-FPM services.  With autoscaling.
 
 The demo uses the Docker Service API and NGINX Plus Status API.  It shows creating Docker services and load balancing those services with the Docker Swarm load balancer and with NGINX Plus.  It shows scaling those services both manually with the Docker CLI and automatically using the Docker CLI and Service API.
 
@@ -418,7 +418,7 @@ The following Docker images are used for this demo:
 
 * nginxbasic: This is based on the nginx image.  This has NGINX F/OSS configured to load balance the backend-app service using the hello image.
 
-* phpfpmbase: This image is based on `dinkel/nginxphpfpm`.  It has a basic PHPFPM proxy configuration.
+* phpfpmbase: This image is based on `dinkel/nginxphpfpm`.  It has a basic PHP-FPM proxy configuration.
 
 * service1: This image is based on `phpfpmbase`.  It has following pages, only the first two of which are used during the demo:
   * service1.php: This page returns the uri, host name and IP address where it is running and it makes a call to service2.php and returns the results. This page includes the file http.phar used to make HTTP requests.
@@ -570,15 +570,15 @@ In the `nginxplus` directory:
 
 In the `phpfpmbase` directory:
 
-* **createphpfpmimage.sh:** Runs the Docker command to create the phpfpm image.
+* **createphpfpmimage.sh:** Runs the Docker command to create the PHP-FPM image.
 
-* **Dockerfile:** The Dockerfile to create the phpfpm image base on the `dinkel/nginx-phpfpm` image.  Exposes port 80.
+* **Dockerfile:** The Dockerfile to create the PHP-FPM image base on the `dinkel/nginx-phpfpm` image.  Exposes port 80.
 
 * **default.conf:** The main NGINX configuration file.
 
 * **nginx.conf:** An HTML page that that has placeholders for uri, host name and IP address to be replaced by NGINX with the actual values.
 
-* **www.conf:** The PHPFPM www.conf file.
+* **www.conf:** The PHP-FPM www.conf file.
 
 In the service1 directory:
 
