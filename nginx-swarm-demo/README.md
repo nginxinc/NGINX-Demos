@@ -113,7 +113,7 @@ python get-pip.py
 
 Download `http://phphttpclient.com/downloads/httpful.phar` to the service1/content directory.
 
-`wget -nv -O /root/NGINX-Demos/nginx-swarm-demo/service1/content http://phphttpclient.com/downloads/httpful.phar`
+`wget -nv -O /root/NGINX-Demos/nginx-swarm-demo/service1/content/httpful.phar http://phphttpclient.com/downloads/httpful.phar`
 
 **Install pv** - Used for the demo script
 
