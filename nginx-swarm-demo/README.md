@@ -157,13 +157,52 @@ If the Docker images are being built on each node then also do this on the worke
  
 **Setup the DockerHub repo:**
 
-As previously noted, it is assumed that the images will be built on the master node and pushed to a DockerHub account and pulled by the worker nodes.  The DokerHub account is defined by the `dockerPrefix` value in `/NGINX-Demos/nginx-swarm-demo/scripts/constants.inc`.  Edit this file and set `dockerPrefix` to the DockerHub account to use.  This must be done on all the nodes.
+As previously noted, it is assumed that the images will be built on the master node and pushed to a DockerHub account and pulled by the worker nodes.  The DokerHub account and optionally the repository is defined by the `dockerPrefix` value in `/show-demos/r-docker-swarm-mode/scripts/constants.inc`.
 
-**NOTE:** The NGINX Plus image, because it is commercial software, must be pushed to a private repo.  If a free DockerHub account is being used, only one private repo is allowed.  To make sure that NGINX Plus is pushed to a private repo, manually create a repo named *nginxplus* on the DockerHub webpage.  
+Edit this file on the master and worker nodes and set `dockerPrefix` to the DockerHub account and the repo if necessary.  If only the Dockerhub account is specified, then each image will be pushed to its own repo, named with the image name.  
 
-If a private repo is ing used, dockerPrefix should be set to the host name and port.  This has not been tested.
+For example, if the DockerHub account is *mydockerhub* and the `constant.inc` file contains (note the "/" at the end):
 
-If the Docker images are being built on each node then this value can be left blank.
+`dockerPrefix="mydockerub/"`
+
+Then all the images will be in seperate repos.
+
+All the images can be pushed to a single repo, with the tag being the image name by creating a DockerHub repo and setting `dockerPrefix` to the DockerHub account and repo.
+
+For example, if the repo is named *swarmdemo* (note the ":" at the end):   
+
+`dockerPrefix="tienidurodad/swarmdemo:"`
+
+Then all the images will be pushed to the *swarmdemo* repo and the image tag will be the image name.
+
+**NOTE:** The NGINX Plus image, because it is commercial software, must be pushed to a private repo.  If a free DockerHub account is being used, only one private repo is allowed.  To make sure that NGINX Plus is pushed to a private repo do the following:
+
+If each image is pushed to a seperate repo:
+
+* Manually create a private repo named *nginxplus* on the DockerHub webpage
+
+If all the images will be pushed to a single repo, for example, named *swarmdemo*:
+
+* Manually create a private repo named *swarmdemo*  
+
+If a local repo is being used, dockerPrefix should be set to the host name and port.  This has not been tested.
+
+If the Docker images are being built on each node then `dockerPrefix` should be left blank.
+
+
+**NOTE:** The NGINX Plus image, because it is commercial software, must be pushed to a private repo.  If a free DockerHub account is being used, only one private repo is allowed.  To make sure that NGINX Plus is pushed to a private repo do the following:
+
+If each image is pushed to a seperate repository:
+
+* Manually create a private repo named *nginxplus* on the DockerHub webpage
+
+If all the images will be pushed to a single repository, for example, named *swarmdemo*:
+
+* Manually create a private repo named *swarmdemo*  
+
+If a local repo is being used, dockerPrefix should be set to the host name and port.  This has not been tested.
+
+If the Docker images are being built on each node then `dockerPrefix` should be left blank.
 
 *On the Swarm master:*
 
