@@ -6,6 +6,8 @@
 #
 # Runs the scripted demo commands
 
+cd "${BASH_SOURCE%/*}"
+
 source constants.inc
 
 . demo-magic.sh
