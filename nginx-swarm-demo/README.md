@@ -155,7 +155,7 @@ If the Docker images are being built on each node then also do this on the worke
 
 *On all nodes:*
  
-**Setup the DockerHub repo:**
+**Setup the DockerHub repository:**
 
 As previously noted, it is assumed that the images will be built on the master node and pushed to a DockerHub account and pulled by the worker nodes.  The DokerHub account and optionally the repository is defined by the `dockerPrefix` value in `/show-demos/r-docker-swarm-mode/scripts/constants.inc`.
 
@@ -188,7 +188,7 @@ If all the images will be pushed to a single repo, for example, named *swarmdemo
 If a local repo is being used, dockerPrefix should be set to the host name and port.  This has not been tested.
 
 If the Docker images are being built on each node then `dockerPrefix` should be left blank.
-
+sitory
 
 **NOTE:** The NGINX Plus image, because it is commercial software, must be pushed to a private repo.  If a free DockerHub account is being used, only one private repo is allowed.  To make sure that NGINX Plus is pushed to a private repo do the following:
 
