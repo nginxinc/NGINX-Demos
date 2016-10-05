@@ -6,19 +6,25 @@
 
 # dockerHost defines host name for the swarm master.
 #
-# dockerPrefix specifies the value to prefix the Docker images with.
-# If the images are to be pushed and pulled from a DockerHub repo,
-# this value much match the the DockerHub user.  If a private repo
-# is used, this value must include the host name and port.  If all
-# images will be stored in the local repo, the value can be left blank.
+# dockerPrefix specifies the value to prefix the Docker images with.  If all the
+# images are to be pushed and pulled from a private DockerHub repo, the
+# recommended approach, this value much be set to
+#     dockerPrefix="DOCKERHUB_USER/REPO_NAME:"
 #
-# If specified, the value must end with a trailing slash.  For
-# example, if the DockerHub account is "nginxdemos" then dockerPrefix
-# should be set to "nginxdemos/".
+# For example, if the DockerHub user is "mydockehub" and the name of the repo
+# is "swarmdemo":
+#   
+#    dockerPrefix="mydockerhub/swarmdemo:"
+# 
+# If all images will be built and stored on each server, then  the value 
+# should be left blank.
 #
-# checkDockerLogin defines whether the user must be logged into 
-# DockerHub when pushing or pulling images.  If a private repo is
-# used, this should be set to "no" to disable the check.
+# It shoudl be possible to use a local private repo, in which case this value
+# should be set to the host name and port, but this has not been tested. 
+#
+# checkDockerLogin defines whether the user must be logged into DockerHub 
+# when pushing or pulling images.  If a local private repo is used, this
+#  should be set to "no" to disable the check.
 
 demoHost="swarmmaster"
 

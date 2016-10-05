@@ -13,7 +13,7 @@ checkDockerLogin () {
 
     path="${BASH_SOURCE%/*}"
 
-    dockerUser=$(grep dockerPrefix= $path/constants.inc | awk -F[\",/] '{print $2}')
+    dockerUser=$(grep dockerPrefix= $path/constants.inc | grep -v '^#' | awk -F[\",/] '{print $2}')
     if [ -z $dockerUser ]; then
         echo "Error: You must set "dockerPrefix" in constants.inc to be able $1 images"
         return 1
