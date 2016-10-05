@@ -149,13 +149,10 @@ demo_2 () {
 
     TYPE_SPEED=15
 
-    # 21. Remove the NGINX service
-    pe "docker service rm nginx"
+    # 21. Remove the services
+    pe "docker service rm nginx backend-app"
 
-    # 22. Remove the backend-app service
-    pe "docker service rm backend-app"
-
-    # 23. Remove the overlay network
+    # 22. Remove the overlay network
     pe "docker network rm appnetwork"
 }
 
