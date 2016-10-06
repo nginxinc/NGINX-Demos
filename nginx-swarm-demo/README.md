@@ -147,9 +147,9 @@ Add the falling line to `/root/.vim/ftdetect/nginx.vim`:
 
 On the worker nodes:
 
-**Copy the cert and key:**
+**Copy the cert and key keys:**
 
-Copy nginx-repo.crt and nginx-repo.key to `/NGINX-Demos/nginx-swarm-demo/nginxplus`
+Copy `nginx-repo.crt` and `nginx-repo.key` to `/NGINX-Demos/nginx-swarm-demo/nginxplus`
 
 If the Docker images are being built on each node then also do this on the worker nodes.
 
@@ -177,9 +177,11 @@ If the Docker images are being built on each node then `dockerPrefix` should be 
 
 `buildallimages.sh`
 
-This runs scripts in the `hello` `phpfpmbase` `service1` `service2` `etcd` `nginxbasic` and `nginxplus` directories to build the docker images.
+This runs scripts in the `etcd`, `hello`, `nginxbasic`, `nginxplus`, `phpfpmbase`, `service1` and `service2` directories to build the docker images.
 
 If the Docker images are being built on each node then also do this on the worker nodes.
+
+Make sure that the *etcd*, *hello*, *nginxbasic*, *nginxplus*, *phpfpmbase*, *service1* and *service2* images were built, using the `docker images` command.  If the *nginxplus* image has not been built, check that the `nginx-repo.crt` and `nginx-repo.key` files have been copied to `/show-demos/r-docker-swarm-mode/nginxplus`. 
 
 **Push the Docker images:**
 
