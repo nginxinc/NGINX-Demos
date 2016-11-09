@@ -33,7 +33,7 @@ Most of the Demos have been configured to utilize Vagrant and Ansible to enable 
 
 1. Install Vagrant using the necessary package for your OS:
 
-       http://www.vagrantup.com/downloads
+       https://www.vagrantup.com/downloads.html
 
 1. Install provider for vagrant to use to start VM's.
 
