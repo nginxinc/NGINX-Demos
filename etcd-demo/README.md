@@ -15,7 +15,7 @@ The demo is based off the work described in this blog post (to be written :P)
 
 Install Vagrant using the necessary package for your OS:
 
-http://www.vagrantup.com/downloads
+https://www.vagrantup.com/downloads.html
 
 1. Install provider for vagrant to use to start VM's.  
 
