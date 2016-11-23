@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>nginx monitor</title>
+    <script>
+
+    var ngxStatusURI = "/status", ngxUpdateInterval = 1000;
+
+    </script>
+
+    <style>
+    body {
+        background:  white;
+        color:       black;
+        font-family: Helvetica, Arial, sans-serif;
+    }
+
+    h1 {
+        margin: .5em 0 0 0;
+    }
+
+    h2 {
+        margin: .7em 0;
+    }
+
+    h3 {
+        margin: .7em 0 .3em 0;
+    }
+
+    h4 {
+        margin: .3em 0 .3em 0;
+    }
+
+    table {
+        font-size: .8em;
+        margin: .5em 0;
+        border-collapse: collapse;
+        border-bottom: 1px #DED solid;
+    }
+
+    table.plain {
+        border: none;
+    }
+
+    thead th {
+        font-size: 1em;
+        background: #DED;
+        padding: .1em .3em;
+        border: .2em solid #FFF;
+    }
+
+    tbody tr.odd {
+        background: #F5F5F5;
+    }
+
+    tbody th {
+        text-align: left;
+    }
+
+    tbody td {
+        height: 1.2em;
+        text-align: right;
+    }
+
+    #upstreams table, #stream_upstreams table {
+        width: 100%;
+    }
+
+    #upstreams tbody th, #stream_upstreams tbody th {
+        font-weight: normal;
+    }
+
+    .tooltip {
+        text-align: left;
+        border-bottom: 1px black dotted;
+        display: inline;
+        position: relative;
+        cursor: help;
+    }
+
+    .tooltip:hover:after {
+        background: #333;
+        background: rgba(0,0,0,.8);
+        bottom: 26px;
+        color: #fff;
+        content: attr(title);
+        left: 20%;
+        padding: 5px 15px;
+        position: absolute;
+        z-index: 98;
+        width: 14em;
+    }
+
+    .tooltip:hover:before{
+        border: solid;
+        border-color: #333 transparent;
+        border-width: 6px 6px 0 6px;
+        bottom: 20px;
+        content: "";
+        left: 50%;
+        position: absolute;
+        z-index: 99;
+    }
+    </style>
+
+</head>
+<body>
+
+    <h1>
+        <img src="data:image/png;base64,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" alt="nginx" />
+    </h1>
+
+    <div id="monitor"></div>
+
+    <script>
+    var ngxAccum = (function() {
+
+        var data = [];
+        var timestamp = {
+            last: undefined,
+            period: undefined,
+        };
+
+        return {
+            getValue: function(key, value) {
+                if (typeof data[key] === 'undefined') {
+                    data[key] = value;
+                    return 'n/a';
+
+                } else {
+                    var increase = value - data[key];
+                    data[key] = value;
+                    return Math.floor(increase * 1000 / timestamp.period);
+                }
+            },
+
+            refresh: function(time) {
+                timestamp.period = time - timestamp.last;
+                timestamp.last = time;
+            },
+        };
+
+    })();
+
+    function ngxMsToStr(msec) {
+        var str = '';
+
+        if (msec < 1000) {
+            return msec + 'ms';
+        }
+
+        if (msec < 100000) {
+            return Math.floor(msec / 1000) + '.' + Math.floor((msec % 1000) / 10) + 's';
+        }
+
+        var days = Math.floor(msec / 86400000);
+        if (days) {
+            str += days + "d ";
+        }
+
+        var hours = Math.floor((msec % 86400000) / 3600000);
+        if (days || hours) {
+            str += hours + "h ";
+        }
+
+        var minutes = Math.floor(((msec % 86400000) % 3600000) / 60000);
+        if (days || hours || minutes) {
+            str += minutes + "m ";
+        }
+
+        var seconds = Math.floor((((msec % 86400000) % 3600000) % 60000) / 1000);
+
+        return str + seconds + "s";
+    }
+
+    function ngxBToStr(bytes) {
+
+        if (typeof bytes !== 'number') {
+            return bytes;
+        }
+
+        if (bytes < 1024) {
+            return bytes + '&nbsp;B';
+        }
+
+        if (bytes < 1048576) {
+            return (bytes / 1024).toFixed(1) + '&nbsp;KiB';
+        }
+
+        if (bytes < 1073741824) {
+            return (bytes / 1048576).toFixed(1) + '&nbsp;MiB';
+        }
+
+        return (bytes / 1073741824).toFixed(2) + '&nbsp;GiB';
+    }
+
+    function template(it) {
+        var out=' ';ngxAccum.refresh(it.timestamp);out+=' <div id="general"> <table> <thead> <tr> <th rowspan="2">Version</th> <th rowspan="2">Address</th> <th rowspan="2">Uptime</th> <th colspan="6">Connections</th> <th colspan="3">SSL</th> <th colspan="3">Requests</th> </tr> <tr> <th>Current</th> <th>Active</th> <th>Idle</th> <th>Dropped</th> <th>Accepted</th> <th>Conn/s</th> <th>Handshakes</th> <th>Failed<br />Handshakes</th> <th>Reused<br />Sessions</th> <th>Current</th> <th>Total</th> <th>Req/s</th> </tr> </thead> <tbody> <tr> <td>';out+=(it.nginx_version);out+='</td> <td>';out+=(it.address);out+='</td> <td><a title="';out+=('last (re)load ' + new Date(it.load_timestamp));out+='" class="tooltip">';out+=(ngxMsToStr(it.timestamp - it.load_timestamp));out+='</a></td> <td>';out+=(it.connections.active + it.connections.idle);out+='</td> <td>';out+=(it.connections.active);out+='</td> <td>';out+=(it.connections.idle);out+='</td> <td>';out+=(it.connections.dropped);out+='</td> <td>';out+=(it.connections.accepted);out+='</td> <td>';out+=(ngxAccum.getValue('accepted', it.connections.accepted));out+='</td> <td>';out+=('ssl' in it ? it.ssl.handshakes : '-');out+='</td> <td>';out+=('ssl' in it ? it.ssl.handshakes_failed : '-');out+='</td> <td>';out+=('ssl' in it ? it.ssl.session_reuses : '-');out+='</td> <td>';out+=(it.requests.current);out+='</td> <td>';out+=(it.requests.total);out+='</td> <td>';out+=(ngxAccum.getValue('rps', it.requests.total));out+='</td> </tr> </tbody> </table> </div> <h2>HTTP</h2> <div id="server_zones"> <h3>Server zones</h3> <table> <thead> <tr> <th rowspan="2">Zone</th> <th colspan="4">Requests</th> <th colspan="6">Responses</th> <th colspan="4">Traffic</th> </tr> <tr> <th>Current</th> <th>Total</th> <th>Discarded</th> <th>Req/s</th> <th>1xx</th> <th>2xx</th> <th>3xx</th> <th>4xx</th> <th>5xx</th> <th>Total</th> <th>Sent</th> <th>Rcvd</th> <th>Sent/s </th> <th>Rcvd/s</th> </tr> </thead> <tbody> '; var n = 0; out+=' '; for(var name in it.server_zones) { out+=' '; var zone = it.server_zones[name]; out+=' <tr ';out+=( (n++ % 2) ? 'class="odd"' : '');out+='> <th>';out+=(name);out+='</th> <td>';out+=(zone.processing);out+='</td> <td>';out+=(zone.requests);out+='</td> <td>';out+=(zone.discarded);out+='</td> <td>';out+=(ngxAccum.getValue('server_zones.' + name + '.requests', zone.requests));out+='</td> '; for(var code in zone.responses) { out+=' <td>';out+=(zone.responses[code]);out+='</td> '; } out+=' <td>';out+=(ngxBToStr(zone.sent));out+='</td> <td>';out+=(ngxBToStr(zone.received));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('server_zones.' + name + '.sent', zone.sent)));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('server_zones.' + name + '.received', zone.received)));out+='</td> </tr> '; } out+=' </table> </div> '; if ('caches' in it) { out+=' <div id="caches"> <h3>Caches</h3> <table> <thead> <tr> <th rowspan="2">Zone</th> <th rowspan="2">State</th> <th rowspan="2">Capacity</th> <th rowspan="2">Size</th> <th colspan="3">Responses</th> <th colspan="3">Traffic</th> </tr> <tr> <th>Served</th> <th>Written</th> <th>Bypassed</th> <th>Served</th> <th>Written</th> <th>Bypassed</th> </tr> </thead> <tbody> '; var n = 0; out+=' '; for(var name in it.caches) { out+=' '; var cache = it.caches[name]; out+=' <tr ';out+=( (n++ % 2) ? 'class="odd"' : '');out+='> <th>';out+=(name);out+='</th> <td>';out+=(cache.cold ? 'cold' : 'warm');out+='</td> <td>';out+=(ngxBToStr(cache.max_size));out+='</td> <td>';out+=(ngxBToStr(cache.size));out+='</td> <td>';out+=(cache.hit.responses + cache.stale.responses + cache.updating.responses + cache.revalidated.responses);out+='</td> <td>';out+=(cache.miss.responses_written + cache.expired.responses_written + cache.bypass.responses_written);out+='</td> <td>';out+=(cache.miss.responses + cache.expired.responses + cache.bypass.responses);out+='</td> <td>';out+=(ngxBToStr(cache.hit.bytes + cache.stale.bytes + cache.updating.bytes + cache.revalidated.bytes));out+='</td> <td>';out+=(ngxBToStr(cache.miss.bytes_written + cache.expired.bytes_written + cache.bypass.bytes_written));out+='</td> <td>';out+=(ngxBToStr(cache.miss.bytes + cache.expired.bytes + cache.bypass.bytes));out+='</td> </tr> '; } out+=' </table> </div> '; } out+=' '; if ('upstreams' in it) { out+=' <div id="upstreams"> <h3>Upstreams</h3> '; for(var ups in it.upstreams) { out+=' '; var has_least_time = 0; out+=' ';var arr1=it.upstreams[ups].peers;if(arr1){var peer,n=-1,l1=arr1.length-1;while(n<l1){peer=arr1[n+=1];out+=' ';if (('response_time' in peer) || ('header_time' in peer)) { has_least_time = 1; break; } out+=' ';} } out+=' <h4>';out+=(ups);out+='</h4> <table> <thead> <tr> <th rowspan="2">Server</th> <th rowspan="2">State</th> <th rowspan="2">Weight</th> <th rowspan="2">Requests</th> <th rowspan="2">Req/s</th> '; if (has_least_time == 1) { out+=' <th colspan="2">Average Time</th> '; } out+=' <th colspan="6">Responses</th> <th colspan="2">Connections</th> <th colspan="4">Traffic</th> <th colspan="2">Server Checks</th> <th colspan="4">Health Monitors</th> <th rowspan="2">Total<br />Downtime</th> </tr> <tr> '; if (has_least_time == 1) { out+=' <th>Response</th> <th>Header</th> '; } out+=' <th>1xx</th> <th>2xx</th> <th>3xx</th> <th>4xx</th> <th>5xx</th> <th>Total</th> <th rowspan="2">Active</th> <th rowspan="2">Limit</th> <th>Sent</th> <th>Rcvd</th> <th>Sent/s </th> <th>Rcvd/s</th> <th>Fails</th> <th>Unavail</th> <th>Checks</th> <th>Fails</th> <th>Unhealthy</th> <th>Last</th> </tr> </thead> <tbody> ';var arr2=it.upstreams[ups].peers;if(arr2){var peer,n=-1,l2=arr2.length-1;while(n<l2){peer=arr2[n+=1];out+=' <tr ';out+=( (n % 2) ? 'class="odd"' : '');out+='> <th>';out+=(peer.server + (peer.backup ? ' b' : ''));out+='</th> <td> '; if (peer.downstart) { out+=' <a title="';out+=('down since ' + new Date(peer.downstart));out+='" class="tooltip">';out+=(peer.state);out+='</a> '; } else { out+=' ';out+=(peer.state);out+=' '; } out+=' </td> <td>';out+=(peer.weight);out+='</td> <td> '; if (peer.selected) { out+=' <a title="last: ';out+=(new Date(peer.selected));out+=' (';out+=(ngxMsToStr(new Date().getTime() - peer.selected));out+=' ago)" class="tooltip"> '; } else { out+=' <a title="last: unknown" class="tooltip"> '; } out+=' ';out+=(peer.requests);out+='</a> </td> <td>';out+=(ngxAccum.getValue('upstreams.' + ups + '.peers.' + peer.server + '.' + n + '.requests', peer.requests));out+='</td> '; if (has_least_time == 1) { out+=' <td>';out+=('response_time' in peer ? ngxMsToStr(peer.response_time) : 'unknown');out+='</td> <td>';out+=('header_time' in peer ? ngxMsToStr(peer.header_time) : 'unknown');out+='</td> '; } out+=' '; for(var code in peer.responses) { out+=' <td>';out+=(peer.responses[code]);out+='</td> '; } out+=' <td>';out+=(peer.active);out+='</td> <td>';out+=('max_conns' in peer ? peer.max_conns : '&infin;');out+='</td> <td>';out+=(ngxBToStr(peer.sent));out+='</td> <td>';out+=(ngxBToStr(peer.received));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('upstreams.' + ups + '.peers.' + peer.server + '.' + n + '.sent', peer.sent)));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('upstreams.' + ups + '.peers.' + peer.server + '.' + n + '.received', peer.received)));out+='</td> <td>';out+=(peer.fails);out+='</td> <td>';out+=(peer.unavail);out+='</td> <td>';out+=(peer.health_checks.checks);out+='</td> <td>';out+=(peer.health_checks.fails);out+='</td> <td>';out+=(peer.health_checks.unhealthy);out+='</td> <td>';out+=('last_passed' in peer.health_checks ? (peer.health_checks.last_passed ? 'passed' : 'failed') : 'unknown');out+='</td> <td>';out+=(ngxMsToStr(peer.downtime));out+='</td> </tr> ';} } out+=' </tbody> </table> '; } out+=' </div> '; } out+=' '; if ('stream' in it) { out+=' <h2>Stream</h2> <div id="stream_server_zones"> <h3>Server zones</h3> <table> <thead> <tr> <th rowspan="2">Zone</th> <th colspan="3">Connections</th> <th colspan="4">Traffic</th> </tr> <tr> <th>Current</th> <th>Total</th> <th>Conn/s</th> <th>Sent</th> <th>Rcvd</th> <th>Sent/s </th> <th>Rcvd/s</th> </tr> </thead> <tbody> '; var n = 0; out+=' '; for(var name in it.stream.server_zones) { out+=' '; var zone = it.stream.server_zones[name]; out+=' <tr ';out+=( (n++ % 2) ? 'class="odd"' : '');out+='> <th>';out+=(name);out+='</th> <td>';out+=(zone.processing);out+='</td> <td>';out+=(zone.connections);out+='</td> <td>';out+=(ngxAccum.getValue('stream.server_zones.' + name + '.connections', zone.connections));out+='</td> <td>';out+=(ngxBToStr(zone.sent));out+='</td> <td>';out+=(ngxBToStr(zone.received));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('stream.server_zones.' + name + '.sent', zone.sent)));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('stream.server_zones.' + name + '.received', zone.received)));out+='</td> </tr> '; } out+=' </table> </div> '; if ('upstreams' in it.stream) { out+=' <div id="stream_upstreams"> <h3>Upstreams</h3> '; for(var ups in it.stream.upstreams) { out+=' '; var has_least_time = 0; out+=' ';var arr3=it.stream.upstreams[ups].peers;if(arr3){var peer,n=-1,l3=arr3.length-1;while(n<l3){peer=arr3[n+=1];out+=' ';if (('response_time' in peer) || ('first_byte_time' in peer) || ('connect_time' in peer)) { has_least_time = 1; break; } out+=' ';} } out+=' <h4>';out+=(ups);out+='</h4> <table> <thead> <tr> <th rowspan="2">Server</th> <th rowspan="2">State</th> <th rowspan="2">Weight</th> <th rowspan="2">Conns Total</th> <th rowspan="2">Conn/s</th> '; if (has_least_time == 1) { out+=' <th colspan="3">Average Time</th> '; } out+=' <th colspan="2">Connections</th> <th colspan="4">Traffic</th> <th colspan="2">Server Checks</th> <th colspan="4">Health Monitors</th> <th rowspan="2">Total<br />Downtime</th> </tr> <tr> '; if (has_least_time == 1) { out+=' <th>Response</th> <th>First byte</th> <th>Connect</th> '; } out+=' <th rowspan="2">Active</th> <th rowspan="2">Limit</th> <th>Sent</th> <th>Rcvd</th> <th>Sent/s </th> <th>Rcvd/s</th> <th>Fails</th> <th>Unavail</th> <th>Checks</th> <th>Fails</th> <th>Unhealthy</th> <th>Last</th> </tr> </thead> <tbody> ';var arr4=it.stream.upstreams[ups].peers;if(arr4){var peer,n=-1,l4=arr4.length-1;while(n<l4){peer=arr4[n+=1];out+=' <tr ';out+=( (n % 2) ? 'class="odd"' : '');out+='> <th>';out+=(peer.server + (peer.backup ? ' b' : ''));out+='</th> <td> '; if (peer.downstart) { out+=' <a title="';out+=('down since ' + new Date(peer.downstart));out+='" class="tooltip">';out+=(peer.state);out+='</a> '; } else { out+=' ';out+=(peer.state);out+=' '; } out+=' </td> <td>';out+=(peer.weight);out+='</td> <td> '; if (peer.selected) { out+=' <a title="last: ';out+=(new Date(peer.selected));out+=' (';out+=(ngxMsToStr(new Date().getTime() - peer.selected));out+=' ago)" class="tooltip"> '; } else { out+=' <a title="last: unknown" class="tooltip"> '; } out+=' ';out+=(peer.connections);out+='</a> </td> <td>';out+=(ngxAccum.getValue('stream.upstreams.' + ups + '.peers.' + peer.server + '.' + n + '.connections', peer.connections));out+='</td> '; if (has_least_time == 1) { out+=' <td>';out+=('response_time' in peer ? ngxMsToStr(peer.response_time) : 'unknown');out+='</td> <td>';out+=('first_byte_time' in peer ? ngxMsToStr(peer.first_byte_time) : 'unknown');out+='</td> <td>';out+=('connect_time' in peer ? ngxMsToStr(peer.connect_time) : 'unknown');out+='</td> '; } out+=' <td>';out+=(peer.active);out+='</td> <td>';out+=('max_conns' in peer ? peer.max_conns : '&infin;');out+='</td> <td>';out+=(ngxBToStr(peer.sent));out+='</td> <td>';out+=(ngxBToStr(peer.received));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('stream.upstreams.' + ups + '.peers.' + peer.server + '.' + n + '.sent', peer.sent)));out+='</td> <td>';out+=(ngxBToStr(ngxAccum.getValue('stream.upstreams.' + ups + '.peers.' + peer.server + '.' + n + '.received', peer.received)));out+='</td> <td>';out+=(peer.fails);out+='</td> <td>';out+=(peer.unavail);out+='</td> <td>';out+=(peer.health_checks.checks);out+='</td> <td>';out+=(peer.health_checks.fails);out+='</td> <td>';out+=(peer.health_checks.unhealthy);out+='</td> <td>';out+=('last_passed' in peer.health_checks ? (peer.health_checks.last_passed ? 'passed' : 'failed') : 'unknown');out+='</td> <td>';out+=(ngxMsToStr(peer.downtime));out+='</td> </tr> ';} } out+=' </tbody> </table> '; } out+=' '; } out+=' '; } out+=' ';return out;
+    }
+
+    var monitor = document.getElementById('monitor');
+
+    function ngxGetData() {
+        var request = new XMLHttpRequest;
+
+        request.onload = function() {
+            if (this.status != 200) {
+                // TODO error notification
+                return;
+            }
+
+            monitor.innerHTML = template(JSON.parse(this.responseText));
+        }
+
+        request.open('GET', ngxStatusURI);
+        request.send();
+    };
+
+    ngxGetData();
+    setInterval(ngxGetData, ngxUpdateInterval);
+    </script>
+
+</body>
+</html>
