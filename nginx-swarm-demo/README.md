@@ -563,7 +563,7 @@ In the `nginxbasic` directory:
 
 In the `nginxplus` directory:
 
-* **backend.conf:** The application NGINX configuration file.  Proxies to the service1, service2 and etcd containers.  Has health checks, the status API and upstream_conf API configured.  Exposes ports 80, 443, 2379 and 8081.
+* **backend.conf:** The application level NGINX configuration file.  Proxies to the service1, service2 and etcd containers.  Has health checks, the status API and upstream_conf API configured.  Exposes ports 80, 443, 2379 and 8081.  It also allows for the healthcheck.php page for specific service1 containers to be displayed at the url `http://SWARM_MASTER_IP/showhealthcheck?ip=IPADDRESS:PORT` where IP_ADDRESS:PORT are the IP address and port of a service1 container.
 
 * **Dockerfile:** The Docker file to create the nginxplusc image by installing NGINX Plus.  Requires that a valid nginx-repo.crt and nginx-repo.key files be copied to this directory.
 
@@ -604,3 +604,4 @@ In the service2 directory:
 * **createservice2image.sh:** Runs the Docker command to create the service2 image.
 
 * **content/service2.php:** Returns the uri, host name and IP address of the container as a JSON response.
+leve
