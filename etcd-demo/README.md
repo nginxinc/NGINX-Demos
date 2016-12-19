@@ -7,7 +7,7 @@ up the following containers:
 * [Registrator](https://github.com/gliderlabs/registrator) to register services with etcd. Registrator monitors for containers being started and stopped and updates key-value pairs in etcd when a container changes state.
 * [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as a NGINX webserver that serves a simple page containing its hostname, IP address and port to simulate backend servers
 * and of course [NGINX Plus](http://www.nginx.com/products) R8
-The demo is based off the work described in this blog post (to be written :P)
+The demo is based off the work described in this blog post: [Service Discovery for NGINX Plus with etcd](https://www.nginx.com/blog/service-discovery-nginx-plus-etcd/)
  
 ## Setup Options:
 
