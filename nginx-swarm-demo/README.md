@@ -450,7 +450,7 @@ Please note these scripts and Docker commands will need to be executed with root
 
 `Cannot connect to the Docker daemon. Is the docker daemon running on this host?`
 
-The following scripts/programs are required for the scripted demo. Is is assumed they will be run from the Swarm master, but only demo-script.sh must be run from the master.
+The following scripts/programs are required for the scripted demo. It is assumed they will be run from the Swarm master, but only demo-script.sh must be run from the master.
 
 * **autoscale.py**: Demonstrates auto scaling of NGINX Plus upstream servers running in containers.  This Python program utilizes the NGINX Plus status API and the Docker API to scale up and scale down NGINX backend containers, adding and removing them from the upstream group based on the request rate per node.  A set of parameters can be passed in to control the autoscaling behavior, with all parameters having default values defined. It based its calculation requests per second on the number of active/up nodes.  These are the parameters and their defaults:
 
