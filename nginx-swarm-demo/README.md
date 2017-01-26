@@ -23,7 +23,7 @@ The following is assumed:
 * All Docker images will be built on the Swarm master and pushed to a private DockerHub repo.  If the Docker images are to be built localy on the worker nodes, then the steps required are noted.
 * All commands used during the demo will be executed on the master node, even those that don't have to be run from the master node.  
 
-The demo runs on a Swarm cluster of three Docker hosts; a master and two workers.  It requires NGINX Plus R8+.  It has been tested with NGINX Plus R10, Ubuntu 16.04, Docker 1.12.1, etcd 3.0.6 siege 3.0.8 and Python 2.7.12.  It assumes that the following software packages are installed:
+The demo runs on a Swarm cluster of three Docker hosts; a master and two workers.  It requires NGINX Plus R8+.  It has been tested with NGINX Plus R10 and R11, Ubuntu 16.04, Docker 1.12.1 and 1.12.3-rc1, etcd 3.0.6 siege 3.0.8 and Python 2.7.12.  It assumes that the following software packages are installed:
 
 * openssh-client and openssh-server  
 * curl   
@@ -147,9 +147,9 @@ Add the falling line to `/root/.vim/ftdetect/nginx.vim`:
 
 On the worker nodes:
 
-**Copy the cert and key:**
+**Copy the cert and key keys:**
 
-Copy nginx-repo.crt and nginx-repo.key to `/NGINX-Demos/nginx-swarm-demo/nginxplus`
+Copy `nginx-repo.crt` and `nginx-repo.key` to `/NGINX-Demos/nginx-swarm-demo/nginxplus`
 
 If the Docker images are being built on each node then also do this on the worker nodes.
 
@@ -177,9 +177,11 @@ If the Docker images are being built on each node then `dockerPrefix` should be 
 
 `buildallimages.sh`
 
-This runs scripts in the `hello` `phpfpmbase` `service1` `service2` `etcd` `nginxbasic` and `nginxplus` directories to build the docker images.
+This runs scripts in the `etcd`, `hello`, `nginxbasic`, `nginxplus`, `phpfpmbase`, `service1` and `service2` directories to build the docker images.
 
 If the Docker images are being built on each node then also do this on the worker nodes.
+
+Make sure that the *etcd*, *hello*, *nginxbasic*, *nginxplus*, *phpfpmbase*, *service1* and *service2* images were built, using the `docker images` command.  If the *nginxplus* image has not been built, check that the `nginx-repo.crt` and `nginx-repo.key` files have been copied to `/show-demos/r-docker-swarm-mode/nginxplus`. 
 
 **Push the Docker images:**
 
@@ -561,7 +563,7 @@ In the `nginxbasic` directory:
 
 In the `nginxplus` directory:
 
-* **backend.conf:** The application NGINX configuration file.  Proxies to the service1, service2 and etcd containers.  Has health checks, the status API and upstream_conf API configured.  Exposes ports 80, 443, 2379 and 8081.
+* **backend.conf:** The application level NGINX configuration file.  Proxies to the service1, service2 and etcd containers.  Has health checks, the status API and upstream_conf API configured.  Exposes ports 80, 443, 2379 and 8081.  It also allows for the healthcheck.php page for specific service1 containers to be displayed at the url `http://SWARM_MASTER_IP/showhealthcheck?ip=IPADDRESS:PORT` where IP_ADDRESS:PORT are the IP address and port of a service1 container.
 
 * **Dockerfile:** The Docker file to create the nginxplusc image by installing NGINX Plus.  Requires that a valid nginx-repo.crt and nginx-repo.key files be copied to this directory.
 
@@ -602,3 +604,4 @@ In the service2 directory:
 * **createservice2image.sh:** Runs the Docker command to create the service2 image.
 
 * **content/service2.php:** Returns the uri, host name and IP address of the container as a JSON response.
+leve

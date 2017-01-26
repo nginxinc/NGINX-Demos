@@ -2,7 +2,7 @@
 ################################################################################
 # Copyright (C) 2016 Nginx, Inc.
 #
-# Version 0.5.0 2016/08/24
+# Version 0.6.0 2016/10/26
 #
 # This program is provided for demonstration purposes only
 #
@@ -198,9 +198,10 @@ def main():
         replicaCount = getReplicaCount(client, args.swarm_master, args.docker_api_port, args.service)
 
         currentRequests = getRequestCount(args.nginx_server_zone, nginxStats)
-        print("currentRequests=%d lastSeconds=%d") %(currentRequests, lastSeconds) #DEBUG
+        if args.verbose:
+            print("currentRequests=%d lastSeconds=%d") %(currentRequests, lastSeconds)
 
-        print("NGINX Total Nodes=%d Up Nodes=%d Replicas=%d") %(totalNodes, upNodes, replicaCount) #DEBUG
+        print("NGINX Total Nodes=%d Up Nodes=%d Replicas=%d") %(totalNodes, upNodes, replicaCount)
         # If totalNodes isn't equal to replicatCount then Docker must be
         # updating.  Try again on the next loop iteration.
         if totalNodes != replicaCount:
@@ -225,8 +226,9 @@ def main():
             lastRequests = currentRequests
 
             # If upNodes is 0 then either there are no nodes, in which case
-            # no traffic can be flowing and no scale up can be needed or there
-            # was a problem getting the node information.
+            # no traffic can be flowing and no scale up based on load can be
+            # needed but new containers will be added if the maximum number
+            # number of nodes hasn't been reached.
             if upNodes > 0:
                 # Calculate the requests per second per backend node
                 rpsPerNode = rps / upNodes
@@ -259,10 +261,28 @@ def main():
                         else:
                             if args.verbose:
                                 print("upNodes %d not greater than minimum nodes %d") %(upNodes, args.min_nodes)
+                            # Scale up if the number of up nodes is below the minimum
+                            if upNodes < args.min_nodes:
+                                print("upNodes %d is less than minimum nodes %d") %(upNodes, args.min_nodes)
+                                newNodeCount = min(args.min_nodes - upNodes, args.max_nodes_to_add, args.max_nodes - totalNodes)
+                                if newNodeCount > 0:
+                                    print("Scale up by %d nodes from %d to %d nodes") %(newNodeCount, totalNodes, totalNodes + newNodeCount)
+                                    scaleBackendNodes(args.service, totalNodes + newNodeCount)
+                                else:
+                                    print("Maximum nodes %d has been reached") %(args.max_nodes)
                     else:
                         if args.verbose:
                             print("rpsPerNode %f in between minRPS %d and maxRPS %d") %(rpsPerNode, args.min_rps, args.max_rps)
-
+            else:
+                print("upNodes %d is less than minimum nodes %d") %(upNodes, args.min_nodes)
+                newNodeCount = min(args.min_nodes - upNodes, args.max_nodes_to_add, args.max_nodes - totalNodes)
+                print("newNodeCount=%d") %(newNodeCount) #DEBUG
+                if newNodeCount > 0:
+                    print("Scale up by %d nodes from %d to %d nodes") %(newNodeCount, totalNodes, totalNodes + newNodeCount)
+                    scaleBackendNodes(args.service, totalNodes + newNodeCount)
+                else:
+                    if args.verbose:
+                        print("Maximum nodes %d has been reached") %(args.max_nodes)
         else:
             lastSeconds = currentSeconds
             lastRequests = currentRequests
