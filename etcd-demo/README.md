@@ -5,12 +5,12 @@ up the following containers:
 
 * [etcd](https://github.com/coreos/etcd) for service discovery
 * [Registrator](https://github.com/gliderlabs/registrator) to register services with etcd. Registrator monitors for containers being started and stopped and updates key-value pairs in etcd when a container changes state.
-* [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as a NGINX webserver that serves a simple page containing its hostname, IP address and port to simulate backend servers
-* and of course [NGINX Plus](http://www.nginx.com/products) R8
+* [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as a NGINX webserver that serves a simple page containing its hostname, IP address and port, request URI, local time of the webserver and the client IP address. This is to simulate backend servers NGINX Plus will be load balancing across.
+* and of course [NGINX Plus](http://www.nginx.com/products) (R8 or higher)
+
 The demo is based off the work described in this blog post: [Service Discovery for NGINX Plus with etcd](https://www.nginx.com/blog/service-discovery-nginx-plus-etcd/)
  
-## Setup Options:
-
+## Setup Options
 ### Fully automated Vagrant/Ansible setup:
 
 Install Vagrant using the necessary package for your OS:
@@ -95,10 +95,10 @@ The demo files will be in /srv/NGINX-Demos/etcd-demo
 
 The following section assumes you are running on Mac OSX. The following software needs to be installed on your machine:
 
-* [Docker Toolbox](https://www.docker.com/docker-toolbox) if running on OSX
+* [Docker Toolbox](https://www.docker.com/docker-toolbox) OR [Docker for Mac](https://www.docker.com/products/docker#/mac)
 * [docker-compose](https://docs.docker.com/compose/install). I used [Homebrew](http://brew.sh) to install it: `brew install docker-compose`
 * [jq](https://stedolan.github.io/jq/), I used [brew](http://brew.sh) to install it: `brew install jq`
-* [etcdctl](https://github.com/coreos/etcd/tree/master/etcdctl) is a command line client for etcd. Follow the steps under 'Getting etcdctl' section and and copy over etcdctl executable under /usr/local/bin
+* [etcd](https://github.com/coreos/etcd) & etcdctl, a command line client for etcd. Follow the steps under 'Getting etcd' section and and copy over etcdctl executable under /usr/local/bin and make sure this path is present in $PATH variable
 
 As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be copied into the `nginxplus/` directory
 
@@ -120,12 +120,16 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
     $ ./clean-containers.sh
     ```
 
-1. NGINX Plus will be listening on port 80 on docker host, and you can get the IP address by running 
+1. NGINX Plus will be listening on port 80 on docker host
+     1. If you are using Docker Toolbox, you can get the IP address of your docker-machine (default here) by running 
+
      ```
      $ docker-machine ip default
      192.168.99.100
      ```
-     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by script.sh & etcd_exec_watch.sh scripts)
+     1. If you are using Docker for Mac, the IP address you need to use is 127.0.0.1
+
+   Export this IP into an environment variable named HOST_IP by running `export HOST_IP=x.x.x.x` command. This variable is used by docker-compose.yml file
 
 1. Spin up the etcd, Registrator and NGINX Plus containers first: 
 
@@ -138,9 +142,9 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
      $ ./etcd_exec_watch.sh &
      ```
 
-1. Spin up the two hello-world containers which will act as NGINX Plus upstreams
+1. Spin up the nginxdemos/hello container which is the backend http service
      ```
-     $ docker-compose -f create-services.yml up -d
+     $ docker-compose -f create-http-service.yml up -d
      ```
 
 ## Running the demo
@@ -149,29 +153,22 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
     ```
     $ docker ps
     CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                                NAMES
-26544538c3ec        nginxdemos/hello:latest         "nginx -g 'daemon off"   2 hours ago         Up 2 hours          443/tcp, 0.0.0.0:8081->80/tcp                                        service1
-27abd73b4621        nginxdemos/hello:latest         "nginx -g 'daemon off"   2 hours ago         Up About an hour    443/tcp, 0.0.0.0:8082->80/tcp                                        service2
-9b976338829b        etcddemo_nginxplus              "nginx -g 'daemon off"   2 hours ago         Up 2 hours          0.0.0.0:80->80/tcp, 443/tcp, 0.0.0.0:8080->8080/tcp                  nginxplus
-d9806ab06d05        gliderlabs/registrator:latest   "/bin/registrator etc"   2 hours ago         Up 2 hours                                                                               registrator
-8f8f1c80c7e4        quay.io/coreos/etcd:v2.0.8      "/etcd -name etcd0 -a"   2 hours ago         Up 2 hours          0.0.0.0:2379-2380->2379-2380/tcp, 0.0.0.0:4001->4001/tcp, 7001/tcp   etcd
+    9fe2155fb33f        nginxdemos/hello:latest         "nginx -g 'daemon off"   5 seconds ago       Up 4 seconds        443/tcp, 0.0.0.0:32779->80/tcp                                       etcddemo_http_1
+    20ae0c91237c        gliderlabs/registrator:latest   "/bin/registrator etc"   26 seconds ago      Up 25 seconds                                                                            registrator
+    82f6a35d5212        etcddemo_nginxplus              "nginx -g 'daemon off"   26 seconds ago      Up 25 seconds       0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp, 443/tcp                  nginxplus
+    9fd1ab126773        quay.io/coreos/etcd:v2.0.8      "/etcd -name etcd0 -a"   26 seconds ago      Up 25 seconds       0.0.0.0:2379-2380->2379-2380/tcp, 0.0.0.0:4001->4001/tcp, 7001/tcp   etcd
     ```
 
-1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile) and is set already. And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening (IP of the interface set on line 6 of provision.sh, set to eth1 by default). For the manual install option, HOST_IP was already set above to `docker-machine ip default`
+1. If you followed the Fully automated Vagrant/Ansible setup option above, HOST_IP referred below is the IP assigned to your Vagrant VM (i.e 10.2.2.70 in Vagrantfile) and is set already. And if you followed the Ansible only deployment option, HOST_IP will be the IP of your Ubuntu VM on which NGINX Plus is listening (IP of the interface set on line 6 of provision.sh, set to eth1 by default). For the manual install option, HOST_IP was already set above to `docker-machine ip default` OR 127.0.0.1 in case of Docker for Mac
 
 1. Go to `http://<HOST_IP>` in your favorite browser window and that will take you to one of the nginx-hello containers printing its hostname, IP Address and the port of the container. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf. If you would like to see all the services registered with etcd you could do a `curl http://$HOST_IP:4001/v2/keys | jq '.'`. **We are also using the persistent on-the-fly reconfiguration introduced in NGINX Plus R8 using the [state](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#state) directive. This means that NGINX Plus will save the upstream conf across reloads by writing it to a file on disk.**
 
-1. Now spin up two more containers named service3 and service4 which use the same [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
+1. Now scale up and scale down the http service using the commands below. Go to the Upstreams tab on Nginx Plus dashboard and observe the change in the list of servers being added/removed from the backend group accordingly.
      ```
-     $ docker-compose -f add-services.yml up -d
-     ```
-
-1. Now stop any two services and observe that they get removed from the upstream group on Nginx Plus dashboard automatically
-     ```
-     $ docker stop service2 service4
+     $ docker-compose -f create-http-service.yml scale http=5
+     $ docker-compose -f create-http-service.yml scale http=3
      ```
 
-1. Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAG "production" or starting a container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
-
-1. The way this works is everytime there is a change in etcd, script.sh gets invoked (through etcd_exec_watch.sh) which checks some of the environment variables set by etcd and adds the server specified by ETCD_WATCH_VALUE to the NGINX upstream block if ETCD_WATCH_ACTION is 'set' and removes it if ETCD_WATCH_ACTION is 'delete'. The removal happens by traversing through all NGINX Plus upstreams and removing the ones not present in etcd.
+1. The way this works is everytime there is a change in etcd, script.sh gets triggered (through etcd_exec_watch.sh) which checks for some of the environment variables set by etcd and adds the server specified by ETCD_WATCH_VALUE to the NGINX upstream block if ETCD_WATCH_ACTION is 'set' and removes it if ETCD_WATCH_ACTION is 'delete'. The removal happens by traversing through all NGINX Plus upstreams and removing the ones not present in etcd.
 
 All the changes should be automatically reflected in the NGINX config and show up on the NGINX Plus Dashboard.
