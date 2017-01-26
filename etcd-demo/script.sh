@@ -35,16 +35,10 @@ elif [[ $ETCD_WATCH_ACTION == "delete" ]]; then
             continue
         fi
         # Loop through the servers in Etcd & check if $server exists
-        services=$(docker ps --filter "label=SERVICE_TAGS=production" --format "{{.Names}}")
-        found=0
-        for srv in $(echo $services | tr " " "\n"); do
-            service=$($CURL $OPTIONS $ETCD_KEYS_API/${srv} | jq --raw-output '.node.nodes[].value')
-            if [[ $service =~ "jq: error" ]]; then
-                continue
-            fi
-            IFS=':' read -ra list <<< "$service"    #Convert string to array
-            port=${list[1]}
-            entry=$etcdip:$port
+        ports=$($CURL $OPTIONS $ETCD_KEYS_API/http | jq --raw-output '.node.nodes[].value')
+	found=0
+        for port in ${ports[@]}; do
+            entry=$etcdip$port
             if [[ $server =~ $entry ]]; then
                 #echo "$server matches etcd $entry"
                 found=1
