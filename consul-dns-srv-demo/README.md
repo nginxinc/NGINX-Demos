@@ -96,7 +96,7 @@ The demo files will be in /srv/NGINX-Demos/consul-dns-srv-demo
 
 The following software needs to be installed on your laptop:
 
-* [Docker Toolbox](https://www.docker.com/docker-toolbox)
+* [Docker Toolbox](https://www.docker.com/docker-toolbox) OR [Docker for Mac](https://www.docker.com/products/docker#/mac)
 * [docker-compose](https://docs.docker.com/compose/install). I used [brew](http://brew.sh) to install it: `brew install docker-compose`
 
 #### Setting up the demo
@@ -117,12 +117,16 @@ The following software needs to be installed on your laptop:
      $ ./clean-containers.sh
      ```
 
-1. NGINX Plus will be listening on port 80 on docker host, and you can get the IP address by running 
+1. NGINX Plus will be listening on port 80 on docker host.
+     1. If you are using Docker Toolbox, you can get the IP address of your docker-machine (default here) by running 
+
      ```
      $ docker-machine ip default
      192.168.99.100
      ```
-     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by docker-compose.yml below)
+     1. If you are using Docker for Mac, the IP address you need to use is 172.17.0.1
+
+   Export this IP into an environment variable named HOST_IP by running `export HOST_IP=x.x.x.x` command. This variable is used by docker-compose.yml file
 
 1. Spin up Consul, Registrator, NGINX Plus & http service containers: 
 
