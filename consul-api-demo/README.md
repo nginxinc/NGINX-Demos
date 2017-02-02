@@ -115,7 +115,7 @@ The following software needs to be installed on your laptop:
 
 1. If you have run this demo previously or have any docker containers running, start with a clean slate by running
      ```
-     $ ./clean-containers.sh
+     $ ./clean_containers.sh
      ```
 
 1. NGINX Plus will be listening on port 80 on your docker host.

@@ -12,13 +12,13 @@
       shell: curl -sSL https://get.docker.com/ | sh      
 
     - name: Setup Zookeeper Demo | Install docker-compose
-      shell: curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+      shell: curl -L https://github.com/docker/compose/releases/download/1.10.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 
     - name: Setup Zookeeper Demo | Apply executable permissions to the docker-compose binary
       shell: chmod +x /usr/local/bin/docker-compose
 
     - name: Setup Zookeeper Demo | Copy docker-compose under /etc/bash_completion.
-      shell: curl -L https://raw.githubusercontent.com/docker/compose/1.6.2/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
+      shell: curl -L https://raw.githubusercontent.com/docker/compose/1.10.0/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
 
     - name: NGINX Plus | Copying NGINX Plus repository certificate
       copy: src=files/nginx-repo.crt dest=/srv/NGINX-Demos/zookeeper-demo/nginxplus/nginx-repo.crt
