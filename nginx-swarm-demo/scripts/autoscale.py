@@ -19,9 +19,9 @@
 # the specified limit, one or more nodes will be removed from the upstream
 # group unless the minimum number of nodes has been reached.
 #
-# The settings that control the autoscaling behavior can be set on the command
-# or the default values can be used.  -h or --help will print out the complete
-# list of command line parameters.
+# The settings that control the autoscaling behavior can be set on the
+# command line or the default values can be used.  -h or --help will print
+# out the complete list of command line parameters.
 ################################################################################
 
 import requests
