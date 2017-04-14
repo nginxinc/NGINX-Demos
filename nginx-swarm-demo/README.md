@@ -229,13 +229,15 @@ The five terminal windows will be used for the following:
 
 All commands, except those denoted with *Shell* or *Browser* are included in demo-script.sh and will executed through that script.  Those marked with *Shell* need to be run manually in a seperate shell  and those marked with *Browser* should be run from a browser.  This scripts assumes that the host name of the swarmmaster is `swarmmaster`.  demo-script.sh gets the actual host name from `constants.inc`.
 
+If you are executing all the commands below manually, make sure to replace `dockerPrefix` with the DockerHub account and repo. For example, if the DockerHub user is *mydockerhub* and the repo is named *swarmdemo*, then `dockerPrefix="mydockerhub/swarmdemo:"` (note the ":" at the end).
+
 #### Swarm Only Demo
 
 1.  Show Swarm Cluster  
 	`# docker node ls`
 
 2.  Create the backend service  
-	`# docker service create --name backend-app-swarm -p8085:80 --replicas 3 hello`
+	`# docker service create --name backend-app-swarm -p8085:80 --replicas 3 ${dockerPrefix}hello`
 
 3.  Show the services  
 	`# docker service ls`
@@ -282,10 +284,10 @@ All commands, except those denoted with *Shell* or *Browser* are included in dem
 	`# docker network ls`
 
 3. Create the backend service  
-	`# docker service create --name backend-app --replicas 3 –network appnetwork hello`
+	`# docker service create --name backend-app --replicas 3 –network appnetwork ${dockerPrefix}hello`
 
 4. Create the NGINX F/OSS service  
-	`# docker service create --name nginx --replicas 1 -p 8090:80 –p 9443:443 --network appnetwork nginxbasic`
+	`# docker service create --name nginx --replicas 1 -p 8090:80 –p 9443:443 --network appnetwork ${dockerPrefix}nginxbasic`
 
 5. Show the services  
 	`# docker service ls`
@@ -347,16 +349,16 @@ All commands, except those denoted with *Shell* or *Browser* are included in dem
 	`# docker network create -d overlay appnetwork`
 
 2. Create the service1 service  
-	`# docker service create --endpoint-mode dnsrr --name service1 --replicas 3 --network appnetwork service1`
+	`# docker service create --endpoint-mode dnsrr --name service1 --replicas 3 --network appnetwork ${dockerPrefix}service1`
 
 3. Create the service2 service  
-	`# docker service create --endpoint-mode dnsrr --name service2 --replicas 3 --network appnetwork service2`
+	`# docker service create --endpoint-mode dnsrr --name service2 --replicas 3 --network appnetwork ${dockerPrefix}service2`
 
 4. Create the etcd service  
-	`# docker service create --endpoint-mode dnsrr --name etcd --network appnetwork --replicas 1 etcd`
+	`# docker service create --endpoint-mode dnsrr --name etcd --network appnetwork --replicas 1 ${dockerPrefix}etcd`
 
 5. Create the NGINX Plus service  
-	`# docker service create --name nginxplus --replicas 1 -p 8080:80 -p8443:443 -p 8081:8081 --network appnetwork nginxplus`
+	`# docker service create --name nginxplus --replicas 1 -p 8080:80 -p8443:443 -p 8081:8081 --network appnetwork ${dockerPrefix}nginxplus`
 
 6. Show the services  
 	`# docker service ls`
