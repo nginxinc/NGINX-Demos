@@ -66,6 +66,21 @@ Assuming the scripts are in `/root/NGINX-Demos/nginx-swarm-demo/scripts` add the
 
 Log out and back in again to have it take effect.
 
+**Install Python** - Used by autoscale.py
+
+```
+apt-get install python2.7 python2.7-dev
+ln -s /usr/bin/python2.7 /usr/bin/python
+wget https://bootstrap.pypa.io/get-pip.py
+python get-pip.py
+```
+
+**Install PHP HTTP client** - Used by service1.php
+
+Download `http://phphttpclient.com/downloads/httpful.phar` to the service1/content directory.
+
+`wget -nv -O /root/NGINX-Demos/nginx-swarm-demo/service1/content/httpful.phar http://phphttpclient.com/downloads/httpful.phar`
+
 *On the Swarm master:*
 
 **Create a swarm:**
@@ -96,24 +111,9 @@ The host name for the Swarm master used in the demo is defined in `/NGINX-Demos/
 
 There must also be an entry in the `/etc/hosts` file for the Swarm master host name.
 
-**Install Python** - Used by autoscale.py
-
-```
-apt-get install python2.7 python2.7-dev
-ln -s /usr/bin/python2.7 /usr/bin/python
-wget https://bootstrap.pypa.io/get-pip.py
-python get-pip.py
-```
-
 **Install Docker Python Client** - Used by autoscale.py
 
 `pip install docker-py`
-
-**Install PHP HTTP client** - Used by service1.php
-
-Download `http://phphttpclient.com/downloads/httpful.phar` to the service1/content directory.
-
-`wget -nv -O /root/NGINX-Demos/nginx-swarm-demo/service1/content/httpful.phar http://phphttpclient.com/downloads/httpful.phar`
 
 **Install pv** - Used for the demo script
 
@@ -379,9 +379,9 @@ If you are executing all the commands below manually, make sure to replace `dock
 	Browser: `http://swarmdemo:8081`
 
 12. Show service2  
-	Browser: `http://swarmdemo/service2.php`		
+	Browser: `http://swarmdemo:8080/service2.php`		
 13. Show service1  
-	Browser: `http://swarmdemo/service1.php`
+	Browser: `http://swarmdemo:8080/service1.php`
 
 14. Generate load  
 	Shell: `# runsiege.sh`
@@ -401,10 +401,10 @@ If you are executing all the commands below manually, make sure to replace `dock
 #### NGINX Plus Demo Part 2
 
 1. Run autoscale.py for service1  
-	Shell: `# ./autoscale.py`
+	Shell: `# autoscale.py`
 
 2. Run autoscale.py for service2  
-	Shell: `# ./autoscale.py -s service2`
+	Shell: `# autoscale.py -s service2`
 
 	**Note:** The best setting of the minimum and maximium requests per second to try and maintain is dependent on the systems being used.  The default is a minimum rps of 4 and a maximum of 6.  These values can be changed using the `--min_rps` and `--max_rps` parameters for autoscale.py.   
 
