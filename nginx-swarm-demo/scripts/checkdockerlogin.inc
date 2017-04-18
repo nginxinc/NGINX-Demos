@@ -18,6 +18,7 @@ checkDockerLogin () {
         echo "Error: You must set "dockerPrefix" in constants.inc to be able $1 images"
         return 1
     fi
+    dockerUser=`echo "$(set -f; echo $dockerUser)"` # Remove whitespace
 
     CheckDockerLogin=$(grep checkDockerLogin $path/constants.inc | awk -F= '{print $2}')
     if [ "$checkDockerLogin" = "no" ]; then
