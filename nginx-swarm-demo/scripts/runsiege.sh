@@ -21,5 +21,5 @@ while [ true ]; do
     duration=`shuf -i${minDuration}-${maxDuration} -n1`
     connections=`shuf -i${minConnections}-${maxConnections} -n1`
     echo "duration=$duration connections=$connections"
-    siege -t ${duration}s -c $connections -d 1 http://${demoHost}:8080/service1.php
+    siege -t ${duration}s -c $connections -d 1 http://${demoHost}/service1.php
 done

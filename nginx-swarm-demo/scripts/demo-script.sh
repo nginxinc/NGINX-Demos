@@ -194,10 +194,10 @@ demo_3 () {
     # Browser: http://swarmdemo:8081
 
     # 12. Show service2
-    # Browser: http://swarmdemo:8080/service2.php
+    # Browser: http://swarmdemo/service2.php
 
     # 13. Show service1
-    # Browser: http://swarmdemo:8080/service1.php
+    # Browser: http://swarmdemo/service1.php
 
     # 14. Generate load
     # Shell: runsiege.sh

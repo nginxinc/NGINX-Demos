@@ -16,4 +16,4 @@ ip=`ifconfig docker0 | grep "inet addr" | awk -F '[: ]+' '{print $4}'`
 trap "exit" INT
 
 echo "duration=$duration connections=$connections"
-siege -t ${2}s -c $1 -d 1 http://${ip}:8080/service1.php
+siege -t ${2}s -c $1 -d 1 http://${ip}/service1.php
