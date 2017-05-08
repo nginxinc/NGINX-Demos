@@ -305,13 +305,13 @@ If you are executing all the commands below manually, make sure to replace `dock
 	`# curl http://swarmdemo:8090 | grep address`
 
 10. Show HTTPS load balancing 1  
-	`# \# curl -k https://swarmdemo:9443 | grep address`
+	`# curl -k https://swarmdemo:9443 | grep address`
 	
 11. Show HTTPS load balancing 2  
-	`# \# curl -k https://swarmdemo:9443 | grep address`
+	`# curl -k https://swarmdemo:9443 | grep address`
 	
 12. Show HTTPS load balancing 3   
-	`# \# curl -k https://swarmdemo:9443 | grep address`  
+	`# curl -k https://swarmdemo:9443 | grep address`  
 			
 13. Show the nginx configuration  
 	`# vim ../nginxbasic/backend.conf`
@@ -323,19 +323,19 @@ If you are executing all the commands below manually, make sure to replace `dock
 	`# docker service ps backend-app`
 
 16. Show HTTPS load balancing 1  
-	`# \# curl -k https://swarmdemo:9443 | grep address`
+	`# curl -k https://swarmdemo:9443 | grep address`
 
 17. Show HTTPS load balancing 2  
-	`# \# curl -k https://swarmdemo:9443 | grep address`
+	`# curl -k https://swarmdemo:9443 | grep address`
 
 18. Show HTTPS load balancing 3  
-	`# \# curl -k https://swarmdemo:9443 | grep address`
+	`# curl -k https://swarmdemo:9443 | grep address`
 
 19. Show HTTPS load balancing 4  
-	`# \# curl -k https://swarmdemo:9443 | grep address`
+	`# curl -k https://swarmdemo:9443 | grep address`
 
 20. Show HTTPS load balancing 5  
-	`# \# curl -k https://swarmdemo:9443 | grep address`
+	`# curl -k https://swarmdemo:9443 | grep address`
 
 21. Remove the services  
 	`# docker service rm nginx backend-app`
@@ -379,7 +379,8 @@ If you are executing all the commands below manually, make sure to replace `dock
 	Browser: `http://swarmdemo:8081`
 
 12. Show service2  
-	Browser: `http://swarmdemo:8080/service2.php`		
+	Browser: `http://swarmdemo:8080/service2.php`
+
 13. Show service1  
 	Browser: `http://swarmdemo:8080/service1.php`
 
