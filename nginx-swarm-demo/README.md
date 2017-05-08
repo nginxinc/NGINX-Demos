@@ -23,7 +23,7 @@ The following is assumed:
 * All Docker images will be built on the Swarm master and pushed to a private DockerHub repo.  If the Docker images are to be built localy on the worker nodes, then the steps required are noted.
 * All commands used during the demo will be executed on the master node, even those that don't have to be run from the master node.  
 
-The demo runs on a Swarm cluster of three Docker hosts; a master and two workers.  It requires NGINX Plus R8+.  It has been tested with NGINX Plus R10 and R11, Ubuntu 16.04, Docker 1.12.1 and 1.12.3-rc1, etcd 3.0.6 siege 3.0.8 and Python 2.7.12.  It assumes that the following software packages are installed:
+The demo runs on a Swarm cluster of three Docker hosts; a master and two workers.  It requires NGINX Plus R8+.  It has been tested with NGINX Plus R10 and R11, Ubuntu 16.04, Docker 1.12.1, 1.12.3-rc1, 17.4.0 and 17.5.0, etcd 3.0.6 siege 3.0.8 and Python 2.7.12.  It assumes that the following software packages are installed:
 
 * openssh-client and openssh-server  
 * curl   
