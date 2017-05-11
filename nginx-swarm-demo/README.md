@@ -1,4 +1,4 @@
-# Load balancing in Docker Swarm (Docker 1.12) with NGINX F/OSS and NGINX Plus with autoscaling
+# Load balancing in Docker Swarm with NGINX F/OSS and NGINX Plus with autoscaling
 
 ## Overview
 
