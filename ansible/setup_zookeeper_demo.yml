@@ -31,17 +31,12 @@
       args:
         chdir: /srv/NGINX-Demos/zookeeper-demo/
    
-    - name: Setup Zookeeper Demo | Create a dummy znode under /services path inside the zk container
-      shell: docker exec -i zookeeper ./zk-tool create /services -d abc
-      args:
-        chdir: /srv/NGINX-Demos/zookeeper-demo/zookeeper
-
-    - name: Setup Zookeeper Demo | Watch for changes under /services path inside the zk container
-      shell: docker exec -i zookeeper ./zk-tool watch-children /services &
+    - name: Setup Zookeeper Demo | Watch for changes under /services/http path inside the zk container
+      shell: docker exec -i zookeeper ./zk-tool watch-children /services/http &
       args:
         chdir: /srv/NGINX-Demos/zookeeper-demo/zookeeper
 
     - name: Setup Zookeeper Demo | Spin up the two NGINX hello containers which will act as NGINX Plus upstreams
-      shell: /usr/local/bin/docker-compose -f create-services.yml up -d
+      shell: /usr/local/bin/docker-compose -f create-http-service.yml up -d
       args:
         chdir: /srv/NGINX-Demos/zookeeper-demo/
