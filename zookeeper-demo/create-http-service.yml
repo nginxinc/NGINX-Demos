@@ -1,0 +1,7 @@
+http:
+  image: nginxdemos/hello:latest
+  labels:
+    SERVICE_80_NAME: http 
+    SERVICE_TAGS: production
+  ports:
+  - "80"

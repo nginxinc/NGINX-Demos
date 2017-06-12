@@ -96,13 +96,13 @@ The demo files will be in /srv/NGINX-Demos/zookeeper-demo
 
 The following software needs to be installed on your laptop:
 
-* [Docker Toolbox](https://www.docker.com/docker-toolbox)
+* [Docker Toolbox](https://www.docker.com/docker-toolbox) OR [Docker for Mac](https://www.docker.com/products/docker#/mac)
 * [docker-compose](https://docs.docker.com/compose/install). I used [brew](http://brew.sh) to install it: `brew install docker-compose`
 
 #### Setting up the demo
 1. Clone demo repo
 
-     ```$ git clone git@github.com:nginxinc/NGINX-Demos.git```
+     ```$ git clone https://github.com/nginxinc/NGINX-Demos.git```
 
 1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```~/NGINX-Demos/zookeeper-demo/nginxplus/```
 
@@ -117,12 +117,16 @@ The following software needs to be installed on your laptop:
      $ ./clean-containers.sh
      ```
 
-1. NGINX Plus will be listening on port 80 on docker host, and you can get the IP address by running 
+1. NGINX Plus will be listening on port 80 on your docker host.
+     1. If you are using Docker Toolbox, you can get the IP address of your docker-machine (default here) by running 
+
      ```
      $ docker-machine ip default
      192.168.99.100
      ```
-     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by docker-compose.yml below)
+     1. If you are using Docker for Mac, the IP address you need to use is 172.17.0.1
+
+   **Export this IP into an environment variable named HOST_IP by running `export HOST_IP=x.x.x.x` command. This variable is used by docker-compose.yml file**
 
 1. Spin up the zookeeper, Registrator and NGINX Plus containers first: 
 
@@ -130,20 +134,15 @@ The following software needs to be installed on your laptop:
      $ docker-compose up -d
      ```
 
-1. Now cd into zookeeper directoy and execute the following `docker exec` command 'zk-tool create /services -d abc' command to create a dummy Znode under /services path
+1. Now cd into zookeeper directoy and execute the following `docker exec` command 'zk-tool watch-children /services/http' command to watch for changes (additions/deletions under the /services/http path). This triggers script.sh whenever a change in the number of http service containers is detected
      ```
      $ cd zookeeper
-     $ docker exec -ti zookeeper ./zk-tool create /services -d abc
+     $ docker exec -ti zookeeper ./zk-tool watch-children /services/http
      ```
 
-1. Execute the following `docker exec` command 'zk-tool watch-children /services' command to watch for changes (additions/deletions under the /services path). This executes script.sh whenever a change is detected
+1. Now in a different tab under the zookeeper-demo dir, Spin up the nginxdemos/hello container which is the backend http service
      ```
-     $ docker exec -ti zookeeper ./zk-tool watch-children /services
-     ```
-
-1. Now in a different tab under the zookeeper-demo dir, spin up the two hello-world containers which will act as NGINX Plus upstreams
-     ```
-     $ docker-compose -f create-services.yml up -d
+     $ docker-compose -f create-http-service.yml up -d
      ```
 
 1. Now follow the steps under section 'Running the demo'
@@ -154,27 +153,20 @@ The following software needs to be installed on your laptop:
 
      ```
      $ docker ps
-     CONTAINER ID        IMAGE                           COMMAND                  CREATED              STATUS              PORTS                                                                                            NAMES
-     bc76380d3cb4        nginxdemos/hello:latest         "nginx -g 'daemon off"   About a minute ago   Up About a minute   443/tcp, 0.0.0.0:8081->80/tcp                                                                    service1
-     29dcb91b2e98        nginxdemos/hello:latest         "nginx -g 'daemon off"   About a minute ago   Up About a minute   443/tcp, 0.0.0.0:8082->80/tcp                                                                    service2
-     5b565915d855        zookeeperdemo_nginxplus         "nginx -g 'daemon off"   23 minutes ago       Up 23 minutes       0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp, 443/tcp                                              nginxplus
-     2e9b9b5c678e        gliderlabs/registrator:master   "/bin/registrator zoo"   23 minutes ago       Up 23 minutes                                                                                                        registrator
-     82cfa1f58c57        zookeeperdemo_zookeeper         "/opt/zookeeper/bin/z"   23 minutes ago       Up 23 minutes       0.0.0.0:2181->2181/tcp, 0.0.0.0:2888->2888/tcp, 0.0.0.0:3888->3888/tcp, 0.0.0.0:9998->9998/tcp   zookeeper
+     CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                                                                                            NAMES
+     ed66c3ac7563        nginxdemos/hello:latest         "nginx -g 'daemon ..."   6 minutes ago       Up 6 minutes        443/tcp, 0.0.0.0:32778->80/tcp                                                                   zookeeperdemo_http_1
+     142d64081f2b        gliderlabs/registrator:latest   "/bin/registrator ..."   9 minutes ago       Up 9 minutes                                                                                                         registrator
+     4abcc06eb1bd        zookeeperdemo_nginxplus         "nginx -g 'daemon ..."   9 minutes ago       Up 9 minutes        0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp, 443/tcp                                              nginxplus
+     69be5bf69e8c        zookeeperdemo_zookeeper         "/opt/zookeeper/bi..."   9 minutes ago       Up 9 minutes        0.0.0.0:2181->2181/tcp, 0.0.0.0:2888->2888/tcp, 0.0.0.0:3888->3888/tcp, 0.0.0.0:9888->9888/tcp   zookeeper
      ```
 
-1. Go to `http://<HOST_IP>` in your favorite browser window and it will take you to one of the two NGINX webserver containers printing its IP and port. `http://<HOST_IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf.
+1. Go to `http://<DOCKER-HOST-IP>` (Note: Docker for Mac runs on IP address 127.0.0.1) in your favorite browser window and it will take you to one of the two NGINX hello containers printing its hostname, IP Address and port number, request URI, local time of the webserver and the client IP address. `http://<DOCKER-HOST-IP>:8080/` will bring up the NGINX Plus dashboard. The configuration file NGINX Plus is using here is /etc/nginx/conf.d/app.conf which is included from /etc/nginx/nginx.conf.
 
-1. Now spin up two more containers named service3 and service4 which use the same [nginxdemos/hello](https://hub.docker.com/r/nginxdemos/hello/) image as above. Go to the Upstreams tab on Nginx Plus dashboard and observe the two new servers being added to the backend group.
+1. Now scale up and scale down the http service using the commands below. Go to the Upstreams tab on Nginx Plus dashboard and observe the change in the list of servers being added/removed from the backend group accordingly.
      ```
-     $ docker-compose -f add-services.yml up -d
+     $ docker-compose -f create-http-service.yml scale http=5
+     $ docker-compose -f create-http-service.yml scale http=3
      ```
-
-1. Now stop any two services and observe that they get removed from the upstream group on Nginx Plus dashboard automatically
-     ```
-     $ docker stop service2 service4
-     ```
-
-1. Play by creating/removing/starting/stopping multiple containers. Creating a new container with SERVICE_TAGS "production" or starting a stopped container will add that container to the NGINX upstream group automatically. Removing or stopping a container removes it from the upstream group.
 
 1. The way this works is using [Watches](https://zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html#sc_zkDataMode_watches) feature of Zookeeper, eveytime there is a change in the list of services, a handler (script.sh) is invoked through zk-tool. This bash script gets the list of all Nginx Plus upstreams using its status and upstream_conf APIs, loops through all the containers registered with ZK which are tagged with SERVICE_TAG "production" using 'zk-tool list /services'. and adds them to the upstream group using upstream_conf API if not present already. It also removes the upstreams from Nginx upstream group which are not present in ZK. 
 
