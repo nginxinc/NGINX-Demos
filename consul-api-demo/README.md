@@ -44,7 +44,7 @@ https://www.vagrantup.com/downloads.html
      $ cd ~/NGINX-Demos/consul-api-demo
      $ vagrant up
      ```
-     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_consul_demo.yml. The ansible playbook file also invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile) and invokes the ```docker-compose up -d``` command
+     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_consul_api_demo.yml. The ansible playbook file also invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile) and invokes the ```docker-compose up -d``` command
 
 1. SSH into the newly created virtual machine and move into the /vagrant directory which contains the demo files:
 
@@ -84,7 +84,7 @@ The demo files will be in /srv/NGINX-Demos/consul-api-demo
 1. Run the ansible playbook against localhost on Ubuntu VM:
 
      ```
-     $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_demo.yml
+     $ sudo ansible-playbook -i "localhost," -c local /srv/NGINX-Demos/ansible/setup_consul_api_demo.yml
      ```
 
 1. Now simply follow the steps listed under section 'Running the demo'.
