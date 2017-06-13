@@ -44,7 +44,7 @@ https://www.vagrantup.com/downloads.html
      $ cd ~/NGINX-Demos/zookeeper-demo
      $ vagrant up
      ```
-     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_zookeeper_demo.yml. The ansible playbook file also invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile) and invokes the ```docker-compose up -d``` command
+     The ```vagrant up``` command will start the virtualbox VM and provision it using the ansible playbook file ~/NGINX-Demos/ansible/setup_zookeeper_demo.yml. This ansible playbook file setsup the environment, invokes another script provision.sh which sets the HOST_IP environment variable to the IP address of the eth1 interface (10.2.2.70 in this case assigned in the Vagrantfile) and invokes the ```docker-compose up -d``` command
 
 1. SSH into the newly created virtual machine and move into the /vagrant directory which contains the demo files:
 
@@ -76,9 +76,10 @@ The demo files will be in /srv/NGINX-Demos/zookeeper-demo
 
 1. Copy ```nginx-repo.key``` and ```nginx-repo.crt``` files for your account to ```/srv/NGINX-Demos/ansible/files/```
 
-1. Move into the zookeeper-demo directory which contains the demo files and make sure the IP address of your Ubuntu VM on which NGINX Plus will be listening is assigned to the ```eth1``` interface. If in case you need to use IP of another interface, replace ```eth1``` on line 6 of provision.sh with the corresponding interface name
+1. cd into zookeeper-demo dir & Set the HOST_IP environment variable to the public IP of your ubuntu VM
      ```
      $ cd /srv/NGINX-Demos/zookeeper-demo
+     $ export HOST_IP=x.x.x.x
      ```
 
 1. Run the ansible playbook against localhost on Ubuntu VM:
