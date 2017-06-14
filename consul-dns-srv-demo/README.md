@@ -96,7 +96,7 @@ The demo files will be in /srv/NGINX-Demos/consul-dns-srv-demo
 
 The following software needs to be installed:
 
-* [Docker for Mac](https://www.docker.com/products/docker#/mac) if you are running this locally on your MAC OR * [docker-compose](https://docs.docker.com/compose/install) if you are running this on a linux VM
+* [Docker for Mac](https://www.docker.com/products/docker#/mac) if you are running this locally on your MAC **OR** [docker-compose](https://docs.docker.com/compose/install) if you are running this on a linux VM
 
 
 #### Setting up the demo
