@@ -26,11 +26,16 @@
     - name: NGINX Plus | Copying NGINX Plus repository key
       copy: src=files/nginx-repo.key dest=/srv/NGINX-Demos/zookeeper-demo/nginxplus/nginx-repo.key
 
-    - name: Setup Zookeeper Demo | Executing provision.sh (sets HOST_IP, builds the container images and starts them)
+    - name: Setup Zookeeper Demo | Executing provision.sh (sets HOST_IP, builds the container images and starts them). This step will take a while the first time since its going to download & build few big docker images...
       shell: ./provision.sh 
       args:
         chdir: /srv/NGINX-Demos/zookeeper-demo/
    
+    - name: Setup Zookeeper Demo | Create a dummy znode under /services path inside the zk container
+      shell: docker exec -i zookeeper ./zk-tool create /services -d abc
+      args:
+        chdir: /srv/NGINX-Demos/zookeeper-demo/zookeeper
+
     - name: Setup Zookeeper Demo | Watch for changes under /services/http path inside the zk container
       shell: docker exec -i zookeeper ./zk-tool watch-children /services/http &
       args:
