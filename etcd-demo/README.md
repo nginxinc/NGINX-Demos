@@ -93,10 +93,9 @@ The demo files will be in /srv/NGINX-Demos/etcd-demo
 
 #### Prerequisites and Required Software
 
-The following section assumes you are running on Mac OSX. The following software needs to be installed on your machine:
+The following software needs to be installed:
 
-* [Docker Toolbox](https://www.docker.com/docker-toolbox) OR [Docker for Mac](https://www.docker.com/products/docker#/mac)
-* [docker-compose](https://docs.docker.com/compose/install). I used [Homebrew](http://brew.sh) to install it: `brew install docker-compose`
+* [Docker for Mac](https://www.docker.com/products/docker#/mac) if you are running this locally on your MAC OR * [docker-compose](https://docs.docker.com/compose/install) if you are running this on a linux VM
 * [jq](https://stedolan.github.io/jq/), I used [brew](http://brew.sh) to install it: `brew install jq`
 * [etcd](https://github.com/coreos/etcd) & etcdctl, a command line client for etcd. Follow the steps under 'Getting etcd' section and and copy over etcdctl executable under /usr/local/bin and make sure this path is present in $PATH variable
 

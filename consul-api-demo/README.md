@@ -94,11 +94,10 @@ The demo files will be in /srv/NGINX-Demos/consul-api-demo
 
 #### Prerequisites and Required Software
 
-The following software needs to be installed on your laptop:
+The following software needs to be installed:
 
-* [Docker Toolbox](https://www.docker.com/docker-toolbox) OR [Docker for Mac](https://www.docker.com/products/docker#/mac)
-* [docker-compose](https://docs.docker.com/compose/install). I used [brew](http://brew.sh) to install it: `brew install docker-compose`
-* [jq](https://stedolan.github.io/jq/), I used [brew](http://brew.sh) to install it: `brew install jq`
+* [Docker for Mac](https://www.docker.com/products/docker#/mac) if you are running this locally on your MAC OR * [docker-compose](https://docs.docker.com/compose/install) if you are running this on a linux VM
+* [jq](https://stedolan.github.io/jq/), I used [brew](http://brew.sh) to install it on my Mac: `brew install jq`
 
 #### Setting up the demo
 1. Clone demo repo
