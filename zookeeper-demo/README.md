@@ -135,9 +135,10 @@ The following software needs to be installed on your laptop:
      $ docker-compose up -d
      ```
 
-1. Now cd into zookeeper directoy and execute the following `docker exec` command 'zk-tool watch-children /services/http' command to watch for changes (additions/deletions under the /services/http path). This triggers script.sh whenever a change in the number of http service containers is detected
+1. Now cd into zookeeper directoy and execute the following two `docker exec` commands. The first one is to create a /services path under ZK and the second one is to watch for changes (additions/deletions under the /services/http path in ZK). It triggers script.sh whenever a change in the number of http service containers is detected
      ```
      $ cd zookeeper
+     $ docker exec -ti zookeeper ./zk-tool create /services -d abc
      $ docker exec -ti zookeeper ./zk-tool watch-children /services/http
      ```
 
