@@ -9,8 +9,8 @@ This demo uses NGINX Plus as a TCP load balancer for a MySQL Galera cluster cons
 
 The following software needs to be installed on your laptop:
 
-* [Docker Toolbox](https://www.docker.com/docker-toolbox)
-* [docker-compose](https://docs.docker.com/compose/install). I used [Homebrew](http://brew.sh) to install it: `brew install docker-compose`
+* [Docker for Mac](https://www.docker.com/products/docker#/mac) if you are running this locally on your MAC **OR** [docker-compose](https://docs.docker.com/compose/install) if you are running this on a linux VM
+
 As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be copied into the `nginxplus/` directory
 
 ## Setting up & Running the demo
@@ -32,12 +32,16 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
     $ ./clean-containers.sh
     ```
 
-1. NGINX Plus container will be listening on port 8080, 3306 & 9200 on the docker host, and you can get the IP address by running 
+1. NGINX Plus container will be listening on port 8080, 3306 & 9200 on the Docker Host
+     1. If you are using Docker Toolbox, you can get the IP address of your docker-machine (default here) by running 
+
      ```
      $ docker-machine ip default
      192.168.99.100
      ```
-     Export this IP into an environment variable HOST_IP `export HOST_IP=192.168.99.100` (used by test.sh below)
+     1. If you are using Docker for Mac or Docker Compose on your Linux VM, the IP address you need to use is 127.0.0.1 (localhost)
+
+     Export this IP into an environment variable HOST_IP `export HOST_IP=x.x.x.x` (used by test.sh below)
 
 1. Spin up the MySQL and NGINX Plus containers: 
 	 ```
@@ -77,8 +81,8 @@ As the demo uses NGINX Plus a `nginx-repo.crt` and `nginx-repo.key` needs to be 
 	 ```
 	 upstream hc_backend {
          zone hc_backend 64k;
-         server 172.17.42.1:9201;
-         server 172.17.42.1:9202;
+         server 172.17.0.1:9201;
+         server 172.17.0.1:9202;
      }
      match tcp {
          expect ~ "MySQL is running";
