@@ -23,6 +23,8 @@ whenever we create or delete our application instances, NGINX Plus is automatica
 
 * **random-files**: Demo to show random content and upstream_conf. Nick to add more description here
 
+* **redis-demo**: This demo uses NGINX Plus as a TCP load balancer for a Redis cluster consisting of 3 Redis nodes in Docker. It does Round-robin load balancing between the 3 Redis nodes, leverages the active health checks feature of NGINX Plus and also shows advanced logging using nginScript.
+
 * **zookeeper-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with Apache Zookeeper for service discovery. It uses the upstream_conf API in NGINX Plus to dynamically add or remove the servers without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on Zookeeper data using a simple bash script and Zookeeper watches.
 
 * **kubernetes-demo** **(New!)**: Shows how to load balance applications on Kubernetes using NGINX and NGINX Plus.
