@@ -1,0 +1,40 @@
+nginxplus:
+  build: ./nginxplus
+  container_name: nginxplus
+  ports:
+  - "6379:6379"
+  - "8080:8080"
+
+redis-master:
+  image: redis:3
+  container_name: redis-master
+  ports:
+  - "63791:6379"
+
+redis-slave1:
+  image: redis:3
+  command: redis-server --slaveof redis-master 6379
+  container_name: redis-slave1
+  links:
+  - redis-master
+  ports:
+  - "63792:6379"
+
+redis-slave2:
+  image: redis:3
+  command: redis-server --slaveof redis-master 6379
+  container_name: redis-slave2
+  links:
+  - redis-master
+  ports:
+  - "63793:6379"
+
+sentinel:
+  build: sentinel
+  environment:
+  - SENTINEL_DOWN_AFTER=5000
+  - SENTINEL_FAILOVER=5000
+  links:
+  - redis-master
+  - redis-slave1
+  - redis-slave2    
