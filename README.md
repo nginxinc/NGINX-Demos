@@ -21,6 +21,8 @@ whenever we create or delete our application instances, NGINX Plus is automatica
 
 * **nginx-swarm-demo**:  Shows how to use NGINX and NGINX Plus in a Docker Swarm, ultilizing the new features of Docker 1.12.  Demonstrates doing load balancing with just Docker Swarm, then with NGINX open source and then with NGINX Plus, including autoscaling the backend containers.
 
+* **packer-terraform-all-active-nginx-plus-lb**: This demo contains a series of scripts that enable an easy deployment of a High Availability All Active Auto Scaling NGINX Plus Load Balancing configuration on Google Cloud. Adaptation of a guide found [here](https://www.nginx.com/resources/deployment-guides/all-active-nginx-plus-load-balancing-gce/).
+
 * **random-files**: Demo to show random content and upstream_conf. Nick to add more description here
 
 * **redis-demo**: This demo uses NGINX Plus as a TCP load balancer for a Redis cluster consisting of 3 Redis nodes in Docker. It does Round-robin load balancing between the 3 Redis nodes, leverages the active health checks feature of NGINX Plus and also shows advanced logging using nginScript.
