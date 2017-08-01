@@ -3,4 +3,14 @@
 *.crt
 *.key
 
-*/.vagrant
+# Ignore content of any .vagrant folder that gets created when you run
+# vagrant up. Such folder has only files related to created VMs. If you
+# re-create VMs, the content will change. It is safe to ignore those files.
+*/.vagrant/*
+
+# Ignore Terraform state/backup files
+*.tfstate
+*.backup
+
+# Ignore MacOS system files
+.DS_Store

@@ -1,0 +1,141 @@
+{
+  "description": "Create an NGINX Plus LB and two NGINX Plus web servers",
+  "variables": {
+    "home": "{{env `HOME`}}",
+    "project_id": "all-active-nginx-plus-lb",
+    "zone": "us-west1-a"
+  },
+  "builders": [
+    {
+      "type": "googlecompute",
+      "account_file": "{{user `home`}}/.gcloud/gcloud_credentials.json",
+      "project_id": "{{user `project_id`}}",
+      "source_image_family": "ubuntu-1604-lts",
+      "zone": "{{user `zone`}}",
+      "ssh_username": "ubuntu",
+      "name": "nginx-lb",
+      "image_name": "nginx-plus-lb-image"
+    },
+    {
+      "type": "googlecompute",
+      "account_file": "{{user `home`}}/.gcloud/gcloud_credentials.json",
+      "project_id": "{{user `project_id`}}",
+      "source_image_family": "ubuntu-1604-lts",
+      "zone": "{{user `zone`}}",
+      "ssh_username": "ubuntu",
+      "name": "nginx-app-1",
+      "image_name": "nginx-oss-app-1-image"
+    },
+    {
+      "type": "googlecompute",
+      "account_file": "{{user `home`}}/.gcloud/gcloud_credentials.json",
+      "project_id": "{{user `project_id`}}",
+      "source_image_family": "ubuntu-1604-lts",
+      "zone": "{{user `zone`}}",
+      "ssh_username": "ubuntu",
+      "name": "nginx-app-2",
+      "image_name": "nginx-oss-app-2-image"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 30",
+        "if [ ! -d /etc/ssl/nginx ]; then sudo mkdir -p /etc/ssl/nginx; fi;"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./certs",
+      "destination": "~"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mv ~/certs/* /etc/ssl/nginx",
+        "sudo rm -rf ~/certs"
+      ]
+    },
+    {
+      "type": "shell",
+      "script": "./scripts/install-nginx-plus.sh",
+      "only": [
+        "nginx-lb"
+      ]
+    },
+    {
+      "type": "shell",
+      "script": "./scripts/install-nginx-oss.sh",
+      "only": [
+        "nginx-app-1",
+        "nginx-app-2"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./conf/lb",
+      "destination": "~/conf",
+      "only": [
+        "nginx-lb"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./conf/app",
+      "destination": "~/conf",
+      "only": [
+        "nginx-app-1",
+        "nginx-app-2"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mv ~/conf/* /etc/nginx/conf.d",
+        "sudo rm -rf ~/conf"
+      ]
+    },
+    {
+      "type": "file",
+      "source":"./server",
+      "destination": "~",
+      "only": [
+        "nginx-app-1",
+        "nginx-app-2"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mv ~/server /usr/share/nginx",
+        "sudo rm -rf ~/server"
+      ],
+      "only": [
+        "nginx-app-1",
+        "nginx-app-2"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "if [ -f /etc/nginx/conf.d/default.conf ]; then sudo mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.orig; fi;",
+        "sudo nginx -s reload"
+      ],
+      "only": [
+        "nginx-lb"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo rm -rf /etc/nginx/sites-available",
+        "sudo nginx -s reload"
+      ],
+      "only": [
+        "nginx-app-1",
+        "nginx-app-2"
+      ]
+    }
+  ]
+}
