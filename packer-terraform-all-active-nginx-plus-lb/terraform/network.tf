@@ -49,11 +49,3 @@ resource "google_compute_forwarding_rule" "8080" {
   ip_address = "${google_compute_address.default.address}"
   port_range = "8080"
 }
-
-# Forward incoming connections to port 443 to the Google network balancer
-resource "google_compute_forwarding_rule" "443" {
-  name = "nginx-network-lb-frontend-443"
-  target = "${google_compute_target_pool.default.self_link}"
-  ip_address = "${google_compute_address.default.address}"
-  port_range = "443"
-}
