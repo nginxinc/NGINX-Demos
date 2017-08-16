@@ -1,4 +1,4 @@
-# Create a Google compute instance template for the Nginx LB
+# Create a Google compute instance template for the NGINX LB
 resource "google_compute_instance_template" "lb" {
   name = "nginx-plus-lb-instance-template"
   description = "NGINX Plus Load Balancing Instance Template"
@@ -43,7 +43,7 @@ EOF
   }
 }
 
-# Create a Google compute instance template for the Nginx app-1
+# Create a Google compute instance template for the NGINX app-1
 resource "google_compute_instance_template" "app-1" {
   name = "nginx-oss-app-1-instance-template"
   description = "NGINX OSS app-1 Instance Template"
@@ -97,7 +97,7 @@ EOF
   }
 }
 
-# Create a Google compute instance template for the Nginx app-2
+# Create a Google compute instance template for the NGINX app-2
 resource "google_compute_instance_template" "app-2" {
   name = "nginx-oss-app-2-instance-template"
   description = "NGINX OSS app-2 Instance Template"
@@ -151,7 +151,7 @@ EOF
   }
 }
 
-# Configure a Google compute instance group manager for the Nginx LB
+# Configure a Google compute instance group manager for the NGINX LB
 resource "google_compute_instance_group_manager" "lb" {
   name = "nginx-plus-lb-instance-group"
   description = "Instance group to host NGINX Plus load balancing instances"
@@ -170,7 +170,7 @@ resource "google_compute_instance_group_manager" "lb" {
   }
 }
 
-# Configure a Google compute instance group manager for the Nginx app-1
+# Configure a Google compute instance group manager for the NGINX app-1
 resource "google_compute_instance_group_manager" "app-1" {
   name = "nginx-oss-app-1-instance-group"
   description = "Instance group to host NGINX OSS app-1 instances"
@@ -186,7 +186,7 @@ resource "google_compute_instance_group_manager" "app-1" {
   }
 }
 
-# Configure a Google compute instance group manager for the Nginx app-2
+# Configure a Google compute instance group manager for the NGINX app-2
 resource "google_compute_instance_group_manager" "app-2" {
   name = "nginx-oss-app-2-instance-group"
   description = "Instance group to host NGINX OSS app-2 instances"

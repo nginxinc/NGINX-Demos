@@ -14,7 +14,7 @@ variable "region_zone" {
 }
 
 variable "machine_type" {
-  description = "The type of machine used to deploy Nginx"
+  description = "The type of machine used to deploy NGINX"
   default = "n1-standard-1"
 }
 
