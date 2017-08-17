@@ -13,6 +13,6 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder "nginx_www/", "/srv/NGINX-Demos/autoscaling-demo/nginx_www"
 
   config.vm.provision :ansible do |ansible|
-    ansible.playbook = "../ansible/setup_autoscaling_demo.yml"
+    ansible.playbook = "./setup_autoscaling_demo.yml"
   end
 end

@@ -8,7 +8,7 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder "../consul-dns-srv-demo/", "/srv/NGINX-Demos/consul-dns-srv-demo"
 
   config.vm.provision :ansible do |ansible|
-    ansible.playbook = "../ansible/setup_consul_dns_srv_demo.yml"
+    ansible.playbook = "./setup_consul_dns_srv_demo.yml"
   end
 
 end

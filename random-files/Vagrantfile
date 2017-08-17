@@ -9,7 +9,7 @@ Vagrant.configure(2) do |config|
   config.vm.define "frontend" do |frontend|
     frontend.vm.network "private_network", :ip => "10.2.2.65"
     frontend.vm.provision "ansible" do |ansible|
-      ansible.playbook = "../ansible/setup_random_files_frontend.yml"
+      ansible.playbook = "./setup_random_files_frontend.yml"
       ansible.sudo = true
     end
   end
@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
   config.vm.define "backend" do |backend|
     backend.vm.network "private_network", :ip => "10.2.2.90"
     backend.vm.provision "ansible" do |ansible|
-      ansible.playbook = "../ansible/setup_random_files_backend.yml"
+      ansible.playbook = "./setup_random_files_backend.yml"
       ansible.sudo = true
     end
   end
