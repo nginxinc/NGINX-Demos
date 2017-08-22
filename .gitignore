@@ -8,7 +8,8 @@
 # re-create VMs, the content will change. It is safe to ignore those files.
 */.vagrant/*
 
-# Ignore Terraform state/backup files
+# Ignore Terraform conf/state/backup files
+.terraform
 *.tfstate
 *.backup
 
