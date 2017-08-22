@@ -19,7 +19,9 @@ In this implementation, Terraform is used to create a set of Google Cloud instan
 ## Setup
 
 1. [Install](https://www.packer.io/intro/getting-started/install.html) Packer.
-2. [Install](https://www.terraform.io/intro/getting-started/install.html) Terraform.
+    * This solution was developed using Packer v1.0.4 and as such might not work if a different version of Packer is employed. We will strive to update the code if any breaking changes are introduced in a future release of Packer.
+2. [Install](https://www.terraform.io/intro/getting-started/install.html) Terraform. v0.10.2 was employed to develop this solution.
+    * This solution was developed using Terraform v0.10.2 and as such might not work if a different version of Terraform is employed. We will strive to update the code if any breaking changes are introduced in a future release of Terraform.
 3. [Create](https://cloud.google.com/) a Google Cloud account.
 4. [Create](https://cloud.google.com/resource-manager/docs/creating-managing-projects) a Google Cloud project.
 5. [Download](https://www.terraform.io/docs/providers/google/index.html) the corresponding credentials for the previously created project. Terraform has a good [guide](https://www.terraform.io/docs/providers/google/index.html) on how to do this. You will need to wait until the Compute Engine has initialized before you are able to download the default account credentials. Copy and rename the credentials to `~/.gcloud/gcloud_credentials.json`
