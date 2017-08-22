@@ -19,21 +19,21 @@ In this implementation, Terraform is used to create a set of Google Cloud instan
 ## Setup
 
 1. [Install](https://www.packer.io/intro/getting-started/install.html) Packer.
-    * This solution was developed using Packer v1.0.4 and as such might not work if a different version of Packer is employed. We will strive to update the code if any breaking changes are introduced in a future release of Packer.
+    * This solution was developed using **Packer v1.0.4** and as such might not work if a different version of Packer is employed. We will strive to update the code if any breaking changes are introduced in a future release of Packer.
 2. [Install](https://www.terraform.io/intro/getting-started/install.html) Terraform.
-    * This solution was developed using Terraform v0.10.2 and as such might not work if a different version of Terraform is employed. We will strive to update the code if any breaking changes are introduced in a future release of Terraform.
+    * This solution was developed using **Terraform v0.10.2** and as such might not work if a different version of Terraform is employed. We will strive to update the code if any breaking changes are introduced in a future release of Terraform.
 3. [Create](https://cloud.google.com/) a Google Cloud account.
 4. [Create](https://cloud.google.com/resource-manager/docs/creating-managing-projects) a Google Cloud project.
-5. [Download](https://www.terraform.io/docs/providers/google/index.html) the corresponding credentials for the previously created project. Terraform has a good [guide](https://www.terraform.io/docs/providers/google/index.html) on how to do this. You will need to wait until the Compute Engine has initialized before you are able to download the default account credentials. Copy and rename the credentials to `~/.gcloud/gcloud_credentials.json`
+5. [Download](https://www.terraform.io/docs/providers/google/index.html) the corresponding credentials for the previously created project. Terraform has a good [guide](https://www.terraform.io/docs/providers/google/index.html) on how to do this. You will need to wait until the Compute Engine has initialized before you are able to download the default account credentials. Copy and rename the credentials to `~/.gcloud/gcloud_credentials.json`.
 6. [Install](https://cloud.google.com/sdk/downloads) the Google Cloud SDK.
 7. [Install](https://cloud.google.com/sdk/docs/managing-components) the Google Cloud SDK beta commands.
-8. Clone this repository
+8. [Clone or download](https://github.com/nginxinc/NGINX-Demos/tree/master/packer-terraform-all-active-nginx-plus-lb) the files in the Packer Terraform All Active Nginx Plus LB folder in the NGINX Demos GitHub repo.
 9. Change the variables in `variables.tf` and `packer.json` to include your project id, the region/zone of your project, the desired machine type for your instances, and the Gcloud credentials file path.
 10. Copy your NGINX Plus crt and key into the `packer/certs` subfolder.
-11. Open a terminal, navigate to this repository's location, and run `./setup.sh`.
+11. Open a terminal, navigate to the location where you cloned the repository, and run `./setup.sh`.
 12. To test the autoscaling features, install [wrk](https://github.com/wg/wrk) and run `wrk -t12 -c400 -d30s http://$static_external_ip` where `$static_external_ip` is the output of the Terraform script.
 13. If you want to see a nice graph representation of the Terraform dependencies install the [Graphviz software](http://www.graphviz.org/) and run `terraform graph | dot -Tpng > graph.png`.
-14. Once you're done with the demo and/or you want to delete the Google Cloud environment you've just created run `./cleanup.sh`
+14. Once you're done with the demo and/or you want to delete the Google Cloud environment you've just created run `./cleanup.sh`.
 
 ## Code Structure
 
