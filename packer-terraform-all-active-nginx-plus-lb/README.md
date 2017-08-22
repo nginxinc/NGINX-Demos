@@ -20,7 +20,7 @@ In this implementation, Terraform is used to create a set of Google Cloud instan
 
 1. [Install](https://www.packer.io/intro/getting-started/install.html) Packer.
     * This solution was developed using Packer v1.0.4 and as such might not work if a different version of Packer is employed. We will strive to update the code if any breaking changes are introduced in a future release of Packer.
-2. [Install](https://www.terraform.io/intro/getting-started/install.html) Terraform. v0.10.2 was employed to develop this solution.
+2. [Install](https://www.terraform.io/intro/getting-started/install.html) Terraform.
     * This solution was developed using Terraform v0.10.2 and as such might not work if a different version of Terraform is employed. We will strive to update the code if any breaking changes are introduced in a future release of Terraform.
 3. [Create](https://cloud.google.com/) a Google Cloud account.
 4. [Create](https://cloud.google.com/resource-manager/docs/creating-managing-projects) a Google Cloud project.
