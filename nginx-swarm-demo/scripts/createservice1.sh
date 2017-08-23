@@ -6,4 +6,4 @@
 # Create the service1 service.
 
 source constants.inc
-docker service create --endpoint-mode dnsrr --name service1 --replicas 3 --network appnetwork ${dockerPrefix}service1
+docker service create --endpoint-mode dnsrr --name service1 --replicas 3 --network appnetwork --detach=true ${dockerPrefix}service1

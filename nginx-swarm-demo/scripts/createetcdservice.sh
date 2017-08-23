@@ -6,4 +6,4 @@
 # Create the etcd service.
 
 source constants.inc
-docker service create --endpoint-mode dnsrr --name etcd --network appnetwork --replicas 1 ${dockerPrefix}etcd
+docker service create --endpoint-mode dnsrr --name etcd --replicas 1 --network appnetwork --detach=true ${dockerPrefix}etcd
