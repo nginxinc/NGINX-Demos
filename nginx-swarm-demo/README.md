@@ -20,10 +20,11 @@ The following is assumed:
 
 * The user will be logged in as root.  If the commands are to be run by a non-root user, then many commands will need to prefixed with sudo.
 * The demo files will be installed at `/root/NGINX-Demos/nginx-swarm-demo/`
+* There are three physcial or virtual servers available.
 * All Docker images will be built on the Swarm master and pushed to a private DockerHub repo.  If the Docker images are to be built localy on the worker nodes, then the steps required are noted.
 * All commands used during the demo will be executed on the master node, even those that don't have to be run from the master node.  
 
-The demo runs on a Swarm cluster of three Docker hosts; a master and two workers.  It requires NGINX Plus R8+.  It has been tested with NGINX Plus R10 and R11, Ubuntu 16.04, Docker 1.12.1, 1.12.3-rc1, 17.4.0 and 17.5.0, etcd 3.0.6 siege 3.0.8 and Python 2.7.12.  It assumes that the following software packages are installed:
+The demo runs on a Swarm cluster of three Docker hosts; a master and two workers.  It requires NGINX Plus R8+.  It has been tested with NGINX Plus R10 and R11, Ubuntu 16.04, Docker 1.12.1, 1.12.3-rc1, 17.04.0, 17.05.0 and 17.06.1, etcd 3.0.6 siege 3.0.8 and Python 2.7.12.  It assumes that the following software packages are installed:
 
 * openssh-client and openssh-server  
 * curl   
@@ -349,16 +350,16 @@ If you are executing all the commands below manually, make sure to replace `dock
 	`# docker network create -d overlay appnetwork`
 
 2. Create the service1 service  
-	`# docker service create --endpoint-mode dnsrr --name service1 --replicas 3 --network appnetwork ${dockerPrefix}service1`
+	`# docker service create --endpoint-mode dnsrr --name service1 --replicas 3 --network appnetwork service1`
 
 3. Create the service2 service  
-	`# docker service create --endpoint-mode dnsrr --name service2 --replicas 3 --network appnetwork ${dockerPrefix}service2`
+	`# docker service create --endpoint-mode dnsrr --name service2 --replicas 3 --network appnetwork service2`
 
 4. Create the etcd service  
-	`# docker service create --endpoint-mode dnsrr --name etcd --network appnetwork --replicas 1 ${dockerPrefix}etcd`
+	`# docker service create --endpoint-mode dnsrr --name etcd --network appnetwork --replicas 1 etcd`
 
 5. Create the NGINX Plus service  
-	`# docker service create --name nginxplus --replicas 1 -p 8080:80 -p8443:443 -p 8081:8081 --network appnetwork ${dockerPrefix}nginxplus`
+	`# docker service create --name nginxplus --replicas 1 -p 80:80 -p8443:443 -p 8081:8081 --network appnetwork nginxplus`
 
 6. Show the services  
 	`# docker service ls`
@@ -379,10 +380,10 @@ If you are executing all the commands below manually, make sure to replace `dock
 	Browser: `http://swarmdemo:8081`
 
 12. Show service2  
-	Browser: `http://swarmdemo:8080/service2.php`
+	Browser: `http://swarmdemo/service2.php`
 
 13. Show service1  
-	Browser: `http://swarmdemo:8080/service1.php`
+	Browser: `http://swarmdemo/service1.php`
 
 14. Generate load  
 	Shell: `# runsiege.sh`
