@@ -13,3 +13,14 @@ The code itself is a combination of two separate Contiki examples - combined, mo
 By default the MQTT client will attempt to reach the MQTT broker on the Tunslip IPv6 address (aaaa::1). Modify this in `project-conf.h`
 
 See the MQTT Mote in action at https://youtu.be/lUoQgx_eZWo
+
+MQTT client behaviours
+----------------------
+### Publish
+Publishes internal sensor data to the MQTT topic `sensor/data`. Client ID is **sensor**_N_ where _N_ is obtained from the last segment of its IPv6 address.
+
+Message data is in JSON format, consisting of a counter, uptime, and fictitious temperature and light values.
+`{"sensor6":{"Sequence":1,"Clock":39,"Temp":22,"Light":282}}`
+
+### Subscribe
+Subscribes to topic `sensor/command`. Message value of `1` illuminates the red LED, message value of `0` extinguishes the red LED.
