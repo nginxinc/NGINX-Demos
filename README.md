@@ -29,7 +29,9 @@ whenever we create or delete our application instances, NGINX Plus is automatica
 
 * **zookeeper-demo**: This demo spins up a bunch of docker containers and shows NGINX Plus being used in conjuction with Apache Zookeeper for service discovery. It uses the upstream_conf API in NGINX Plus to dynamically add or remove the servers without the need for reloading NGINX Plus. This automates the process of upstream reconfiguration in NGINX Plus based on Zookeeper data using a simple bash script and Zookeeper watches.
 
-* **kubernetes-demo** **(New!)**: Shows how to load balance applications on Kubernetes using NGINX and NGINX Plus.
+* **kubernetes-demo**: Shows how to load balance applications on Kubernetes using NGINX and NGINX Plus.
+
+* **mqtt-contiki-demo**: Simple MQTT device (mote) for Contiki OS, to demo with Cooji simulator.
 
 Most of the Demos have been configured to utilize Vagrant and Ansible to enable autodeployment.
 
