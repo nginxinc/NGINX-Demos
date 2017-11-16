@@ -3,13 +3,13 @@
 current_dir = File.dirname(__FILE__)
 log_level                :info
 log_location             STDOUT
-node_name                "damiancurry"
-client_key               "#{current_dir}/damiancurry.pem"
+node_name                ""
+client_key               "#{current_dir}/<>.pem"
 chef_server_url          "https://api.chef.io/organizations/nginx"
 cookbook_path            ["#{current_dir}/../cookbooks"]
 #AWS variables
-knife[:aws_access_key_id] = "AKIAJHFYIWJNODHCQEEA"
-knife[:aws_secret_access_key] = "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"
+knife[:aws_access_key_id] = ""
+knife[:aws_secret_access_key] = ""
 knife[:region] = "us-west-2"
 #openstack variables
 knife[:openstack_auth_url] = "http://192.168.111.128:5000/v2.0/tokens"
