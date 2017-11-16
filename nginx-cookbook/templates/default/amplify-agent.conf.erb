@@ -1,0 +1,77 @@
+[credentials]
+api_key = <%= node['nginx']['amplify_api_key'] %>
+hostname = <%= node['hostname'] %>
+uuid =
+imagename =
+
+[nginx]
+#user = nginx
+#configfile = /etc/nginx/nginx.conf
+#stub_status = /nginx_status
+#plus_status = /status
+#exclude_logs =
+
+[proxies]
+https =
+
+[cloud]
+api_url = https://receiver.amplify.nginx.com:443/1.3
+api_timeout = 5.0
+
+[listeners]
+keys = syslog-default
+
+[listener_syslog-default]
+address =
+
+[loggers]
+keys = root,devnull,agent-default
+
+[handlers]
+keys = root,devnull,agent-default
+
+[formatters]
+keys = simpleFormatter
+
+[formatter_simpleFormatter]
+format = %(asctime)s [%(process)d] %(threadName)s %(message)s
+datefmt =
+
+[logger_devnull]
+level = DEBUG
+qualname = devnull
+handlers = devnull
+formatter = simpleFormatter
+propagate = 0
+
+[handler_devnull]
+class = logging.handlers.WatchedFileHandler
+level = DEBUG
+formatter = simpleFormatter
+args = ('/dev/null',)
+
+[logger_root]
+level = DEBUG
+handlers = root
+qualname = root
+formatter = simpleFormatter
+propagate = 0
+
+[handler_root]
+class = logging.handlers.WatchedFileHandler
+level = DEBUG
+formatter = simpleFormatter
+args = ('/dev/null',)
+
+[logger_agent-default]
+level = INFO
+qualname = agent-default
+handlers = agent-default
+formatter = simpleFormatter
+propagate = 0
+
+[handler_agent-default]
+class = logging.handlers.WatchedFileHandler
+level = INFO
+formatter = simpleFormatter
+args = ('/var/log/amplify-agent/agent.log', 'a', None, 1)

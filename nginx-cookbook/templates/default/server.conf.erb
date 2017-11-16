@@ -1,0 +1,17 @@
+server {
+  listen 80;
+  server_name <%= node['nginx']['server_name'] %>;
+  status_zone <%= node['nginx']['server_name'] %>;
+
+  access_log            /var/log/nginx/<%= node['nginx']['server_name'] %>.log combined;
+  error_log             /var/log/nginx/<%= node['nginx']['server_name'] %>.error.log;
+
+  location / {
+    proxy_pass            http://<%= node['nginx']['upstream'] %>;
+    health_check;
+    limit_rate 1000;
+    proxy_set_header      Host $host;
+    proxy_set_header      X-Real-IP $remote_addr;
+    proxy_set_header      X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}

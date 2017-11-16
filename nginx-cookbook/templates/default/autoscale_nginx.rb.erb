@@ -1,0 +1,163 @@
+require 'chef/api_client'
+require 'chef/config'
+require 'chef/knife'
+require 'chef/node'
+require 'chef/search/query'
+require 'net/http'
+require 'json'
+class MyCLI
+  include Mixlib::CLI
+end
+
+Chef::Config.from_file(File.expand_path("~/.chef/knife.rb"))
+nginx_node = "<%= @nginx_host %>"
+cloud_provider = "<%= node['nginx']['cloud_provider'] %>"
+nginx_upstream = "<%= node['nginx']['upstream'] %>"
+nginx_server_zone = "<%= node['nginx']['server_name'] %>"
+if cloud_provider == "ec2"
+  create_args = ["#{cloud_provider}", 'server', 'create', '-r', "role[#{nginx_upstream}-upstream]", '-S', 'chef-demo', '-I', 'ami-93d80ff3', '--region', 'us-west-2', '-f', 'm1.medium', '-g', 'chef-demo', '--ssh-user', 'ubuntu', '-i', '~/.ssh/chef-demo.pem']
+elsif cloud_provider == "openstack"
+  create_args = ["#{cloud_provider}", 'server', 'create', '-i', '~/.ssh/demo_key.pem', '--ssh-user', 'ubuntu', '-f', 'demo_flavor', '--openstack-private-network', '-Z', 'nova', '-r', "role[#{nginx_upstream}-upstream]"]
+else
+  puts "Please specify a valid cloud provider"
+  exit
+end
+sleep_interval_in_seconds = 10
+min_server_count = 1
+max_server_count = 10
+min_conns = 10
+max_conns = 20
+nginx_status_url = "http://#{nginx_node}:8080/status"
+
+def get_nginx_active_servers(nginx_status_data, nginx_upstream)
+  active_nodes = Array.new
+  peers = nginx_status_data["upstreams"]["#{nginx_upstream}"]["peers"]
+  peers.each do |node|
+    if node["state"] == "up"
+      active_nodes.push node["server"]
+    end
+  end
+  return active_nodes
+end
+
+def get_nginx_server_conns(nginx_status_data, nginx_server_zone)
+  return nginx_status_data["server_zones"]["#{nginx_server_zone}"]["processing"]
+end
+
+def add_backend_node(create_args)
+  #search for existing hostnames to pick a new one
+  query = Chef::Search::Query.new
+  #nodes = query.search('node', 'role:#{nginx_upstream}-upstream').first rescue []
+  nodes = query.search('node', 'role:<%= node['nginx']['upstream'] %>-upstream').first rescue []
+  hosts = Array.new
+  used_num = Array.new
+  nodes.each do |node|
+    node_name = node.name
+    hosts.push node_name
+    num = node_name.scan(/\d+/)
+    used_num.push num
+  end
+  used_num.sort!
+  fixed1 = used_num.flatten.collect do |num| num.to_i end
+  fixed_num = fixed1.sort!
+  firstnum = fixed_num.first
+  lastnum = fixed_num.last
+  firsthost = hosts.sort[0].to_i
+  lasthost = hosts.sort[-1].to_i
+
+  unless firstnum.nil? && lastnum.nil?
+    total = (1..lastnum).to_a
+    missingnum = total-fixed_num
+  end
+  newhostname = ""
+  if missingnum.nil?
+    puts "No existing hosts"
+    fixnum = "1"
+    newnum = fixnum.to_i
+    newhostname = "<%= node['nginx']['upstream'] %>-app-#{newnum}"
+  elsif missingnum.any?
+    puts "Missing numbers are #{missingnum}"
+    newnum = missingnum.first
+    newhostname = "<%= node['nginx']['upstream'] %>-app-#{newnum}"
+  else
+    newnum = lastnum + 1
+    puts "new number is \n"
+    newhostname = "<%= node['nginx']['upstream'] %>-app-#{newnum}"
+  end
+  new_create_args = create_args + ['--node-name', newhostname]
+  knife = Chef::Knife.new
+  knife.options=MyCLI.options
+  Chef::Knife.run(new_create_args, MyCLI.options)
+  #sleep to wait for chef run
+  1.upto(10) do |n|
+    puts "."
+    sleep 1 # second
+  end
+end
+
+def del_backend_node(nginx_status_data, nginx_node, active_nodes, cloud_provider, nginx_upstream)
+  #lookup hostnames/ips and pick a backend at random
+  query = Chef::Search::Query.new
+  #nodes = query.search('node', 'role:#{nginx_upstream}-upstream').first rescue []
+  nodes = query.search('node', 'role:<%= node['nginx']['upstream'] %>-upstream').first rescue []
+  hosts = Array.new
+  nodes.each do |node|
+    node_name = node.name
+    node_ip = node['ipaddress']
+    if active_nodes.any? { |val| /#{node_ip}/ =~ val }
+      hosts.push "#{node_name}:#{node_ip}"
+    end
+  end
+  del_node = hosts.sample
+  node_name = del_node.rpartition(":").first
+  node_ip = del_node.rpartition(":").last
+  puts "Removing #{node_name}"
+  nginx_url = "http://#{nginx_node}:8080/upstream_conf?upstream=#{nginx_upstream}"
+  response = Net::HTTP.get(URI(nginx_url))
+  node_id = response.lines.grep(/#{node_ip}/).first.split('id=').last.chomp
+  drain_url = "http://#{nginx_node}:8080/upstream_conf?upstream=#{nginx_upstream}\&id=#{node_id}\&drain=1"
+  Net::HTTP.get(URI(drain_url))
+  sleep(5)
+  knife = Chef::Knife.new
+  knife.options=MyCLI.options
+  #delete_args = ["#{cloud_provider}", 'server', 'delete', "#{node_name}", '--purge', '-y']
+  #Chef::Knife.run(delete_args, MyCLI.options)
+  delete_args = "#{cloud_provider} server delete -N #{node_name} -P -y"
+  `knife #{delete_args}`
+end
+
+
+last_conns_count = -1
+
+while true
+  response = Net::HTTP.get(URI(nginx_status_url))
+  nginx_status_data = JSON.parse(response)
+
+  active_nodes = get_nginx_active_servers(nginx_status_data, nginx_upstream)
+  server_count = active_nodes.length
+  current_conns = get_nginx_server_conns(nginx_status_data, nginx_server_zone)
+
+  conns_per_server = current_conns / server_count.to_f
+
+  puts "Current connections = #{current_conns}"
+  puts "connections per server = #{conns_per_server}"
+
+  if server_count < min_server_count
+    puts "Creating new #{cloud_provider} Instance"
+    add_backend_node(create_args)
+  elsif conns_per_server > max_conns
+    if server_count < max_server_count
+      puts "Creating new #{cloud_provider} Instance"
+      add_backend_node(create_args)
+    end
+  elsif conns_per_server < min_conns
+    if server_count > min_server_count
+      del_backend_node(nginx_status_data, nginx_node, active_nodes, cloud_provider, nginx_upstream)
+    end
+
+  end
+
+  last_conns_count = current_conns
+  sleep(sleep_interval_in_seconds)
+end
+

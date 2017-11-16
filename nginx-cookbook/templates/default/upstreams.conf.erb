@@ -1,0 +1,6 @@
+   upstream <%= node['nginx']['upstream'] %> {
+       zone <%= node['nginx']['upstream'] %> 64k;
+       <% @hosts.each do |node| -%>
+       server <%= node %>;
+       <% end %>
+   }

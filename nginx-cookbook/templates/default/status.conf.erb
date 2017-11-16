@@ -1,0 +1,31 @@
+server {
+                listen <%= node['nginx']['plus_status_port'] -%>;
+                status_zone <%= node['nginx']['plus_status_server_name'] %>;
+		access_log  <%= node['nginx']['log_dir'] %>/status.access.log;
+                location = /status.html { root /usr/share/nginx/html; }
+                location = / {
+                        return 301 /status.html;
+                }
+                location /status {
+                <% if node['nginx']['plus_status_allowed_ips'] -%>
+                <% node['nginx']['plus_status_allowed_ips'].each do |ip| %>
+                        allow <%= ip %>;
+                <% end -%>
+                        deny all;
+                <% end -%>
+                        status;
+                        status_format json;
+                        access_log off;
+                }
+                <% if node['nginx']['enable_upstream_conf']==true -%>
+                location /upstream_conf {
+                        upstream_conf;
+                <% if node['nginx']['plus_status_allowed_ips'] -%>
+                <% node['nginx']['plus_status_allowed_ips'].each do |ip| %>
+                        allow <%= ip %>;
+                <% end -%>
+                        deny all;
+                <% end -%>
+                }
+                <% end -%>
+}
