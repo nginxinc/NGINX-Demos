@@ -1,0 +1,39 @@
+{
+  "variables": {
+    "home": "{{env `HOME`}}",
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "name": "ngx-oss",
+      "ami_name": "packer-nginx-oss {{isotime \"2006-01-02\"}}",
+      "instance_type": "t2.micro",
+      "region": "us-west-1",
+      "source_ami": "ami-1c1d217c",
+      "ssh_username": "ubuntu",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "tags": {
+        "Name": "ngx-oss"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 60",
+        "sudo apt update",
+        "sudo apt install python-pip -y",
+        "sudo pip install ansible"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "galaxy_file": "requirements.yml",
+      "playbook_file": "playbook.yml"
+    }
+  ]
+}
