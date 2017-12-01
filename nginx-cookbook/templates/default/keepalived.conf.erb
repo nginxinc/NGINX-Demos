@@ -1,38 +1,54 @@
+<%
+=begin
+
+Cookbook Name:: nginx
+Attributes:: default
+
+Author:: Damian Curry (<damian.curry@nginx.com>)
+
+Copyright (c) 2017-present, NGINX, Inc.
+
+This source code is licensed under the Apache License (v2.0) found in the LICENSE file in
+the root directory of this source tree.
+
+=end
+%>
+
 vrrp_script chk_nginx_service {
-	script "/usr/lib/keepalived/nginx-ha-check"
-	interval 3
-	weight 50
+    script "/usr/lib/keepalived/nginx-ha-check"
+    interval 3
+    weight 50
 }
 
 vrrp_instance VI_1 {
-	interface eth1
-	<% if node['nginx']['ha_primary'] == "true" %>
-	state MASTER
-	priority 151
-	<% end %>
-	<% if node['nginx']['ha_primary'] == "false" %>
-	state BACKUP
-	priority 150
-	<% end %>
-	virtual_router_id 51
-	advert_int 1
-	unicast_src_ip <%= @myip %>
-	unicast_peer {
-	<% @ha_pair_ip.each do |ip| %>
-	   <% if ip != @myip %>
-	      <%= ip %>
-	   <% end %>
-	<% end %>
-	}
-	authentication {
-		auth_type PASS
-		auth_pass <%= node['nginx']['ha_keepalived_key'] %>
-	}
-	virtual_ipaddress {
-		<%= node['nginx']['ha_vip'] %>
-	}
-	track_script {
-		chk_nginx_service
-	}
-	notify "/usr/lib/keepalived/nginx-ha-notify"
+    interface eth1
+    <% if node['nginx']['ha_primary'] == "true" %>
+    state MASTER
+    priority 151
+    <% end %>
+    <% if node['nginx']['ha_primary'] == "false" %>
+    state BACKUP
+    priority 150
+    <% end %>
+    virtual_router_id 51
+    advert_int 1
+    unicast_src_ip <%= @myip %>
+    unicast_peer {
+    <% @ha_pair_ip.each do |ip| %>
+        <% if ip != @myip %>
+            <%= ip %>
+        <% end %>
+    <% end %>
+    }
+    authentication {
+        auth_type PASS
+        auth_pass <%= node['nginx']['ha_keepalived_key'] %>
+    }
+    virtual_ipaddress {
+        <%= node['nginx']['ha_vip'] %>
+    }
+    track_script {
+        chk_nginx_service
+    }
+    notify "/usr/lib/keepalived/nginx-ha-notify"
 }

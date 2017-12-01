@@ -1,3 +1,15 @@
+#
+# Cookbook Name:: nginx
+# Attributes:: default
+#
+# Author:: Damian Curry (<damian.curry@nginx.com>)
+#
+# Copyright (c) 2017-present, NGINX, Inc.
+#
+# This source code is licensed under the Apache License (v2.0) found in the LICENSE file in
+# the root directory of this source tree.
+#
+
 upstream_node_ips = []
 upstream_role = (node[:nginx][:upstream]).to_s
 search(:node, "role:#{node[:nginx][:upstream]}-upstream") do |nodes|

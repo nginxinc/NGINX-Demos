@@ -1,11 +1,10 @@
-NGINX Cookbook
-==============
-[![Cookbook]](https://github.com/NGINX-Demos/tree/master/nginx-cookbook)
+# NGINX Cookbook
+[Cookbook](https://github.com/NGINX-Demos/tree/master/nginx-cookbook)
 
 This cookbook is for demonstration purposes only. The code contained herein is not intended for use in production.
 
-Requirements
-------------
+## Requirements
+
 ### Cookbooks
 
 - On RHEL family distros, the "yum" cookbook is required.
@@ -19,11 +18,10 @@ The following platforms are supported:
 
 Other Debian and RHEL family distributions are assumed to work.
 
-Attributes
-----------
+## Attributes
+
 Node attributes for this cookbook are logically separated into different files. Some attributes are set only via a specific recipe.
 
-### default
 Generally used attributes. Some have platform-specific values. See `attributes/default.rb`. "The config" refers to "nginx.conf", the main config file.
 
 - `node['nginx']['install_source']` - Defines where the package will be installed from, can be either 'plus' or 'opensource'. Defaults to 'opensource'.
@@ -47,8 +45,4 @@ Generally used attributes. Some have platform-specific values. See `attributes/d
 - `node['nginx']['enable_upstream_conf']` - Enables the on-the-fly reconfiguration API for NGINX Plus. Defaults to false.
 - `node['nginx']['plus_status_server_name']` - Sets the `server_name` directive used in the Plus status page. Defaults to 'status-page'.
 
-- `node['nginx']['cloud_provider']` - Sets cloud provider to be used by the autoscaling script.  Currently supports ec2 (AWS) and openstack.
-
-
-
-
+- `node['nginx']['cloud_provider']` - Sets cloud provider to be used by the autoscaling script.  Currently supports ec2 (AWS) and openstack. You will also need to set your credentials in `files/default/knife.rb` to enable this option.

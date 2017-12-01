@@ -1,3 +1,19 @@
+<%
+=begin
+
+Cookbook Name:: nginx
+Attributes:: default
+
+Author:: Damian Curry (<damian.curry@nginx.com>)
+
+Copyright (c) 2017-present, NGINX, Inc.
+
+This source code is licensed under the Apache License (v2.0) found in the LICENSE file in
+the root directory of this source tree.
+
+=end
+%>
+
 #!/bin/bash
 NGINX_NODES="$(mktemp)"
 /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?upstream=<%= node['nginx']['upstream'] %>"| /usr/bin/awk '{print $2}' | /bin/sed -r 's/;//g' | /usr/bin/sort > $NGINX_NODES
@@ -21,19 +37,19 @@ for i in $DEL_NODE; do
     NODE_CONNS=`/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/status" | /usr/bin/jq ".upstreams.<%= node['nginx']['upstream'] %>.peers[${JSON_NODE_NUM}].active"`
     NODE_STATE=`/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/status" | /usr/bin/jq ".upstreams.<%= node['nginx']['upstream'] %>.peers[${JSON_NODE_NUM}].state"`
     if [[ ${NODE_STATE} == '"up"' ]] && [[ ${NODE_CONNS} == 0 ]]; then
-	echo "nodes is up with no active connections, removing ${i}"
-	/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
+    echo "nodes is up with no active connections, removing ${i}"
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
     elif [[ ${NODE_STATE} == '"draining"' ]] && [[ ${NODE_CONNS} == 0 ]]; then
     echo "nodes is draining with no active connections, removing ${i}"
     /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
     elif [[ ${NODE_STATE} == '"down"' ]]; then
-	echo "node state is down, removing ${i}":
-	/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
+    echo "node state is down, removing ${i}":
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
     elif [[ ${NODE_STATE} == '"unhealthy"' ]]; then
-	echo "node state is down, removing ${i}":
-	/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
+    echo "node state is down, removing ${i}":
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
     elif [[ ${NODE_STATE} == '"up"' ]] && [[ ${NODE_CONNS} != 0 ]]; then
-	echo "node has active connections, draining connections on ${i}"
+    echo "node has active connections, draining connections on ${i}"
     fi
 done
 

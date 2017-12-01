@@ -1,14 +1,8 @@
-Contributing
-============
+# Contributing
 
-TODO: Fill out your contributing process, or just stick with the default.
+Thanks for your interest in the NGINX cookbook! If you'd like to help out please:
 
-Steps
------
-
-Thanks for your interest in <%= cookbook_name %>! If you'd like to help out please:
-
-1. Fork it
+1. Fork this repository
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Add tests for the new feature; ensure they pass (`rake`)
 4. Commit your changes (`git commit -am 'Add some feature'`)

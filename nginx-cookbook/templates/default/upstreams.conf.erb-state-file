@@ -1,4 +1,0 @@
-   upstream <%= node['nginx']['upstream'] %> {
-       zone <%= node['nginx']['upstream'] %> 64k;
-       state /tmp/nginx-<%= node['nginx']['upstream'] %>.state;
-   }

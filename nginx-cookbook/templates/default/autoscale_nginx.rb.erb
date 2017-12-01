@@ -1,3 +1,19 @@
+<%
+=begin
+
+Cookbook Name:: nginx
+Attributes:: default
+
+Author:: Damian Curry (<damian.curry@nginx.com>)
+
+Copyright (c) 2017-present, NGINX, Inc.
+
+This source code is licensed under the Apache License (v2.0) found in the LICENSE file in
+the root directory of this source tree.
+
+=end
+%>
+
 require 'chef/api_client'
 require 'chef/config'
 require 'chef/knife'
@@ -160,4 +176,3 @@ while true
   last_conns_count = current_conns
   sleep(sleep_interval_in_seconds)
 end
-
