@@ -8,7 +8,7 @@
     {
       "type": "amazon-ebs",
       "name": "ngx-plus",
-      "ami_name": "packer-nginx-plus {{isotime \"2006-01-02\"}}",
+      "ami_name": "ngx-plus {{isotime \"2006-01-02\"}}",
       "instance_type": "t2.micro",
       "region": "us-west-1",
       "source_ami": "ami-1a033c7a",
@@ -23,7 +23,7 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "{{user `home`}}/.ssh/certs",
+      "source": "{{user `home`}}/.ssh/ngx-certs",
       "destination": "~/.ssh/certs"
     },
     {

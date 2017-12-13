@@ -8,7 +8,7 @@
     {
       "type": "amazon-ebs",
       "name": "ngx-oss",
-      "ami_name": "packer-nginx-oss {{isotime \"2006-01-02\"}}",
+      "ami_name": "ngx-oss {{isotime \"2006-01-02\"}}",
       "instance_type": "t2.micro",
       "region": "us-west-1",
       "source_ami": "ami-1c1d217c",
