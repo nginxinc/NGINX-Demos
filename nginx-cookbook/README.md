@@ -39,6 +39,11 @@ Generally used attributes. Some have platform-specific values. See `attributes/d
 - `node['nginx']['enable_streams']` - Enables or disables the stream directive with an `include` directive. Defaults to false.
 - `node['nginx']['stream_conf_dir']` - Sets directory and match string for the stream `include` statement.  Defaults to '/etc/nginx/streams-conf/*.conf'.
 
+- `node['nginx']['enable_ha_mode']` - Enables active/passive HA using keepalived with NGINX Plus.  If set to true it will automatically be installed.
+- `node['nginx']['ha_primary']` - Defines the primary node of a HA pair.  To be used in conjunction with the 'enable_ha_mode' directive.
+- `node['nginx']['ha_keepalived_key']` - Defines the secret key used by keepalived for an HA pair. To be used in conjunction with the 'enable_ha_mode' directive.
+- `node['nginx']['ha_vip']` - Defines the IP address to use as the VIP for a HA pair. To be used in conjunction with the 'enable_ha_mode' directive.
+
 - `node['nginx']['plus_status_enable']` - Enables or disables the Plus-only extended status page.  Defaults to false.
 - `node['nginx']['plus_status_port']` - Sets the port that the status page will listen on. Defaults to '8080'.
 - `node['nginx']['plus_status_allowed_ips']` - Sets the list of IPs or IP ranges that have access to the status page. Defaults to nil.

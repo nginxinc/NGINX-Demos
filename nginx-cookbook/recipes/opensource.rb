@@ -16,7 +16,7 @@ when 'rhel'
   version = version_long[0]
   yum_repository 'nginx' do
     description 'NGINX Mainline Repo'
-    baseurl "http://nginx.org/packages/mainline/#{node['platform']}/#{version}/$basearch/"
+    baseurl "https://nginx.org/packages/mainline/#{node['platform']}/#{version}/$basearch/"
     gpgcheck false
     action :create
   end
@@ -25,11 +25,11 @@ when 'debian'
   #include_recipe 'apt::default'
 
   apt_repository 'nginx' do
-    uri          "http://nginx.org/packages/mainline/#{node['platform']}/"
+    uri          "https://nginx.org/packages/mainline/#{node['platform']}/"
     distribution node['lsb']['codename']
     components   %w(nginx-plus)
     deb_src      false
-    key          'http://nginx.org/keys/nginx_signing.key'
+    key          'https://nginx.org/keys/nginx_signing.key'
     notifies :update, 'apt_update[nginx update]', :immediate
   end
 

@@ -49,9 +49,8 @@ cookbook_file "/home/ubuntu/.chef/knife.rb" do
   mode 0644
 end
 
-#cookbook_file "/root/.chef/damiancurry.pem" do
-cookbook_file "/home/ubuntu/.chef/damiancurry.pem" do
-  source "damiancurry.pem-chef"
+cookbook_file "/home/ubuntu/.chef/chef-key.pem" do
+  source "chef-key.pem"
   owner 'root'
   group 'root'
   mode 0644
