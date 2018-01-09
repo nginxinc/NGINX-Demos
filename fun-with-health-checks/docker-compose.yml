@@ -1,0 +1,72 @@
+nginxplus:
+  image: bhc-nginxplus
+  container_name: bhc-nginxplus
+  links:
+  - consul
+  volumes:
+  - "./nginxplus/config/conf.d:/etc/nginx/conf.d:ro"
+  ports:
+  - "80:80"
+  - "8082:8082"
+  - "8001:8001"
+  - "8002:8002"
+  - "8003:8003"
+
+consul:
+  command: "-server -bootstrap -node consul -advertise ${HOST_IP} -config-file /etc/consul.d/config.json"
+  image: progrium/consul:latest
+  container_name: consul
+  ports:
+  - "8300:8300"
+  - "8400:8400"
+  - "8500:8500"
+  - "8600:53"
+  - "8600:53/udp"
+  volumes:
+  - "./consul_dns_config.json:/etc/consul.d/config.json"
+  environment:
+  - HOST_IP
+
+registrator:
+  command: consul://consul:8500
+  image: gliderlabs/registrator:latest
+  container_name: registrator
+  links:
+  - consul
+  volumes:
+  - "/var/run/docker.sock:/tmp/docker.sock"
+
+unitcnt:
+  image: bhc-unit
+  labels:
+    SERVICE_9080_NAME: unitcnt
+    SERVICE_TAGS: production
+  volumes:
+  - "./unitcnt:/srv/app:ro"
+  ports:
+  - "9080"
+
+unitcpu:
+  image: bhc-unit
+  labels:
+    SERVICE_9080_NAME: unitcpu
+    SERVICE_TAGS: production
+  extra_hosts:
+    dockerhost: ${HOST_IP}
+  volumes:
+  - "./unitcpu:/srv/app:ro"
+  ports:
+  - "9080"
+
+unitmem:
+  image: bhc-unit
+  labels:
+    SERVICE_9080_NAME: unitmem
+    SERVICE_TAGS: production
+  mem_limit: 128M
+  extra_hosts:
+    dockerhost: ${HOST_IP}
+  volumes:
+  - "./unitmem:/srv/app:ro"
+  ports:
+  - "9080"
