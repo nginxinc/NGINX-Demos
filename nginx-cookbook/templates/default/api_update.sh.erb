@@ -1,0 +1,56 @@
+<%
+=begin
+
+Cookbook Name:: nginx
+Attributes:: default
+
+Author:: Damian Curry (<damian.curry@nginx.com>)
+
+Copyright (c) 2017-present, NGINX, Inc.
+
+This source code is licensed under the Apache License (v2.0) found in the LICENSE file in
+the root directory of this source tree.
+
+=end
+%>
+
+#!/bin/bash
+NGINX_NODES="$(mktemp)"
+/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?upstream=<%= node['nginx']['upstream'] %>"| /usr/bin/awk '{print $2}' | /bin/sed -r 's/;//g' | /usr/bin/sort > $NGINX_NODES
+CONFIG_NODES="$(mktemp)"
+/bin/grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /etc/nginx/conf.d/<%= node['nginx']['upstream'] %>-upstream.conf | /usr/bin/awk '{print $2}' | /bin/sed -r 's/;//g' | /usr/bin/sort > $CONFIG_NODES
+DIFF_OUT="$(mktemp)"
+/usr/bin/diff $CONFIG_NODES $NGINX_NODES > $DIFF_OUT
+ADD_NODE=`/usr/bin/diff ${CONFIG_NODES} ${NGINX_NODES} | /bin/grep "<" | /usr/bin/awk '{print $2}'`
+DEL_NODE=`/usr/bin/diff ${CONFIG_NODES} ${NGINX_NODES} | /bin/grep ">" | /usr/bin/awk '{print $2}'`
+
+for i in $ADD_NODE; do
+    echo "adding node ${i}";
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?add=&upstream=<%= node['nginx']['upstream'] %>&server=${i}&max_fails=0"
+done
+for i in $DEL_NODE; do
+    echo "removing node ${i}";
+    #NODE_ID=`/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?upstream=<%= node['nginx']['upstream'] %>" | /bin/grep ${i} | /usr/bin/awk '{print $4}' | /bin/sed -r 's/id=//g'`
+    NODE_ID=`/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?upstream=<%= node['nginx']['upstream'] %>" | /bin/grep ${i} | /bin/grep -oP 'id=\K\d+'`
+    NODE_COUNT=`/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?upstream=<%= node['nginx']['upstream'] %>" | /bin/grep -n ${i} | /bin/grep -oP '\d+:server' | /bin/sed -r 's/:server//g'`
+    JSON_NODE_NUM=$(expr $NODE_COUNT - 1)
+    NODE_CONNS=`/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/status" | /usr/bin/jq ".upstreams.<%= node['nginx']['upstream'] %>.peers[${JSON_NODE_NUM}].active"`
+    NODE_STATE=`/usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/status" | /usr/bin/jq ".upstreams.<%= node['nginx']['upstream'] %>.peers[${JSON_NODE_NUM}].state"`
+    if [[ ${NODE_STATE} == '"up"' ]] && [[ ${NODE_CONNS} == 0 ]]; then
+    echo "nodes is up with no active connections, removing ${i}"
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
+    elif [[ ${NODE_STATE} == '"draining"' ]] && [[ ${NODE_CONNS} == 0 ]]; then
+    echo "nodes is draining with no active connections, removing ${i}"
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
+    elif [[ ${NODE_STATE} == '"down"' ]]; then
+    echo "node state is down, removing ${i}":
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
+    elif [[ ${NODE_STATE} == '"unhealthy"' ]]; then
+    echo "node state is down, removing ${i}":
+    /usr/bin/curl -s "http://localhost:<%= node['nginx']['plus_status_port'] %>/upstream_conf?remove=&upstream=<%= node['nginx']['upstream'] %>&id=${NODE_ID}"
+    elif [[ ${NODE_STATE} == '"up"' ]] && [[ ${NODE_CONNS} != 0 ]]; then
+    echo "node has active connections, draining connections on ${i}"
+    fi
+done
+
+rm $NGINX_NODES $CONFIG_NODES $DIFF_OUT

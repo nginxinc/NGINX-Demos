@@ -1,0 +1,5 @@
+---
+- hosts: localhost
+  become: true
+  roles:
+    - role: nginxinc.nginx-oss

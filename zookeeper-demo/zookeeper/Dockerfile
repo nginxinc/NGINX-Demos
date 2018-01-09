@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER Kunal Pariani <kunal.pariani@nginx.com>
 
-LABEL name="zookeeper" version="3.4.8"
+LABEL name="zookeeper" version="3.4.11"
 
 RUN apt-get update && apt-get install -y software-properties-common wget curl bash
 
@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y openjdk-8-jdk jq
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 RUN export JAVA_HOME
 
-RUN wget -q -O - http://apache.mirrors.pair.com/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz | tar -xzf - -C /opt \
-    && mv /opt/zookeeper-3.4.8 /opt/zookeeper \
+RUN wget -q -O - http://apache.mirrors.pair.com/zookeeper/zookeeper-3.4.11/zookeeper-3.4.11.tar.gz | tar -xzf - -C /opt \
+    && mv /opt/zookeeper-3.4.11 /opt/zookeeper \
     && cp /opt/zookeeper/conf/zoo_sample.cfg /opt/zookeeper/conf/zoo.cfg \
     && mkdir -p /tmp/zookeeper
 

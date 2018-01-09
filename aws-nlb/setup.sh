@@ -1,0 +1,1 @@
+cd packer/ngx-plus && packer build -force packer.json && cd ../ngx-oss && packer build -force packer.json && sleep 90 && cd ../../terraform && terraform init && yes yes | terraform destroy && terraform apply
