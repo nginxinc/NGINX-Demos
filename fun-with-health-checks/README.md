@@ -30,7 +30,7 @@ The following images are used:
 
 ## System Requirements and Setup
 
-The demo runs on a single Docker host.  The backend services are written in PHP and Python.  It has been tested with Ubuntu 16.04, NGINX Plus R14, NGINX Unit 0.3, PHP 7.0, Python 2.7, Docker 17.05-ce, 17.06-ce and 17.12-ce and Docker Compose 1.13, 1.14 and 1.18.  The demo uses the `dashboard.html` page and version 2 of the NGINX Plus API, included in NGINX Plus R14.
+The demo runs on a single Docker host.  The backend services are written in PHP and Python.  It has been tested with Ubuntu 16.04, NGINX Plus R14, NGINX Unit 0.3 and 0.4, PHP 7.0, Python 2.7, Docker 17.05-ce, 17.06-ce and 17.12-ce and Docker Compose 1.13, 1.14 and 1.18.  The demo uses the `dashboard.html` page and version 2 of the NGINX Plus API, included in NGINX Plus R14.
 
 The following is assumed:
 
@@ -54,7 +54,7 @@ To install the demo follow these steps:
 
 1. Install Docker if it isn't already installed:<br>`curl -fsSL https://get.docker.com/ | sh`<br>You may need to start the Docker service.
 
-2. Install Docker Compose if it isn't already installed:<br>``curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose``<br>`chmod +x /usr/local/bin/docker-compose`<br>*Note:* To find the latest release, check `https://github.com/docker/compose/releases`.
+2. Install Docker Compose if it isn't already installed:<br>``curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose``<br><br>`chmod +x /usr/local/bin/docker-compose`<br>*Note:* To find the latest release, check `https://github.com/docker/compose/releases`.
 
 3. The CPU and memory-usage-based health checks use the Docker API. To configure the API to work with HTTP:
 	* Edit `/lib/systemd/system/docker.service` and change the line:<br>`ExecStart=/usr/bin/dockerd -H fd://`<br>to:<br>`ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock`
@@ -75,8 +75,8 @@ To install the demo follow these steps:
 
 9. Install pv - Used for the demo script<br>`apt-get install pv`
 
-10. Install demo-magic.sh - Used by the demo script<br>Download `https://raw.githubusercontent.com/paxtonhare/demo-magic/master/demo-magic.sh`:
-`wget -nv -O /root/NGINX-Demos/r-fun-with-health-checks/demo-magic.sh https://raw.githubusercontent.com/paxtonhare/demo-magic/master/demo-magic.sh`
+10. Install demo-magic.sh - Used by the demo script<br>Download `https://raw.githubusercontent.com/paxtonhare/demo-magic/master/demo-magic.sh`:<br><br>
+`wget -nv -O /root/NGINX-Demos/r-fun-with-health-checks/demo-magic.sh https://raw.githubusercontent.com/paxtonhare/demo-magic/master/demo-magic.sh`<br><br>
 Make the script executable:
 `chmod a+x demo-magic.sh`
 
