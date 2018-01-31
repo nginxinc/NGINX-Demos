@@ -10,6 +10,7 @@ RUN apt-get install -y procps net-tools
 
 RUN apt-get install -y apt-transport-https curl wget
 RUN apt-get install -y php7.0-curl
+RUN apt-get install -y stress
 
 EXPOSE 8443 9080
 
