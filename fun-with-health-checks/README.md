@@ -20,7 +20,7 @@ The following images are used:
 
 * **NGINX Plus:** This image is created using `nginxplus/Docketfile` which closely matches the Dockerfile from the blog post [Deploying NGINX and NGINX Plus with Docker](http://nginx.com/blog/deploying-nginx-nginx-plus-docker/).  It is named *bhc-nginxplus* and exposes ports 80, 8001, 8002, 8003 and 8082.  A volume is used for the NGINX Plus configuration file, `nginxplus/config/backend.conf`.  The content is copied from `nginxplus/content`.
 
-* **NGINX Unit:**  This image is created using `unit/Docketfile`.  It is named *bhc-unit* and exposes ports 8443 and 9080.  In addition to NGINX Unit, PHP 7.0, Python 2.7, curl and stress (to stress the CPU for the CPU-usage-based health check) are installed.  This image is used for the backend containers that are health checked, with the three types of containers having different web content, attached to the container using a Docker volume.
+* **NGINX Unit:**  This image is created using `unit/Docketfile` and is based of the Unit Docker image.  It is named *bhc-unit* and exposes ports 8443 and 9080.  In addition to NGINX Unit curl and stress (to stress the CPU for the CPU-usage-based health check) are installed.  This image is used for the backend containers that are health checked, with the three types of containers having different web content, attached to the container using a Docker volume.
 
 * **Consul:** This image is used in combination with Registrator for DNS service discovery.  It is named *progrium/consul*.
 
