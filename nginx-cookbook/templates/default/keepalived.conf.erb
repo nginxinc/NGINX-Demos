@@ -15,7 +15,12 @@ the root directory of this source tree.
 %>
 
 vrrp_script chk_nginx_service {
+<% if node['platform_family'] == 'debian' %>
     script "/usr/lib/keepalived/nginx-ha-check"
+<% end %>
+<% if node['platform_family'] == 'rhel' %>
+    script "/usr/libexec/keepalived/nginx-ha-check"
+<% end %>    
     interval 3
     weight 50
 }
@@ -50,5 +55,10 @@ vrrp_instance VI_1 {
     track_script {
         chk_nginx_service
     }
-    notify "/usr/lib/keepalived/nginx-ha-notify"
+<% if node['platform_family'] == 'debian' %>
+notify "/usr/lib/keepalived/nginx-ha-notify"
+<% end %>
+<% if node['platform_family'] == 'rhel' %>
+notify "/usr/libexec/keepalived/nginx-ha-notify"
+<% end %>    
 }
