@@ -102,7 +102,7 @@ pe "curl http://localhost:8002/testcpu.php"
 pe "docker-compose up --scale unitcnt=2 --scale unitcpu=2 --scale unitmem=2 -d"
 
 # 25. Send a request to one of the CPU-usage-based containers that uses more then the thresshold for 2 containers (35%) 
-pe "curl http://localhost:8002/testcpu.php?timeout=30&"
+pe "curl http://localhost:8002/testcpu.php?timeout=45&"
 
 # 26. Show Docker stats to see the CPU usage go up on one of the containers.
 # Shell
