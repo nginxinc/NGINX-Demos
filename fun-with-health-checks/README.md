@@ -30,7 +30,7 @@ The following images are used:
 
 ## System Requirements and Setup
 
-The demo runs on a single Docker host.  The backend services are written in PHP and Python.  It has been tested with Ubuntu 16.04, NGINX Plus R14, NGINX Unit 0.6, PHP 7.0, Python 2.7, Docker 17.05-ce, 17.06-ce and 17.12-ce and Docker Compose 1.13, 1.14 and 1.18.  The demo uses the `dashboard.html` page and version 2 of the NGINX Plus API, included in NGINX Plus R14.
+The demo runs on a single Docker host.  The backend services are written in PHP and Python.  It has been tested with Ubuntu 16.04 and 17.10, NGINX Plus R14, NGINX Unit 0.6, PHP 7.0, Python 2.7, Docker 17.05-ce, 17.06-ce and 17.12-ce and Docker Compose 1.13, 1.14 and 1.18.  The demo uses the `dashboard.html` page and version 2 of the NGINX Plus API, included in NGINX Plus R14.
 
 The following is assumed:
 
