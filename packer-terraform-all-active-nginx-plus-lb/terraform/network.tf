@@ -1,8 +1,8 @@
 # Configure the Google Cloud firewall
 resource "google_compute_firewall" "default" {
-  name = "nginx-http-fw-rule"
+  name = "ngx-http-fw-rule"
   network = "default"
-  description = "Allow access to ports 80, 8080, and 443 on all NGINX instances."
+  description = "Allow access to ports 80 and 8080 on all NGINX instances."
   allow {
     protocol = "tcp"
     ports = [
@@ -22,12 +22,12 @@ resource "google_compute_firewall" "default" {
 
 # Create a static IP address in Google cloud
 resource "google_compute_address" "default" {
-  name = "nginx-network-lb-static-ip"
+  name = "ngx-network-lb-static-ip"
 }
 
 # Create a target pool to balance incoming connections to the LB instance group
 resource "google_compute_target_pool" "default" {
-  name = "nginx-network-lb-backend"
+  name = "ngx-network-lb-backend"
   health_checks = [
     "${google_compute_http_health_check.default.name}",
   ]
@@ -36,7 +36,7 @@ resource "google_compute_target_pool" "default" {
 
 # Forward incoming connections to port 80 to the Google network balancer
 resource "google_compute_forwarding_rule" "80" {
-  name = "nginx-network-lb-frontend-80"
+  name = "ngx-network-lb-frontend-80"
   target = "${google_compute_target_pool.default.self_link}"
   ip_address = "${google_compute_address.default.address}"
   port_range = "80"
@@ -44,7 +44,7 @@ resource "google_compute_forwarding_rule" "80" {
 
 # Forward incoming connections to port 8080 to the Google network balancer
 resource "google_compute_forwarding_rule" "8080" {
-  name = "nginx-network-lb-frontend-8080"
+  name = "ngx-network-lb-frontend-8080"
   target = "${google_compute_target_pool.default.self_link}"
   ip_address = "${google_compute_address.default.address}"
   port_range = "8080"
