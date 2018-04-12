@@ -1,6 +1,6 @@
 # Configure HTTP Health Checks for NGINX
 resource "google_compute_http_health_check" "default" {
-  name = "nginx-http-health-check"
+  name = "ngx-http-health-check"
   description = "Basic HTTP health check to monitor NGINX instances"
   request_path = "/"
   check_interval_sec = 10
