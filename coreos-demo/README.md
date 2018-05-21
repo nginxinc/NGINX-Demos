@@ -1,4 +1,12 @@
-# Load Balancing Applications with NGINX Plus in a CoreOS Cluster
+# Load Balancing Applications with NGINX Plus in a CoreOS Cluster [deprecated]
+
+**Note**: The demo uses deprecated technologies:
+* fleet, which CoreOS officially stopped supporting in February, 2018 in favor of Kubernetes.
+* The NGINX Plus Upstream Conf module, which is deprecated and replaced by the NGINX Plus API in NGINX Plus R13 and later.
+
+The demo has not been updated to use the replacement technologies, and the described solution is no longer suitable for use.
+
+## Intro
 
 The demo shows how to load balance a web application running in a CoreOS cluster
 with NGINX Plus.
