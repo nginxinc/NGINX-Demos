@@ -2,6 +2,7 @@
   "description": "Create an NGINX Plus LB and two NGINX Plus web servers",
   "variables": {
     "home": "{{env `HOME`}}",
+    "license": "{{env `HOME`}}/.ssh/ngx-certs",
     "project_id": "all-active-nginx-plus-lb",
     "zone": "us-west1-a"
   },
@@ -40,8 +41,8 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "./license",
-      "destination": "~"
+      "source": "{{user `license`}}",
+      "destination": "~/.ssh/ngx-certs"
     },
     {
       "type": "shell",
@@ -95,7 +96,7 @@
     },
     {
       "type": "file",
-      "source":"./server",
+      "source":"./html",
       "destination": "~",
       "only": [
         "ngx-app-1",
@@ -105,8 +106,8 @@
     {
       "type": "shell",
       "inline": [
-        "sudo mv ~/server /usr/share/nginx",
-        "sudo rm -rf ~/server"
+        "sudo mv ~/html /usr/share/nginx",
+        "sudo rm -rf ~/html"
       ],
       "only": [
         "ngx-app-1",
@@ -116,7 +117,7 @@
     {
       "type": "shell",
       "inline": [
-        "if [ -f /etc/nginx/conf.d/default.conf ]; then sudo mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.orig; fi;",
+        "if [ -f /etc/nginx/conf.d/default.conf ]; then sudo mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak; fi;",
         "sudo nginx -s reload"
       ],
       "only": [

@@ -6,5 +6,5 @@
       vars:
         type: plus
         license:
-          certificate: ~/license/nginx-repo.crt
-          key: ~/license/nginx-repo.key
+          certificate: ~/.ssh/ngx-certs/nginx-repo.crt
+          key: ~/.ssh/ngx-certs/nginx-repo.key
