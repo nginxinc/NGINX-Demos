@@ -32,7 +32,6 @@ import math
 # The following values can be changed to control the autoscaling behavior
 
 NGINX_API_URL = 'http://localhost:8080/api/3/http'
-#UPSTREAM_CONF_URL = 'http://localhost/upstream_conf'
 SERVER_ZONE='nginx_ws' # The server zone to get the number of requests from
 UPSTREAM_GROUP='nginx_backends' # The upstream group to scale
 SLEEP_INTERVAL=2 # How long to wait between API requests, in seconds
@@ -189,7 +188,6 @@ def main():
                     if totalNodes < args.max_nodes:
                         # Make sure to add at least one node
                         newNodeCount = min(neededNodes - upNodes, args.max_nodes_to_add, args.max_nodes - totalNodes)
-                        #print("Scale up %d nodes") %(newNodeCount)
                         print("Scale up by %d nodes from %d to %d nodes") %(newNodeCount, totalNodes, totalNodes + newNodeCount)
                         addBackendNodes(newNodeCount)
                 else:
