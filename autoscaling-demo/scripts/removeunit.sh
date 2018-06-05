@@ -2,7 +2,7 @@
 # Copyright (C) 2015 Nginx, Inc.
 # This program is provided for demonstration purposes only
 #
-# Removes multiple Elasticsearch upstream servers and their containers.
+# Removes multiple NGINX Unit upstream servers and their containers.
 #
 # There is one input parameter, the number of servers to remove.
 
@@ -17,5 +17,5 @@ fi
 
 until [  $count -lt 1 ]; do
     let count-=1
-    ./removenode.sh elasticsearch_backends
+    ./removenode.sh unit_backends
 done

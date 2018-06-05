@@ -6,16 +6,15 @@
 #
 # A proof of concept for auto-scaling an NGINX Plus upstream group
 #
-# This script periodically makes a request to the NGINX Plus status API
+# This script periodically makes a request to the NGINX Plus API
 # and computes the request rate based on the number of requests that have
 # been processed since the last API call and the number of nodes, both up
 # and total in the upstream group.  If the request rate per up node is above
 # the specified maximum request rate, one or more nodes will be added to
-# the upstream group using the NGINX Plus upstream_conf API, unless the
-# maximum number of total nodes has been reached.  If the request rate
-# per up node is below the specified limit, one or more nodes will be
-# removed from the upstream group unless the minimum number of nodes has
-# been reached.
+# the upstream group using the API, unless the maximum number of total nodes
+# has been reached.  If the request rate per up node is below the specified
+# limit, one or more nodes will be removed from the upstream group unless the
+# minimum number of nodes has been reached.
 #
 # The settings that control the autoscaling behavior can be set on the
 # command line or the default values can be used.  -h or --help will print
@@ -32,8 +31,8 @@ import math
 
 # The following values can be changed to control the autoscaling behavior
 
-NGINX_STATUS_URL = 'http://localhost:8080/status' # The URL for the NGINX Plus status API
-UPSTREAM_CONF_URL = 'http://localhost/upstream_conf' # The URL for the NGINX Plus configuration API.
+NGINX_API_URL = 'http://localhost:8080/api/3/http'
+#UPSTREAM_CONF_URL = 'http://localhost/upstream_conf'
 SERVER_ZONE='nginx_ws' # The server zone to get the number of requests from
 UPSTREAM_GROUP='nginx_backends' # The upstream group to scale
 SLEEP_INTERVAL=2 # How long to wait between API requests, in seconds
@@ -54,7 +53,7 @@ def getStatus(client, statusURL, path):
 
     url = statusURL + path
     try:
-        response = client.get(url) # Make an NGINX Plus status API call
+        response = client.get(url) # Make an NGINX Plus API call
     except requests.exceptions.ConnectionError:
         print "Error: Unable to connect to " + url
         sys.exit(1)
@@ -71,7 +70,8 @@ def getStatus(client, statusURL, path):
 # Use the Status API to the total request count from the server zone.
 ################################################################################
 def getRequestCount(nginxStats):
-	return nginxStats['server_zones'][SERVER_ZONE]['requests']
+	return nginxStats[SERVER_ZONE]['requests']
+    #return nginxStats['server_zones'][SERVER_ZONE]['requests']
 
 ################################################################################
 # Function addBackendNodes
@@ -97,12 +97,12 @@ def removeBackendNodes(nodeCount):
 ################################################################################
 def getNodeCounts(client, statusURL, upstreamGroup):
 
-    path = '/upstreams/' + upstreamGroup + '/peers'
+    path = '/upstreams/' + upstreamGroup
     totalCount = 0
     upCount = 0
 
     nginxStats = getStatus(client, statusURL, path)
-    for stats in nginxStats:
+    for stats in nginxStats['peers']:
         totalCount += 1
         if stats['state'] == 'up':
             upCount += 1
@@ -118,7 +118,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Provide more detailed output")
-    parser.add_argument("--nginx_status_url", default=NGINX_STATUS_URL,
+    parser.add_argument("--NGINX_API_URL", default=NGINX_API_URL,
                         help="URL for NGINX Plus Status API")
     parser.add_argument("--nginx_server_zone", default=SERVER_ZONE,
                         help="The NGINX Plus server zone to collect requests count from")
@@ -157,7 +157,7 @@ def main():
     while True:
         now = datetime.datetime.now()
         currentSeconds= (now.hour * 60) + (now.minute * 60) + now.second
-        nginxStats = getStatus(client, args.nginx_status_url, "")
+        nginxStats = getStatus(client, args.NGINX_API_URL, "/server_zones")
 
         currentRequests = getRequestCount(nginxStats)
 
@@ -171,7 +171,7 @@ def main():
             # Get the total number nodes in the upstream group, and the total that
             # that are currently up.  Do the RPS calculation on the up nodes, but
             # still respect the total allowed nodes.
-            nodeCounts = getNodeCounts(client, args.nginx_status_url, args.nginx_upstream_group)
+            nodeCounts = getNodeCounts(client, args.NGINX_API_URL, args.nginx_upstream_group)
             totalNodes = nodeCounts['totalNodes']
             upNodes = nodeCounts['upNodes']
             if args.verbose:

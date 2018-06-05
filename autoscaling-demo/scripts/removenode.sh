@@ -14,23 +14,23 @@ else
 fi
 # Get the upstream data from NGINX Plus for the last upstream server
 # extracting a string with the port and node id: "<port>; id=<node id>"
-upstreamInfo=`curl -s http://localhost/upstream_conf?upstream=$upstream | tail -n1 | awk -F: '{print $2}'`
+upstreamInfo=`curl -s http://localhost:8080/api/3/http/upstreams/$upstream | jq '.peers[-1]'`
 if [ ! "$upstreamInfo" ]; then
     # There are no upstream servers
     exit 1
 fi
 # Get the node id
-node=`echo $upstreamInfo | awk '{print $3}'`
+node=`echo $upstreamInfo | jq '.id'`
 if [ "$node" != "" ]; then
     # Get the port
-    port=`echo $upstreamInfo | awk -F\; '{print $1}'`
+    port=`echo $upstreamInfo | jq --raw-output '.server' | awk -F\: '{print $2}'`
     if [ "$port" != "" ]; then
         cid=`docker ps | grep $port | awk '{print $1}'`
         if [ "$cid" != "" ]; then
             echo "Remove node $node from upstream $upstream"
             # Remove the upstream server
-            curl http://localhost/upstream_conf?remove=\&upstream=$upstream\&$node
-            echo "Remove $upstream container $cid"
+            curl -s -X DELETE "http://localhost:8080/api/3/http/upstreams/$upstream/servers/$node"
+            echo -e "\nRemove $upstream container $cid"
             # Remove the container
             docker rm -f $cid
             exit 0

@@ -29,9 +29,9 @@ fi
 source dockerip
 # Create the container
 cid=`docker run -P -d $image`
-# Get the mapped port 
+# Get the mapped port
 mapport=`docker port $cid $port | awk -F : '{print $2}'`
 echo "Container created: $cid Port: $mapport"
 # Add the node to the upstream group
-addnode=`curl -s http://localhost/upstream_conf?add=\&upstream=$upstream\&server=$ip:$mapport`
-echo "Node added: $addnode"
+curl -s -X POST -d "{\"server\":\"$ip:$mapport\"}" -s "http://localhost:8080/api/3/http/upstreams/$upstream/servers"
+echo -e "\nNode added: $addnode"

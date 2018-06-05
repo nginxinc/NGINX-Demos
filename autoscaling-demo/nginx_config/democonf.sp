@@ -4,9 +4,9 @@ upstream nginx_backends {
     sticky cookie test;
 }
 
-upstream elasticsearch_backends {
-    zone elasticsearch_backends 64K;
-    state /tmp/elasticsearch_backends.state;
+upstream unit_backends {
+    zone unit_backends 64K;
+    state /tmp/unit_backends.state;
 }
 
 match server_ok {
@@ -23,20 +23,13 @@ server {
         sub_filter_once on; 
         health_check uri=/healthcheck.html match=server_ok;
     }
-    location /upstream_conf {
-        upstream_conf;
-    }
 }
 
 server {
-    listen 9200;
-    status_zone elasticsearch;
+    listen 9080;
+    status_zone unit;
     location / {
-        proxy_pass http://elasticsearch_backends;
-        proxy_connect_timeout 1s;
-        proxy_read_timeout 1s;
-        #proxy_next_upstream error timeout;
-        #health_check uri=/_cat/indices?v;
+        proxy_pass http://unit_backends;
     }
 }
 
@@ -45,15 +38,13 @@ server {
     root /usr/share/nginx/html;
  
     location / {
-        index status.html;
+        index dashboard.html;
     }
 
-    location = /status.html {
+    location /api {
+        api write=on;
     }
 
-    location /status {
-        status;
-    }
 }
 
 

@@ -1,9 +1,9 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER NGINX Docker Maintainers "docker-maint@nginx.com"
 
 # Set the debconf frontend to Noninteractive
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN apt-get update && apt-get install -y -q wget apt-transport-https lsb-release ca-certificates
+RUN apt-get update && apt-get install -y -q wget apt-transport-https lsb-release ca-certificates gnupg
 
 # Download certificate and key from the customer portal https://cs.nginx.com
 # and copy to the build context

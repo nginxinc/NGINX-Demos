@@ -2,17 +2,17 @@
 # Copyright (C) 2015 Nginx, Inc.
 # This program is provided for demoonstration purposes only
 #
-# Create multiple Elasticsearch containers and add them to
-# the upstream group. 
+# Create multiple NGINX Unit containers and add them to
+# the upstream group.
 #
 # There is one input parameter, the number of servers to create.
 
 # The name of NGINX Plus upstream group
-upstream="elasticsearch_backends"
+upstream="unit_backends"
 # The Docker image to use for container
-image="elasticsearch"
+image="nginxunit"
 # The port to be mapped
-port=9200
+port=9080
 
 if [ $1 ]; then
     count=$1
