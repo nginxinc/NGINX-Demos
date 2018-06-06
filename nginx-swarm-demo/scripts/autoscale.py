@@ -1,27 +1,27 @@
 #!/usr/bin/env python
 ################################################################################
-# Copyright (C) 2016 Nginx, Inc.
+# Copyright (C) 2018 Nginx, Inc.
 #
-# Version 0.6.0 2016/10/26
+# Version 0.7.0 2018/6/5
 #
 # This program is provided for demonstration purposes only
 #
 # A proof of concept for auto-scaling an NGINX Plus upstream group
 # in Docker Swarm.
 #
-# This script periodically makes a request to the NGINX Plus status API
-# and computes the request rate based on the number of requests that have
-# been processed since the last API call and the number of nodes, both up
-# and total in the upstream group.  If the request rate per up node is above
-# the specified maximum request rate, one or more nodes will be added to
-# the upstream group using the Docker Swarm CLI, unless the maximum number
-# of total nodes has been reached.  If the request rate per up node is below
-# the specified limit, one or more nodes will be removed from the upstream
-# group unless the minimum number of nodes has been reached.
+# This script periodically makes a request to the NGINX Plus API and computes
+# the request rate based on the number of requests that have been processed
+# since the last API call and the number of nodes, both up and total in the
+# upstream group.  If the request rate per up node is above the specified
+# maximum request rate, one or more nodes will be added to the upstream group
+# using the Docker Swarm CLI, unless the maximum number of total nodes has been
+# reached.  If the request rate per up node is below the specified limit, one
+# or more nodes will be removed from the upstream group unless the minimum
+# number of nodes has been reached.
 #
-# The settings that control the autoscaling behavior can be set on the
-# command line or the default values can be used.  -h or --help will print
-# out the complete list of command line parameters.
+# The settings that control the autoscaling behavior can be set on the command
+# or the default values can be used.  -h or --help will print out the complete
+# list of command line parameters.
 ################################################################################
 
 import requests
@@ -38,8 +38,8 @@ from docker import Client
 SWARM_MASTER = 'swarmmaster' # The host name for the Swarm master node
 DOCKER_API_PORT = 2375 # The port for the HTTP Docker API
 SERVICE = 'service1' # The Docker Swarm Service and upstream group to scale
-NGINX_STATUS_PATH = 'status' # The URL path for the NGINX Plus status API
-NGINX_STATUS_PORT = 8081 # The port for the NGINX Plus status API
+NGINX_API_PATH = 'api/3/http' # The URL path for the NGINX Plus API
+NGINX_API_PORT = 8081 # The port for the NGINX Plus API
 SERVER_ZONE = 'swarmdemo' # The server zone to get the number of requests from
 
 SLEEP_INTERVAL = 5 # How long to wait between API requests, in seconds
@@ -53,14 +53,15 @@ MAX_RPS = 6 # Scale up if the requests per second exceeds this value
 ################################################################################
 # Function getStatus
 #
-# Make a call to the NGINX Plus Status API.
+# Make a call to the NGINX Plus API.
 ################################################################################
 def getStatus(client, swarmMaster, statusPath, statusPort, path):
 
-    url = 'HTTP://' + swarmMaster + ':' + str(statusPort) + '/' + statusPath + path
+    url = ('HTTP://' + swarmMaster + ':' + str(statusPort) + '/' + statusPath
+           + path)
 
     try:
-        response = client.get(url) # Make an NGINX Plus status API call
+        response = client.get(url) # Make an NGINX Plus API call
     except requests.exceptions.ConnectionError:
         print("Error: Unable to connect to " + url)
         sys.exit(1)
@@ -87,7 +88,7 @@ def scaleBackendNodes(swarmService, nodeCount):
 # Use the Status API to the total request count from the server zone.
 ################################################################################
 def getRequestCount(serverZone, nginxStats):
-	return nginxStats['server_zones'][serverZone]['requests']
+	return nginxStats[serverZone]['requests']
 
 ################################################################################
 # Function getNodeCounts
@@ -97,12 +98,14 @@ def getRequestCount(serverZone, nginxStats):
 ################################################################################
 def getNodeCounts(client, swarmMaster, statusPath, statusPort, upstreamGroup):
 
-    path = '/upstreams/' + upstreamGroup + '/peers'
+    path = '/upstreams/' + upstreamGroup
+
     totalCount = 0
     upCount = 0
 
     nginxStats = getStatus(client, swarmMaster, statusPath, statusPort, path)
-    for stats in nginxStats:
+
+    for stats in nginxStats['peers']:
         totalCount += 1
         if stats['state'] == 'up':
             upCount += 1
@@ -122,9 +125,6 @@ def getReplicaCount(client, swarmMaster, dockerAPIPort, serviceName):
     serviceData = cli.services({'name': serviceName})
     nodeCount = serviceData[0]['Spec']['Mode']['Replicated']['Replicas']
 
-    #serviceData = getDocker(client, swarmMaster, dockerAPIPort, url)
-    #nodeCount = serviceData['Spec']['Mode']['Replicated']['Replicas']
-
     return nodeCount
 
 ################################################################################
@@ -139,31 +139,47 @@ def main():
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Provide more detailed output")
     parser.add_argument("--swarm_master", default=SWARM_MASTER,
-                        help="Host name or IP address of the Swarm Master node")
+                        help="Host name or IP address of the Swarm Master \
+                        node (default: " + SWARM_MASTER + ")")
     parser.add_argument("--docker_api_port", type=int, default=DOCKER_API_PORT,
-                        help="HTTP port for the Docker API")
+                        help="HTTP port for the Docker API (default: " +
+                        str(DOCKER_API_PORT) + ")")
     parser.add_argument("-s", "--service", default=SERVICE,
-                        help="The Swarm service and NGINX Plus upstream group to scale")
-    parser.add_argument("--nginx_status_path", default=NGINX_STATUS_PATH,
-                        help="URL for NGINX Plus Status API")
-    parser.add_argument("--nginx_status_port", type=int, default=NGINX_STATUS_PORT,
-                        help="Port for the NGINX Plus Status API")
+                        help="The Swarm service and NGINX Plus upstream group \
+                        to scale (default: " + SERVICE + ")")
+    parser.add_argument("--NGINX_API_PATH", default=NGINX_API_PATH,
+                        help="URL for NGINX Plus API (default: " +
+                        NGINX_API_PATH + ")")
+    parser.add_argument("--NGINX_API_PORT", type=int, default=NGINX_API_PORT,
+                        help="Port for the NGINX Plus API (default: " +
+                        str(NGINX_API_PORT) + ")")
     parser.add_argument("--nginx_server_zone", default=SERVER_ZONE,
-                        help="The NGINX Plus server zone to collect requests count from")
+                        help="The NGINX Plus server zone to collect requests \
+                        count from (default: " + SERVER_ZONE + ")")
     parser.add_argument("--sleep_interval", type=int, default=SLEEP_INTERVAL,
-                        help="The sleep interval between checking the status")
+                        help="The sleep interval between checking the status \
+                        (default: " + str(SLEEP_INTERVAL) + ")")
     parser.add_argument("--min_nodes", type=int, default=MIN_NODES,
-                        help="The minimum healthy nodes to keep in the upstream group")
+                        help="The minimum healthy nodes to keep in the \
+                        upstream group (default: " + str(MIN_NODES) + ")")
     parser.add_argument("--max_nodes", type=int, default=MAX_NODES,
-                        help="The maximum nodes to keep in the upstream group, healthy or unhealthy")
-    parser.add_argument("--max_nodes_to_add", type=int, default=MAX_NODES_TO_ADD,
-                        help="The maximum nodes to add at one time")
-    parser.add_argument("--max_nodes_to_remove", type=int, default=MAX_NODES_TO_REMOVE,
-                        help="The maximum nodes to remove at one time")
+                        help="The maximum nodes to keep in the upstream group, \
+                        healthy or unhealthy (default: " + str(MAX_NODES) + ")")
+    parser.add_argument("--max_nodes_to_add", type=int,
+                        default=MAX_NODES_TO_ADD,
+                        help="The maximum nodes to add at one time (default: "
+                        + str(MAX_NODES_TO_ADD) + ")")
+    parser.add_argument("--max_nodes_to_remove", type=int,
+                        default=MAX_NODES_TO_REMOVE,
+                        help="The maximum nodes to remove at one time \
+                        (default: " + str(MAX_NODES_TO_REMOVE) + ")")
     parser.add_argument("--min_rps", type=int, default=MIN_RPS,
-                        help="The rps per node below which to scale down")
+                        help="The rps per node below which to scale down \
+                        (default: " + str(MIN_RPS) + ")")
     parser.add_argument("--max_rps", type=int, default=MAX_RPS,
-                        help="The rps per node above which to scale up")
+                        help="The rps per node above which to scale up \
+                        (default: " + str(MAX_RPS) + ")")
+
     global args
     args = parser.parse_args()
 
@@ -171,12 +187,12 @@ def main():
         print("Input arguments:")
         print("args: " + str(args))
 
-    lastSeconds=0 # The timestamp for the previous API request
-    currentSeconds=0 # The timestamp for the current API request
-    lastRequests=0 # The number of requests processed as of the previous API request
-    currentRequests=0 # The number of requests processed as of the current API request
-    rps=0 # The requests per second since the previous API request
-    nodeCount=0 # The current number of nodes in the upstream group
+    lastSeconds=0 # Timestamp for the previous API request
+    currentSeconds=0 # Timestamp for the current API request
+    lastRequests=0 # Requests processed as of the previous API request
+    currentRequests=0 # Requests processed as of the current API request
+    rps=0 # Requests per second since the previous API request
+    nodeCount=0 # Current number of nodes in the upstream group
 
     client = requests.Session() # Create a session for making HTTP requests
 
@@ -185,40 +201,49 @@ def main():
     while True:
         now = datetime.datetime.now()
         currentSeconds= (now.hour * 60) + (now.minute * 60) + now.second
-        nginxStats = getStatus(client, args.swarm_master, args.nginx_status_path, args.nginx_status_port, "")
+        nginxStats = getStatus(client, args.swarm_master, args.NGINX_API_PATH,
+                     args.NGINX_API_PORT, "/server_zones")
 
         # Get the total number nodes in the upstream group, and the total that
         # that are currently up.  Do the RPS calculation on the up nodes, but
         # still respect the total allowed nodes.
-        nodeCounts = getNodeCounts(client, args.swarm_master, args.nginx_status_path, args.nginx_status_port, args.service)
+        nodeCounts = getNodeCounts(client, args.swarm_master,
+                                   args.NGINX_API_PATH, args.NGINX_API_PORT,
+                                   args.service)
         totalNodes = nodeCounts['totalNodes']
         upNodes = nodeCounts['upNodes']
 
         # Get the number of containers for the service
-        replicaCount = getReplicaCount(client, args.swarm_master, args.docker_api_port, args.service)
+        replicaCount = getReplicaCount(client, args.swarm_master,
+                                       args.docker_api_port, args.service)
 
         currentRequests = getRequestCount(args.nginx_server_zone, nginxStats)
         if args.verbose:
-            print("currentRequests=%d lastSeconds=%d") %(currentRequests, lastSeconds)
+            print("currentRequests=%d lastSeconds=%d") %(currentRequests,
+                  lastSeconds)
 
-        print("NGINX Total Nodes=%d Up Nodes=%d Replicas=%d") %(totalNodes, upNodes, replicaCount)
+        print("NGINX Total Nodes=%d Up Nodes=%d Replicas=%d") %(totalNodes,
+              upNodes, replicaCount)
         # If totalNodes isn't equal to replicatCount then Docker must be
         # updating.  Try again on the next loop iteration.
         if totalNodes != replicaCount:
             syncErrorCount += 1
             if syncErrorCount == 1:
-                print("NGINX Plus shows %d nodes and Docker shows %d containers.  Wait for Docker to update") %(totalNodes, replicaCount)
+                print("NGINX Plus shows %d nodes and Docker shows %d \
+                      containers.  Wait for Docker to update") %(totalNodes,
+                      replicaCount)
                 time.sleep(args.sleep_interval)
                 lastSeconds = currentSeconds
                 lastRequests = currentRequests
                 continue
             else:
-                print("NGINX Plus shows %d nodes and Docker shows %d containers.  Continue") %(totalNodes, replicaCount)
+                print("NGINX Plus shows %d nodes and Docker shows %d \
+                      containers.  Continue") %(totalNodes, replicaCount)
         else:
             syncErrorCount = 0
 
         if lastSeconds > 0:
-            # calculate how many seconds have elapsed since the last API request
+            # Calculate how many seconds have elapsed since the last API request
             interval = currentSeconds - lastSeconds
             # Calculate the total requests per second since the last API request
             rps = (currentRequests - lastRequests) / float(interval)
@@ -234,55 +259,83 @@ def main():
                 rpsPerNode = rps / upNodes
                 neededNodes = math.ceil(rps / float(args.max_rps))
                 if args.verbose:
-                    print("rps=%d rpsPerNode=%d neededNodes=%d") %(rps, rpsPerNode, neededNodes)
+                    print("rps=%d rpsPerNode=%d neededNodes=%d") %(rps,
+                          rpsPerNode, neededNodes)
                 if rpsPerNode > args.max_rps:
                     # Scale up unless the maximum nodes has been reached
                     if totalNodes < args.max_nodes:
                         # Make sure to add at least one node
-                        newNodeCount = min(neededNodes - upNodes, args.max_nodes_to_add, args.max_nodes - totalNodes)
+                        newNodeCount = min(neededNodes - upNodes,
+                                       args.max_nodes_to_add, args.max_nodes -
+                                       totalNodes)
                         if newNodeCount > 0:
-                            print("Scale up by %d nodes from %d to %d nodes") %(newNodeCount, totalNodes, totalNodes + newNodeCount)
-                            scaleBackendNodes(args.service, totalNodes + newNodeCount)
+                            print("Scale up by %d nodes from %d to %d nodes") \
+                                  %(newNodeCount, totalNodes, totalNodes +
+                                  newNodeCount)
+                            scaleBackendNodes(args.service, totalNodes +
+                                              newNodeCount)
                         else:
-                            print("Warning: newNodeCount=%d on scale up event") %(newNodeCount)
+                            print("Warning: newNodeCount=%d on scale up \
+                                  event") %(newNodeCount)
                     else:
                         if args.verbose:
-                            print("totalNodes %d not less than maximum nodes %d") %(totalNodes, args.max_nodes)
+                            print("totalNodes %d not less than maximum nodes \
+                                  %d") %(totalNodes, args.max_nodes)
                 else:
                     if rpsPerNode < args.min_rps:
                         # Scale down unless the minimum nodes has been reached
                         if upNodes > args.min_nodes:
-                            removeNodeCount = min(upNodes - neededNodes, args.max_nodes_to_remove, upNodes - args.min_nodes)
+                            removeNodeCount = min(upNodes - neededNodes,
+                                                  args.max_nodes_to_remove,
+                                                  upNodes - args.min_nodes)
                             if removeNodeCount > 0:
-                                print("Scale down by %d nodes from %d nodes to %d nodes") %(removeNodeCount, totalNodes, totalNodes - removeNodeCount)
-                                scaleBackendNodes(args.service, totalNodes - removeNodeCount)
+                                print("Scale down by %d nodes from %d nodes to \
+                                      %d nodes") %(removeNodeCount, totalNodes,
+                                      totalNodes - removeNodeCount)
+                                scaleBackendNodes(args.service, totalNodes -
+                                                  removeNodeCount)
                             else:
-                                print("Warning: removeNodeCount=%d on scale down event") %(removeNodeCount)
+                                print("Warning: removeNodeCount=%d on scale \
+                                      down event") %(removeNodeCount)
                         else:
                             if args.verbose:
-                                print("upNodes %d not greater than minimum nodes %d") %(upNodes, args.min_nodes)
-                            # Scale up if the number of up nodes is below the minimum
+                                print("upNodes %d not greater than minimum \
+                                      nodes %d") %(upNodes, args.min_nodes)
+                            # Scale up if the nodes count is below the minimum
                             if upNodes < args.min_nodes:
-                                print("upNodes %d is less than minimum nodes %d") %(upNodes, args.min_nodes)
-                                newNodeCount = min(args.min_nodes - upNodes, args.max_nodes_to_add, args.max_nodes - totalNodes)
+                                print("upNodes %d is less than minimum nodes \
+                                      %d") %(upNodes, args.min_nodes)
+                                newNodeCount = min(args.min_nodes - upNodes,
+                                                   args.max_nodes_to_add,
+                                                   args.max_nodes - totalNodes)
                                 if newNodeCount > 0:
-                                    print("Scale up by %d nodes from %d to %d nodes") %(newNodeCount, totalNodes, totalNodes + newNodeCount)
-                                    scaleBackendNodes(args.service, totalNodes + newNodeCount)
+                                    print("Scale up by %d nodes from %d to %d \
+                                          nodes") %(newNodeCount, totalNodes,
+                                          totalNodes + newNodeCount)
+                                    scaleBackendNodes(args.service, totalNodes +
+                                                      newNodeCount)
                                 else:
-                                    print("Maximum nodes %d has been reached") %(args.max_nodes)
+                                    print("Maximum nodes %d has been reached") \
+                                          %(args.max_nodes)
                     else:
                         if args.verbose:
-                            print("rpsPerNode %f in between minRPS %d and maxRPS %d") %(rpsPerNode, args.min_rps, args.max_rps)
+                            print("rpsPerNode %f in between minRPS %d and \
+                                  maxRPS %d") %(rpsPerNode, args.min_rps,
+                                  args.max_rps)
             else:
-                print("upNodes %d is less than minimum nodes %d") %(upNodes, args.min_nodes)
-                newNodeCount = min(args.min_nodes - upNodes, args.max_nodes_to_add, args.max_nodes - totalNodes)
-                print("newNodeCount=%d") %(newNodeCount) #DEBUG
+                print("upNodes %d is less than minimum nodes %d") \
+                      %(upNodes, args.min_nodes)
+                newNodeCount = min(args.min_nodes - upNodes,
+                                   args.max_nodes_to_add, args.max_nodes -
+                                   totalNodes)
                 if newNodeCount > 0:
-                    print("Scale up by %d nodes from %d to %d nodes") %(newNodeCount, totalNodes, totalNodes + newNodeCount)
+                    print("Scale up by %d nodes from %d to %d nodes") \
+                          %(newNodeCount, totalNodes, totalNodes + newNodeCount)
                     scaleBackendNodes(args.service, totalNodes + newNodeCount)
                 else:
                     if args.verbose:
-                        print("Maximum nodes %d has been reached") %(args.max_nodes)
+                        print("Maximum nodes %d has been reached") \
+                              %(args.max_nodes)
         else:
             lastSeconds = currentSeconds
             lastRequests = currentRequests
