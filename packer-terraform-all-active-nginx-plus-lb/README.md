@@ -8,7 +8,7 @@ This set of Packer and Terraform scripts enable an easy deployment of a High Ava
 
 [Packer](https://www.packer.io/) is a tool developed by Hashicorp to automate the creation of any type of machine/golden images in a variety of infrastructure providers. It follows an Infrastructure as Code design pattern that allows developers to write a simple json file describing the target machine image.
 
-In this implementation, Packer is used to create a Google Cloud NGINX Plus image configured to work as a Load Balancer (**nginx-plus-lb-image**) and two distinct Google Cloud NGINX Plus images configured to work as application web servers  (**nginx-plus-app-1-image** & **nginx-plus-app-2-image**).
+In this implementation, Packer is used to create a Google Cloud NGINX Plus image configured to work as a Load Balancer (**nginx-plus-lb**) and two distinct Google Cloud NGINX Open Source images configured to work as application web servers  (**nginx-oss-app-1** & **nginx-oss-app-2**).
 
 ### Terraform
 
