@@ -54,7 +54,7 @@ Please note that these scripts will need to be executed with root privileges. If
 	
 * **autoscale.py**: Demonstrates auto scaling of NGINX Plus web server containers.  This Python program utilizes the NGINX Plus API to scale NGINX web server containers up and scale down , adding and removing them from the upstream group based on the request rate per node.  A set of default values are defined in the program that are used to control the autoscaling behavior. These define the minimum number of nodes, the maximum number of nodes, the maximum number of nodes to scale up at one time and the maximum number of nodes to scale down at one time.  They also control the number of requests per second per node at which to scale down and the requests per second per node at which to scale up.  The calculations are based off of the number of active/up nodes.  These values can be modified using command line flags.
 
-	```
+```
 usage: autoscale.py [-h] [-v] [--NGINX_API_URL NGINX_API_URL]
                     [--nginx_server_zone NGINX_SERVER_ZONE]
                     [--nginx_upstream_group NGINX_UPSTREAM_GROUP]
