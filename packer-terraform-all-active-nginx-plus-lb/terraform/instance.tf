@@ -26,7 +26,7 @@ appip=$(gcloud compute instances list --format="value(networkInterfaces[0].netwo
 arrapp=($appip)
 for (( i=0; i < $${#arrapp[@]}; i++ )); do
   is_present=false;
-  upstrlist=$(curl -s 'http://localhost/api/2/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
+  upstrlist=$(curl -s 'http://localhost:8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
   upstrarr=($upstrlist)
   for (( j=0; j < $${#upstrarr[@]}; j++ )); do
     if [ "$${arrapp[i]}" = "$${upstrarr[j]}" ]; then
@@ -35,7 +35,7 @@ for (( i=0; i < $${#arrapp[@]}; i++ )); do
     fi;
   done;
   if [ "$is_present" = false ]; then
-    curl -X POST -d '{"server": "'"$${arrapp[i]}"'"}' -s 'http://localhost/api/2/http/upstreams/upstream_app_pool/servers';
+    curl -X POST -d '{"server": "'"$${arrapp[i]}"'"}' -s 'http://localhost:8080/api/3/http/upstreams/upstream_app_pool/servers';
     echo "Server $${upstrarr[j]} has been added to the $inip upstream group"
   fi;
 done;
@@ -72,7 +72,7 @@ lbip=$(gcloud compute instances list --format="value(networkInterfaces[0].access
 arrlb=($lbip)
 for (( i=0; i < $${#arrlb[@]}; i++ )); do
   is_present=false;
-  upstrlist=$(curl -s 'http://'"$${arrlb[i]}"'/api/2/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
+  upstrlist=$(curl -s 'http://'"$${arrlb[i]}"':8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
   upstrarr=($upstrlist)
   for (( j=0; j < $${#upstrarr[@]}; j++ )); do
     if [ "$inip" = "$${upstrarr[j]}" ]; then
@@ -81,7 +81,7 @@ for (( i=0; i < $${#arrlb[@]}; i++ )); do
     fi;
   done;
   if [ "$is_present" = false ]; then
-    curl -X POST -d '{"server": "'"$inip"'"}' -s 'http://'"$${arrlb[i]}"'/api/2/http/upstreams/upstream_app_pool/servers';
+    curl -X POST -d '{"server": "'"$inip"'"}' -s 'http://'"$${arrlb[i]}"':8080/api/3/http/upstreams/upstream_app_pool/servers';
     echo "Server $${upstrarr[j]} has been added to the $inip upstream group"
   fi;
 done;
@@ -89,8 +89,8 @@ EOF
     shutdown-script = <<EOF
 inip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1');
 gcloud compute instances list --format="value(networkInterfaces[0].accessConfigs[0].natIP)" --filter="name~'.*lb.*'"| while read -r lb; do
-  for ID in $(curl -s 'http://'"$lb"'/api/2/http/upstreams/upstream_app_pool/servers' | grep -o '"id":[0-9]\+\','"server":"10.138.0.2:80"' | grep -o '"id":[0-9]\+' | grep -o '[0-9]\+'); do
-    curl -X DELETE -s 'http://'"$lb"'/api/2/http/upstreams/upstream_app_pool/servers/'"$ID"'';
+  for ID in $(curl -s 'http://'"$lb"':8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -o '"id":[0-9]\+\','"server":"10.138.0.2:80"' | grep -o '"id":[0-9]\+' | grep -o '[0-9]\+'); do
+    curl -X DELETE -s 'http://'"$lb"':8080/api/3/http/upstreams/upstream_app_pool/servers/'"$ID"'';
     echo "Server $inip has been removed from $lb upstream group"
   done;
 done;
@@ -127,7 +127,7 @@ lbip=$(gcloud compute instances list --format="value(networkInterfaces[0].access
 arrlb=($lbip)
 for (( i=0; i < $${#arrlb[@]}; i++ )); do
   is_present=false;
-  upstrlist=$(curl -s 'http://'"$${arrlb[i]}"'/api/2/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
+  upstrlist=$(curl -s 'http://'"$${arrlb[i]}"':8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
   upstrarr=($upstrlist)
   for (( j=0; j < $${#upstrarr[@]}; j++ )); do
     if [ "$inip" = "$${upstrarr[j]}" ]; then
@@ -136,7 +136,7 @@ for (( i=0; i < $${#arrlb[@]}; i++ )); do
     fi;
   done;
   if [ "$is_present" = false ]; then
-    curl -X POST -d '{"server": "'"$inip"'"}' -s 'http://'"$${arrlb[i]}"'/api/2/http/upstreams/upstream_app_pool/servers';
+    curl -X POST -d '{"server": "'"$inip"'"}' -s 'http://'"$${arrlb[i]}"':8080/api/3/http/upstreams/upstream_app_pool/servers';
     echo "Server $${upstrarr[j]} has been added to the $inip upstream group"
   fi;
 done;
@@ -144,8 +144,8 @@ EOF
     shutdown-script = <<EOF
 inip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1');
 gcloud compute instances list --format="value(networkInterfaces[0].accessConfigs[0].natIP)" --filter="name~'.*lb.*'"| while read -r lb; do
-  for ID in $(curl -s 'http://'"$lb"'/api/2/http/upstreams/upstream_app_pool/servers' | grep -o '"id":[0-9]\+\','"server":"10.138.0.2:80"' | grep -o '"id":[0-9]\+' | grep -o '[0-9]\+'); do
-    curl -X DELETE -s 'http://'"$lb"'/api/2/http/upstreams/upstream_app_pool/servers/'"$ID"'';
+  for ID in $(curl -s 'http://'"$lb"':8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -o '"id":[0-9]\+\','"server":"10.138.0.2:80"' | grep -o '"id":[0-9]\+' | grep -o '[0-9]\+'); do
+    curl -X DELETE -s 'http://'"$lb"':8080/api/3/http/upstreams/upstream_app_pool/servers/'"$ID"'';
     echo "Server $inip has been removed from $lb upstream group"
   done;
 done;

@@ -90,24 +90,19 @@
     {
       "type": "shell",
       "inline": [
-        "sudo mv ~/conf/* /etc/nginx/conf.d",
+        "sudo mv ~/conf/gce-all-active-lb.conf /etc/nginx/conf.d",
         "sudo rm -rf ~/conf"
-      ]
-    },
-    {
-      "type": "file",
-      "source":"./html",
-      "destination": "~",
+      ],
       "only": [
-        "ngx-app-1",
-        "ngx-app-2"
+        "ngx-lb"
       ]
     },
     {
       "type": "shell",
       "inline": [
-        "sudo mv ~/html /usr/share/nginx",
-        "sudo rm -rf ~/html"
+        "sudo mv ~/conf/gce-all-active-app.conf /etc/nginx/conf.d",
+        "sudo mv ~/conf/demo.html /usr/share/nginx/html",
+        "sudo rm -rf ~/conf"
       ],
       "only": [
         "ngx-app-1",
