@@ -13,7 +13,7 @@ ADD nginx-repo.crt /etc/ssl/nginx/
 ADD nginx-repo.key /etc/ssl/nginx/
 
 # Get other files required for installation
-RUN wget -q -O /etc/ssl/nginx/CA.crt https://cs.nginx.com/static/files/CA.crt
+# RUN wget -q -O /etc/ssl/nginx/CA.crt https://cs.nginx.com/static/files/CA.crt
 RUN wget -q -O - http://nginx.org/keys/nginx_signing.key | apt-key add -
 RUN wget -q -O /etc/apt/apt.conf.d/90nginx https://cs.nginx.com/static/files/90nginx
 
