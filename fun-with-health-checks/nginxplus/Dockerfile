@@ -15,7 +15,6 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
     apt-get update && apt-get install -y nginx-plus &&\
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
-    apt-get remove --purge --auto-remove -y gnupg1 && \
     rm -rf /var/lib/apt/lists/*
 
 # copy the config files
