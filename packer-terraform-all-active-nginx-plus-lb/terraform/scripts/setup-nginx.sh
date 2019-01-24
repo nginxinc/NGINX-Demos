@@ -21,7 +21,7 @@ for (( i=0; i < $${#arrapp[@]}; i++ )); do
   is_present=false;
   # Get list of all upstream server instances in this NGINX load balancer
   # and format list as an array
-  upstrlist=$(curl -s 'http://localhost:8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
+  upstrlist=$(curl -s 'http://localhost:8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3})"
   upstrarr=($upstrlist)
   # Loop through all upstream IPs and check whether the application IP is
   # already present in the upstream list
