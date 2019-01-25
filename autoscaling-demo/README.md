@@ -6,7 +6,7 @@ The demo uses the NGINX Plus API to extract metrics and add and remove backend N
 
 ## System requirements and setup
 
-The demo runs on a single Docker host.  It has been tested with NGINX Plus R15, NGINX Unit 1.0, Ubuntu 18.04, Docker 17.12.0-ce and siege 3.0.8 for generating load.
+The demo runs on a single Docker host.  It has been tested with NGINX Plus R15+, NGINX Unit 1.7, Ubuntu 16.04+, Docker 17.12.0-ce+ and siege 3.0.8 for generating load.
 
 The base NGINX Plus Docker image, *nginxplus*, exposes ports 80 and 443.  The NGINX Plus load balancer image, *nginxpluslb* also exposes ports 8080 for the NGINX Plus API and 9080 for the NGINX Unit upstream servers.  For the NGINX Plus web server instances, we want to copy the html files to each container because they contain two versions of a health check page, one with an OK message and one with an error message and we want to be able to change the files on each container independently, so another Docker image, *nginxplusws* is created.
 
