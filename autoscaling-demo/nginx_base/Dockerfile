@@ -20,7 +20,7 @@ RUN printf "deb https://plus-pkgs.nginx.com/ubuntu `lsb_release -cs` nginx-plus\
 # RUN ln -s -f /bin/true /usr/bin/chfn
 
 # Install NGINX Plus
-RUN apt-get update && apt-get install -y nginx-plus
+RUN apt-get update && apt-get install -y nginx-plus && rm -fr /etc/ssl/nginx
 
 # forward request logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/nginx/access.log
