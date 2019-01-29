@@ -1,54 +1,58 @@
 - hosts: all
-  sudo: true
+  become: true
   tasks:
-
-    - name: Setup Etcd Demo | Install curl from apt
-      apt: update_cache=yes pkg=curl
-
-    - name: Setup Etcd Demo | Install git from apt
-      apt: update_cache=yes pkg=git
-
-    - name: Setup Etcd Demo | Install jq from apt
-      apt: update_cache=yes pkg=jq
-
-    - name: Setup Etcd Demo | Install docker.io from apt
-      shell: curl -sSL https://get.docker.com/ | sh      
-
-    - name: Setup Etcd Demo | Install docker-compose
-      shell: curl -L https://github.com/docker/compose/releases/download/1.10.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-
-    - name: Setup Etcd Demo | Apply executable permissions to the docker-compose binary
-      shell: chmod +x /usr/local/bin/docker-compose
-
-    - name: Setup Consul Demo | Copy docker-compose under /etc/bash_completion.
-      shell: curl -L https://raw.githubusercontent.com/docker/compose/1.10.0/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
-
-    - name: NGINX Plus | Copying NGINX Plus repository certificate
-      copy: src=files/nginx-repo.crt dest=/srv/NGINX-Demos/etcd-demo/nginxplus/nginx-repo.crt
-
-    - name: NGINX Plus | Copying NGINX Plus repository key
-      copy: src=files/nginx-repo.key dest=/srv/NGINX-Demos/etcd-demo/nginxplus/nginx-repo.key
-
+    - name: Setup Etcd Demo | Install curl, git and jq from apt
+      apt:
+        update_cache: yes
+        name:
+          - curl
+          - git
+          - jq
+    - name: Setup Etcd Demo | Download docker.io install script
+      get_url:
+        url: https://get.docker.com
+        dest: /tmp/get-docker.sh
+        mode: +x
+    - name: Setup Etcd Demo | Install docker
+      shell: /tmp/get-docker.sh
+    - name: Setup Etcd Demo | Delete docker.io install script
+      file:
+        path: /tmp/get-docker.sh
+        state: absent
+    - name: Setup Etcd Demo | Download docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+    - name: Setup Etcd Demo | Copy docker-compose under /etc/bash_completion
+      get_url:
+        url: https://raw.githubusercontent.com/docker/compose/1.23.2/contrib/completion/bash/docker-compose
+        dest: /etc/bash_completion.d/docker-compose
     - name: Setup Etcd Demo | Executing provision.sh (sets HOST_IP, builds the container images and starts them)
-      shell: ./provision.sh
-      args:
-        chdir: /srv/NGINX-Demos/etcd-demo/
-
-    - name: Setup Etcd Demo | Install etcd and etcdctl
-      command: "{{item}}"
+      shell: /srv/NGINX-Demos/etcd-demo/provision.sh
+    - name: Setup Etcd Demo | Download etcd and etcdctl
+      get_url:
+        url: https://github.com/coreos/etcd/releases/download/v3.3.10/etcd-v3.3.10-linux-amd64.tar.gz
+        dest: /tmp/etcd-v3.3.10-linux-amd64.tar.gz
+    - name: Setup Etcd Demo | Untar etcd and etcdctl
+      unarchive:
+        remote_src: yes
+        src: /tmp/etcd-v3.3.10-linux-amd64.tar.gz
+        dest: /tmp
+    - name: Setup Etcd Demo | Copy etcd and etcdctl
+      copy:
+        remote_src: yes
+        src: /tmp/etcd-v3.3.10-linux-amd64/etcdctl
+        dest: /usr/local/bin/etcdctl
+        mode: +x
+    - name: Setup Etcd Demo | Delete etcd and etcdctl tar
+      file:
+        path: "{{ item }}"
+        state: absent
       with_items:
-        - curl -L https://github.com/coreos/etcd/releases/download/v2.2.4/etcd-v2.2.4-linux-amd64.tar.gz -o etcd-v2.2.4-linux-amd64.tar.gz
-        - tar xzvf etcd-v2.2.4-linux-amd64.tar.gz
-        - cp etcd-v2.2.4-linux-amd64/etcdctl /usr/local/bin/ 
-      args: 
-        chdir: /tmp/
-
+        - /tmp/etcd-v3.3.10-linux-amd64.tar.gz
+        - /tmp/etcd-v3.3.10-linux-amd64
     - name: Setup Etcd Demo | Execute etcd_exec_watch.sh script
-      shell: nohup ./etcd_exec_watch.sh &
-      args:
-        chdir: /srv/NGINX-Demos/etcd-demo/
-
-    - name: Setup Etcd Demo | Spin up the two hello-world containers which will act as NGINX Plus upstreams
-      shell: /usr/local/bin/docker-compose -f create-services.yml up -d
-      args:
-        chdir: /srv/NGINX-Demos/etcd-demo/
+      shell: nohup /srv/NGINX-Demos/etcd-demo/etcd_exec_watch.sh </dev/null >/dev/null 2>&1 &
+    - name: Setup Etcd Demo | Spin up the nginxdemos/hello container which is the backend http service
+      shell: /usr/local/bin/docker-compose -f /srv/NGINX-Demos/etcd-demo/create-http-service.yml up -d

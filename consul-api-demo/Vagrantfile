@@ -1,14 +1,15 @@
-VAGRANTFILE_API_VERSION = "2"
-
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/bionic64"
   config.vm.network "private_network", :ip => "10.2.2.70"
 
   config.vm.synced_folder "../consul-api-demo/", "/srv/NGINX-Demos/consul-api-demo"
 
   config.vm.provision :ansible do |ansible|
     ansible.playbook = "./setup_consul_api_demo.yml"
+    ansible.extra_vars = {
+      ansible_python_interpreter:"/usr/bin/python3"
+    }
   end
 
 end

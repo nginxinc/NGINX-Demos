@@ -1,33 +1,32 @@
-nginxplus:
-  build: ./nginxplus
-  container_name: nginxplus
-  links:
-  - consul
-  ports:
-  - "80:80"
-  - "8080:8080"
-
-consul:
-  command: "-server -bootstrap -node consul -advertise ${HOST_IP} -config-file /etc/consul.d/config.json"
-  image: progrium/consul:latest
-  container_name: consul
-  ports:
-  - "8300:8300"
-  - "8400:8400"
-  - "8500:8500"
-  - "8600:53/udp"
-  volumes:
-  - "./consul_watches_config.json:/etc/consul.d/config.json"
-  - "./script.sh:/tmp/script.sh"
-  environment:
-  - HOST_IP
-
-registrator:
-  command: consul://consul:8500
-  image: gliderlabs/registrator:latest
-  container_name: registrator
-  links:
-  - consul
-  volumes:
-  - "/var/run/docker.sock:/tmp/docker.sock"
-
+version: '3'
+services:
+  nginxplus:
+    build: ./nginxplus
+    container_name: nginxplus
+    links:
+      - consul
+    ports:
+      - "80:80"
+      - "8080:8080"
+  consul:
+    command: "-server -bootstrap -node consul -advertise ${HOST_IP} -config-file /etc/consul.d/config.json"
+    image: progrium/consul:latest
+    container_name: consul
+    ports:
+      - "8300:8300"
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:53/udp"
+    volumes:
+      - "./consul_watches_config.json:/etc/consul.d/config.json"
+      - "./script.sh:/tmp/script.sh"
+    environment:
+      - HOST_IP
+  registrator:
+    command: consul://consul:8500
+    image: gliderlabs/registrator:latest
+    container_name: registrator
+    links:
+      - consul
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock"

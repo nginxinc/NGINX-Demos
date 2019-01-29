@@ -15,3 +15,9 @@
 
 # Ignore MacOS system files
 .DS_Store
+
+# Ignore log files
+*.log
+
+# Ignore Ansible retry files
+*.retry
