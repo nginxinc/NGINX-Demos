@@ -1,38 +1,37 @@
-nginx:
-  build: ./nginx
-  container_name: nginx
-  links:
-  - consul
-  ports:
-  - "80:80"
-  labels:
-    SERVICE_IGNORE: 'yes'
-
-consul:
-  command: -server -bootstrap -advertise ${HOST_IP}
-  image: progrium/consul
-  container_name: consul
-  labels:
-    SERVICE_IGNORE: 'yes'
-  ports:
-  - "8500:8500"
-
-registrator:
-  command: "-internal consul://consul:8500"
-  image: gliderlabs/registrator:latest
-  container_name: registrator
-  links:
-  - consul
-  volumes:
-  - "/var/run/docker.sock:/tmp/docker.sock"
-
-http:
-  image: nginxdemos/hello:latest
-  labels:
-    SERVICE_80_NAME: http
-    SERVICE_80_CHECK_HTTP: /
-    SERVICE_80_CHECK_INTERVAL: 5s
-    SERVICE_443_IGNORE: 'yes'
-    SERVICE_TAGS: production
-  ports:
-  - "80"
+version: '3'
+services:
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    links:
+      - consul
+    ports:
+      - "80:80"
+    labels:
+      SERVICE_IGNORE: 'yes'
+  consul:
+    command: -server -bootstrap -advertise ${HOST_IP}
+    image: progrium/consul
+    container_name: consul
+    labels:
+      SERVICE_IGNORE: 'yes'
+    ports:
+      - "8500:8500"
+  registrator:
+    command: "-internal consul://consul:8500"
+    image: gliderlabs/registrator:latest
+    container_name: registrator
+    links:
+      - consul
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock"
+  http:
+    image: nginxdemos/hello:latest
+    labels:
+      SERVICE_80_NAME: http
+      SERVICE_80_CHECK_HTTP: /
+      SERVICE_80_CHECK_INTERVAL: 5s
+      SERVICE_443_IGNORE: 'yes'
+      SERVICE_TAGS: production
+    ports:
+      - "80"

@@ -1,46 +1,38 @@
 - hosts: all
-  sudo: true
+  become: true
   tasks:
-
-    - name: Setup Consul API Demo | Install curl from apt
-      apt: update_cache=yes pkg=curl
-
-    - name: Setup Consul API Demo | Install git from apt
-      apt: update_cache=yes pkg=git
-
-    - name: Setup Consul API Demo | Install jq from apt
-      apt: update_cache=yes pkg=jq
-
-    - name: Setup Consul API Demo | Install docker.io from apt
-      shell: curl -sSL https://get.docker.com/ | sh      
-
-    - name: Setup Consul API Demo | Install docker-compose
-      shell: curl -L https://github.com/docker/compose/releases/download/1.10.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-
-    - name: Setup Consul API Demo | Apply executable permissions to the docker-compose binary
-      shell: chmod +x /usr/local/bin/docker-compose
-
-    - name: Setup Consul API Demo | Copy docker-compose under /etc/bash_completion.
-      shell: curl -L https://raw.githubusercontent.com/docker/compose/1.10.0/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
-
-    - name: NGINX Plus | Copying NGINX Plus repository certificate
-      copy: src=files/nginx-repo.crt dest=/srv/NGINX-Demos/consul-api-demo/nginxplus/nginx-repo.crt
-
-    - name: NGINX Plus | Copying NGINX Plus repository key
-      copy: src=files/nginx-repo.key dest=/srv/NGINX-Demos/consul-api-demo/nginxplus/nginx-repo.key
-
+    - name: Setup Consul API Demo | Install curl, git and jq from apt
+      apt:
+        update_cache: yes
+        name:
+          - curl
+          - git
+          - jq
+    - name: Setup Consul API Demo | Download docker.io install script
+      get_url:
+        url: https://get.docker.com
+        dest: /tmp/get-docker.sh
+        mode: +x
+    - name: Setup Consul API Demo | Install docker
+      shell: /tmp/get-docker.sh
+    - name: Setup Consul API Demo | Delete docker.io install script
+      file:
+        path: /tmp/get-docker.sh
+        state: absent
+    - name: Setup Consul API Demo | Download docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+    - name: Setup Consul API Demo | Copy docker-compose under /etc/bash_completion
+      get_url:
+        url: https://raw.githubusercontent.com/docker/compose/1.23.2/contrib/completion/bash/docker-compose
+        dest: /etc/bash_completion.d/docker-compose
     - name: Setup Consul API Demo | Executing provision.sh (sets HOST_IP, builds the container images and starts them)
-      shell: ./provision.sh 
-      args:
-        chdir: /srv/NGINX-Demos/consul-api-demo/
-
+      shell: /srv/NGINX-Demos/consul-api-demo/provision.sh
     - name: Setup Consul API Demo | apk update in consul container
       shell: docker exec -i consul apk update
-
     - name: Setup Consul API Demo | Install jq in the consul container
       shell: docker exec -i consul apk add jq
-
     - name: Setup Consul API Demo | Spin up the nginxdemos/hello container which is the backend http service
-      shell: /usr/local/bin/docker-compose -f create-http-service.yml up -d
-      args:
-        chdir: /srv/NGINX-Demos/consul-api-demo/
+      shell: /usr/local/bin/docker-compose -f /srv/NGINX-Demos/consul-api-demo/create-http-service.yml up -d
