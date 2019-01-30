@@ -60,7 +60,7 @@ Install Vagrant using the necessary package for your OS:
 
 ### Ansible only deployment
 
-1.  Create Ubuntu 18.04 VM
+1.  Create Ubuntu 18.04 LTS VM
 
 2.  Install Ansible on Ubuntu VM
 

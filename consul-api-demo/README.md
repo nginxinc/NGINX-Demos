@@ -59,7 +59,7 @@ The demo files will be in `/srv/NGINX-Demos/consul-api-demo`
 
 ### Ansible only deployment
 
-1.  Create Ubuntu 18.04 VM
+1.  Create Ubuntu 18.04 LTS VM
 
 2.  Install Ansible on Ubuntu VM
 
