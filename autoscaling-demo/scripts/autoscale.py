@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ################################################################################
-# Copyright (C) 2016 Nginx, Inc.
+# Copyright (C) 2019 Nginx, Inc.
 #
 # This program is provided for demonstration purposes only
 #
@@ -34,6 +34,8 @@ import math
 NGINX_API_URL = 'http://localhost:8080/api/3/http'
 SERVER_ZONE='nginx_ws' # The server zone to get the number of requests from
 UPSTREAM_GROUP='nginx_backends' # The upstream group to scale
+UPSTREAM_PORT=80 # The port for the upstream servers to listen on
+DOCKER_IMAGE='nginxplusws' # The Docker image to use to create a container
 SLEEP_INTERVAL=2 # How long to wait between API requests, in seconds
 MIN_NODES=2 # Minimum number of nodes to maintain in the upstream group
 MAX_NODES=10 # Maximum number of nodes to allow in the upstream group
@@ -69,8 +71,7 @@ def getStatus(client, statusURL, path):
 # Use the Status API to the total request count from the server zone.
 ################################################################################
 def getRequestCount(nginxStats):
-	return nginxStats[SERVER_ZONE]['requests']
-    #return nginxStats['server_zones'][SERVER_ZONE]['requests']
+	return nginxStats[args.nginx_server_zone]['requests']
 
 ################################################################################
 # Function addBackendNodes
@@ -78,7 +79,8 @@ def getRequestCount(nginxStats):
 # Add one or more backends to the upstream group.
 ################################################################################
 def addBackendNodes(nodeCount):
-    os.system('./addnginxws.sh ' + str(int(nodeCount)))
+    os.system('./addnodes.sh ' + args.nginx_upstream_group + " " + args.docker_image + " " + str(args.nginx_upstream_port) + " " + str(int(nodeCount)))
+    #os.system('./addnginxws.sh ' + str(int(nodeCount)))
 
 ################################################################################
 # Function removeBackendNodes
@@ -86,7 +88,8 @@ def addBackendNodes(nodeCount):
 # Remove one or more backends to the upstream group.
 ################################################################################
 def removeBackendNodes(nodeCount):
-    os.system('./removenginxws.sh ' + str(int(nodeCount)))
+    os.system('./removenodes.sh ' + args.nginx_upstream_group + " " + str(int(nodeCount)))
+    #os.system('./removenginxws.sh ' + str(int(nodeCount)))
 
 ################################################################################
 # Function getNodeCounts
@@ -117,12 +120,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Provide more detailed output")
-    parser.add_argument("--NGINX_API_URL", default=NGINX_API_URL,
+    parser.add_argument("--nginx_api_url", default=NGINX_API_URL,
                         help="URL for NGINX Plus Status API")
     parser.add_argument("--nginx_server_zone", default=SERVER_ZONE,
                         help="The NGINX Plus server zone to collect requests count from")
     parser.add_argument("--nginx_upstream_group", default=UPSTREAM_GROUP,
                         help="The NGINX Plus upstream group to scale")
+    parser.add_argument("--nginx_upstream_port", default=UPSTREAM_PORT,
+                        help="The port for the upstream servers to listen on")
+    parser.add_argument("--docker_image", default=DOCKER_IMAGE,
+                        help="The Docker image to use when createing a container")
     parser.add_argument("--sleep_interval", type=int, default=SLEEP_INTERVAL,
                         help="The sleep interval between checking the status")
     parser.add_argument("--min_nodes", type=int, default=MIN_NODES,
@@ -156,12 +163,12 @@ def main():
     while True:
         now = datetime.datetime.now()
         currentSeconds= (now.hour * 60) + (now.minute * 60) + now.second
-        nginxStats = getStatus(client, args.NGINX_API_URL, "/server_zones")
+        nginxStats = getStatus(client, args.nginx_api_url, "/server_zones")
 
         currentRequests = getRequestCount(nginxStats)
 
         if lastSeconds > 0:
-            # calculate how many seconds have elapsed since the last API request
+            # Calculate how many seconds have elapsed since the last API request
             interval = currentSeconds - lastSeconds
             # Calculate the total requests per second since the last API request
             rps = (currentRequests - lastRequests) / interval
@@ -170,7 +177,7 @@ def main():
             # Get the total number nodes in the upstream group, and the total that
             # that are currently up.  Do the RPS calculation on the up nodes, but
             # still respect the total allowed nodes.
-            nodeCounts = getNodeCounts(client, args.NGINX_API_URL, args.nginx_upstream_group)
+            nodeCounts = getNodeCounts(client, args.nginx_api_url, args.nginx_upstream_group)
             totalNodes = nodeCounts['totalNodes']
             upNodes = nodeCounts['upNodes']
             if args.verbose:
@@ -183,6 +190,9 @@ def main():
                 # Calculate the requests per second per backend node
                 rpsPerNode = rps / upNodes
                 neededNodes = math.ceil(rps / args.max_rps)
+                if args.verbose:
+                    print("rpsPerNode=%d neededNodes=%d") %(rpsPerNode, neededNodes)
+
                 if rpsPerNode > args.max_rps:
                     # Scale up unless the maximum nodes has been reached
                     if totalNodes < args.max_nodes:

@@ -6,7 +6,7 @@ The demo uses the NGINX Plus API to extract metrics and add and remove backend N
 
 ## System requirements and setup
 
-The demo runs on a single Docker host.  It has been tested with NGINX Plus R15+, NGINX Unit 1.7, Ubuntu 16.04+, Docker 17.12.0-ce+ and siege 3.0.8 for generating load.
+The demo runs on a single Docker host.  It has been tested with NGINX Plus R15+, NGINX Unit 1.7, Ubuntu 16.04+, CentOS 7.6, Docker 17.12.0-ce and siege 3.0.8 for generating load.
 
 The base NGINX Plus Docker image, *nginxplus*, exposes ports 80 and 443.  The NGINX Plus load balancer image, *nginxpluslb* also exposes ports 8080 for the NGINX Plus API and 9080 for the NGINX Unit upstream servers.  For the NGINX Plus web server instances, we want to copy the html files to each container because they contain two versions of a health check page, one with an OK message and one with an error message and we want to be able to change the files on each container independently, so another Docker image, *nginxplusws* is created.
 
@@ -31,6 +31,7 @@ To install the demo (assuming the default directories), follow these steps:
 5. Create the load balancer NGINX Plus image: ```$ ./root/NGINX-Demos/autoscaling-demo/nginx_lb/createlbimages.sh```
 6. Create the web server NGINX Plus image: ```$ ./root/NGINX-Demos/autoscaling-demo/nginx_ws/createwsimages.sh```
 7. Create the NGINX Unit image: ```$ ./root/NGINX-Demos/autoscaling-demo/unit/createunitimage.sh```
+8. Note: If the system firewall (ufw on Ubuntu or firewalld on CentOS) is enabled, the default settings will cause networking issues.  Disable it or open the necessary ports.
 
 ## Shell Scripts and Programs
 
@@ -48,6 +49,8 @@ Please note that these scripts will need to be executed with root privileges. If
 
 * **addnode.sh**: Called by ```addnginxws.sh``` and ```addunit.sh``` which pass in the information necessary to create a container and add it to an upstream group.
 
+* **addnodes.sh**: Called by ```autoscale.py``` which passes in the information necessary to create one or more containers and add them to an upstream group.
+
 * **addunit.sh**: Creates one or more NGINX Unit container and adds them to the *unit_backends* upstream group.  There is one optional input parameter, the number of containers to create, which defaults to one.  Calls ```addnode.sh```.
 
 	usage: ```./addunit.sh [number of containers]```
@@ -58,6 +61,9 @@ Please note that these scripts will need to be executed with root privileges. If
 usage: autoscale.py [-h] [-v] [--NGINX_API_URL NGINX_API_URL]
                     [--nginx_server_zone NGINX_SERVER_ZONE]
                     [--nginx_upstream_group NGINX_UPSTREAM_GROUP]
+                    [--nginx_upstream_port NGINX_UPSTREAM_PORT]
+                    [--docker_image DOCKER_IMAGE]
+
                     [--sleep_interval SLEEP_INTERVAL] [--min_nodes MIN_NODES]
                     [--max_nodes MAX_NODES]
                     [--max_nodes_to_add MAX_NODES_TO_ADD]
@@ -74,6 +80,11 @@ usage: autoscale.py [-h] [-v] [--NGINX_API_URL NGINX_API_URL]
                         from
   --nginx_upstream_group NGINX_UPSTREAM_GROUP
                         The NGINX Plus upstream group to scale
+  --nginx_upstream_port NGINX_UPSTREAM_PORT
+                        The port for the upstream servers to listen on
+  --docker_image DOCKER_IMAGE
+                        The Docker image to use when createing a container                      
+
   --sleep_interval SLEEP_INTERVAL
                         The sleep interval between checking the status
   --min_nodes MIN_NODES
@@ -110,6 +121,8 @@ usage: autoscale.py [-h] [-v] [--NGINX_API_URL NGINX_API_URL]
 
 * **removenode.sh**: Called by ```removenginxws.sh``` and ```removeunit.sh``` which pass in the information necessary to delete a container and remove it from an upstream group.
 
+* **removenodes.sh**: Called by ```autoscale.py``` which passes in the information necessary to delete one or more containers and remove them from an upstream group.
+
 * **removeunit.sh**: Deletes one or more NGINX Unit containers from the *unit_backends* upstream group and removes the containers.
 
     usage: ```./removeunit.sh [number of containers]```
@@ -138,7 +151,7 @@ The following additional files are used:
 
 * **nginx_ws/Dockerfile:** The Dockerfile to create the NGINX Plus web server image, copying the content directory to ```/usr/share/nginx/html``` in the container.  The image will be named *nginxplusws*.
 
-* **scripts/dockerip:** Extracts the IP address of the Docker host.  This is included in some of the shell scripts.
+* **scripts/dockerip:** Extracts the IP address of the Docker host.  This file is included in some of the shell scripts.
 
 * **unit/app.config:** The NGINX Unit configuration
 
@@ -154,8 +167,8 @@ All scripts are in the ```scripts``` directory.
 
 1.	If the demo as been run previously, cleanup all the containers: <br>``` $ ./removecontainers.sh```
 2.	Show that there are no containers running:<br>```$ docker ps```
-3.	In a browser show:<br>```http://[docker host ip address]:8080/status.html```<br>
-There will be an error in the browser because NGINX PLUS is not yet running.  Continue to show status.html after each action that effects the NGINX Plus configuration.
+3.	In a browser show:<br>```http://[docker host ip address]:8080/dashboard.html```<br>
+There will be an error in the browser because NGINX PLUS is not yet running.  Continue to show dashboard.html after each action that effects the NGINX Plus configuration.
 4.	Setup the environment:<br>```$ ./createenv.sh```<br>This will create one NGINX PLUS load balancer container, one NGINX PLUS web server container and upstream server and one NGINX Unit container and upstream server. 
 5.	Show that there are now containers running:<br>```$ docker ps```
 6.	Create some more NGINX Unit containers:<br>```$ ./addunit [number of containers]```
