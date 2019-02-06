@@ -159,7 +159,6 @@ The following additional files are used:
 
 * **unit/Dockerfile:** The Dockerfile to create the NGINX Unit image, exposing ports 8443 and 9080.  The image will be named *nginxunit*.
 
-* **unit/start.sh:** The startup script used for the NGINX Unit Docker image,
        
 # Demo Script
 
