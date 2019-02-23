@@ -1,7 +1,0 @@
----
-- hosts: localhost
-  become: true
-  roles:
-    - role: nginxinc.nginx-plus
-  vars:
-    - certs: ~/.ssh/certs/
