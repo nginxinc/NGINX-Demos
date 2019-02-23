@@ -1,6 +1,8 @@
-cd packer \
-&& packer build -force packer.json \
-&& sleep 90 && cd ../terraform \
-&& terraform init \
+cd terraform \
 && yes yes | terraform destroy \
+&& rm -rf .terraform \
+&& terraform init \
+&& cd ../packer \
+&& packer build -force ./packer.json \
+&& cd ../terraform \
 && yes yes | terraform apply
