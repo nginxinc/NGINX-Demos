@@ -3,29 +3,16 @@
   "variables": {
     "home": "{{env `HOME`}}",
     "aws_access_key": "",
-    "aws_secret_key": ""
+    "aws_secret_key": "",
+    "region": "us-west-1"
   },
   "builders": [
-    {
-      "type": "amazon-ebs",
-      "name": "ngx-oss",
-      "ami_name": "ngx-oss {{isotime \"2006-01-02\"}}",
-      "instance_type": "t2.micro",
-      "region": "us-west-1",
-      "source_ami": "ami-0ec3e3a838330c61f",
-      "ssh_username": "ubuntu",
-      "access_key": "{{user `aws_access_key`}}",
-      "secret_key": "{{user `aws_secret_key`}}",
-      "tags": {
-        "Name": "ngx-oss"
-      }
-    },
     {
       "type": "amazon-ebs",
       "name": "ngx-plus",
       "ami_name": "ngx-plus {{isotime \"2006-01-02\"}}",
       "instance_type": "t2.micro",
-      "region": "us-west-1",
+      "region": "{{user `region`}}",
       "source_ami": "ami-0ec6517f6edbf8044",
       "ssh_username": "ec2-user",
       "access_key": "{{user `aws_access_key`}}",
@@ -33,29 +20,23 @@
       "tags": {
         "Name": "ngx-plus"
       }
+    },
+    {
+      "type": "amazon-ebs",
+      "name": "ngx-oss",
+      "ami_name": "ngx-oss {{isotime \"2006-01-02\"}}",
+      "instance_type": "t2.micro",
+      "region": "{{user `region`}}",
+      "source_ami": "ami-0ec3e3a838330c61f",
+      "ssh_username": "ubuntu",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "tags": {
+        "Name": "ngx-oss"
+      }
     }
   ],
   "provisioners": [
-    {
-      "type": "shell",
-      "inline": [
-        "sleep 60",
-        "sudo apt update",
-        "sudo apt install python-pip -y",
-        "sudo pip install ansible"
-      ],
-      "only": [
-        "ngx-oss"
-      ]
-    },
-    {
-      "type": "ansible-local",
-      "galaxy_file": "requirements.yml",
-      "playbook_file": "playbook-app.yml",
-      "only": [
-        "ngx-oss"
-      ]
-    },
     {
       "type": "file",
       "source": "{{user `home`}}/.ssh/ngx-certs",
@@ -88,6 +69,26 @@
       "script": "setup-instance.sh",
       "only": [
         "ngx-plus"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 60",
+        "sudo apt update",
+        "sudo apt install python-pip -y",
+        "sudo pip install ansible"
+      ],
+      "only": [
+        "ngx-oss"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "galaxy_file": "requirements.yml",
+      "playbook_file": "playbook-app.yml",
+      "only": [
+        "ngx-oss"
       ]
     }
   ]
