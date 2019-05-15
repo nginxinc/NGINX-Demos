@@ -1,0 +1,5 @@
+regextester:
+    container_name: regextester
+    build: regextester
+    ports:
+    - "80:80"
