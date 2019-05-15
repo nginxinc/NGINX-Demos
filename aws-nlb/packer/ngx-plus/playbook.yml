@@ -2,6 +2,11 @@
 - hosts: localhost
   become: true
   roles:
-    - role: nginxinc.nginx-plus
+    - role: nginxinc.nginx
+    vars:
+      nginx_type: plus
+        nginx_license:
+          certificate: ~/.ssh/certs/nginx-repo.crt
+          key: ~/.ssh/certs/nginx-repo.key
   vars:
     - certs: ~/.ssh/certs/

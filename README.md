@@ -21,6 +21,10 @@ whenever we create or delete our application instances, NGINX Plus is automatica
 
 * **nginx-swarm-demo**:  Shows how to use NGINX and NGINX Plus in a Docker Swarm, ultilizing the new features of Docker 1.12.  Demonstrates doing load balancing with just Docker Swarm, then with NGINX open source and then with NGINX Plus, including autoscaling the backend containers.
 
+* **oauth2-token-introspection-oss**: NGINX OAuth 2.0 Token Introspection (with disk caching)
+
+* **oauth2-token-introspection-plus**: NGINX Plus OAuth 2.0 Token Introspection (with keyval caching)
+
 * **packer-terraform-all-active-nginx-plus-lb**: This demo contains a series of scripts that enable an easy deployment of a High Availability All Active Auto Scaling NGINX Plus Load Balancing configuration on Google Cloud. Adaptation of a guide found [here](https://www.nginx.com/resources/deployment-guides/all-active-nginx-plus-load-balancing-gce/).
 
 * **random-files**: Demo to show random content and upstream_conf. Nick to add more description here

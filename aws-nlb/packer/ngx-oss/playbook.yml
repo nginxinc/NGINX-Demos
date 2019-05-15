@@ -2,4 +2,4 @@
 - hosts: localhost
   become: true
   roles:
-    - role: nginxinc.nginx-oss
+    - role: nginxinc.nginx
