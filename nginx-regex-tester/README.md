@@ -137,7 +137,7 @@ Here is a screen shot of the PHP page with the results:
 
 #### Setup
 
-* From /nginx-regextester: ```# docker-compose up -d```
+* From /nginx-regex-tester: ```# docker-compose up -d```
 
 #### Running the tester
 
