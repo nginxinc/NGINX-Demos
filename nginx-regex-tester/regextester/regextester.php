@@ -94,7 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errMsg = 'A regular expression must be entered. ';
     }
     $valueToTest = trim($_POST['frmValueToTest']);
-    $caseSensitive = $_POST['frmCaseSensitive'];
+    if (isset($_POST['frmCaseSensitive'])) {
+        $caseSensitive = 1;
+    }
     if ($caseSensitive) {
         $cbChecked = "checked";
     }
