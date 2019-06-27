@@ -1,4 +1,4 @@
-# All Active Auto Scaling AWS NLB NGINX Demo Environment using Packer and Terraform
+# All Active Auto Scaling AWS NLB NGINX Plus Demo Environment
 
 ## Overview
 

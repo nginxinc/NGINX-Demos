@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  become: true
+  roles:
+    - role: nginxinc.nginx
+  vars:
+    nginx_html_demo_template_enable: true
+    nginx_html_demo_template:
+      default:
+        template_file: www/index.html.j2
+        html_file_name: index.html
+        html_file_location: /usr/share/nginx/html
+        web_server_name: Backend Server
+    nginx_http_template_enable: true
+    nginx_http_template:
+      default:
+        template_file: http/default.conf.j2
+        conf_file_name: default.conf
+        conf_file_location: /etc/nginx/conf.d/
+        port: 80
+        server_name: app_server
+        error_page: /usr/share/nginx/html
+        autoindex: false
+        web_server:
+          locations:
+            default:
+              location: /
+              html_file_location: /usr/share/nginx/html
+              html_file_name: index.html
+              autoindex: false
+          http_demo_conf: true

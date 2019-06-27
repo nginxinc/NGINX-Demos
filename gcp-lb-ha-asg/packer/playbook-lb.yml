@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  become: true
+  roles:
+    - role: nginxinc.nginx
+  vars:
+    nginx_type: plus
+    nginx_license:
+      certificate: ~/.ssh/ngx-certs/nginx-repo.crt
+      key: ~/.ssh/ngx-certs/nginx-repo.key

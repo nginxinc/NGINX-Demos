@@ -17,26 +17,26 @@ inip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]
 appip=$(gcloud compute instances list --format="value(networkInterfaces[0].networkIP)" --filter="name~'.*app.*'")
 arrapp=($appip)
 # Loop through all application IPs
-for (( i=0; i < $${#arrapp[@]}; i++ )); do
+for (( i=0; i < ${#arrapp[@]}; i++ )); do
   is_present=false;
   # Get list of all upstream server instances in this NGINX load balancer
   # and format list as an array
-  upstrlist=$(curl -s 'http://localhost:8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3})"
+  upstrlist=$(curl -s 'http://localhost:8080/api/4/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
   upstrarr=($upstrlist)
   # Loop through all upstream IPs and check whether the application IP is
   # already present in the upstream list
-  for (( j=0; j < $${#upstrarr[@]}; j++ )); do
+  for (( j=0; j < ${#upstrarr[@]}; j++ )); do
     # Do nothing if application IP is already included in the upstream list
-    if [ "$${arrapp[i]}" = "$${upstrarr[j]}" ]; then
+    if [ "${arrapp[i]}" = "${upstrarr[j]}" ]; then
       is_present=true;
-      echo "Server $${upstrarr[j]} is already contained in the $inip upstream group"
+      echo "Server ${arrapp[i]} is already contained in the $inip upstream group"
     fi;
   done;
   # Add application IP to upstream list if application IP is not already
   # included in the upstream list
   if [ "$is_present" = false ]; then
-    curl -X POST -d '{"server": "'"$${arrapp[i]}"'"}' -s 'http://localhost:8080/api/3/http/upstreams/upstream_app_pool/servers';
-    echo "Server $${upstrarr[j]} has been added to the $inip upstream group"
+    curl -X POST -d '{"server": "'"${arrapp[i]}"'"}' -s 'http://localhost:8080/api/4/http/upstreams/upstream_app_pool/servers';
+    echo "Server ${arrapp[i]} has been added to the $inip upstream group"
   fi;
 done;
 
@@ -50,26 +50,26 @@ inip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]
 lbip=$(gcloud compute instances list --format="value(networkInterfaces[0].accessConfigs[0].natIP)" --filter="name~'.*lb.*'")
 arrlb=($lbip)
 # Loop through all load balancer IPs
-for (( i=0; i < $${#arrlb[@]}; i++ )); do
+for (( i=0; i < ${#arrlb[@]}; i++ )); do
   is_present=false;
   # Get list of all upstream server instances in each NGINX load balancer
   # and format list as an array
-  upstrlist=$(curl -s 'http://'"$${arrlb[i]}"':8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
+  upstrlist=$(curl -s 'http://'"${arrlb[i]}"':8080/api/4/http/upstreams/upstream_app_pool/servers' | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
   upstrarr=($upstrlist)
   # Loop through all upstream IPs and check whether the application IP is
   # already present in the upstream list
-  for (( j=0; j < $${#upstrarr[@]}; j++ )); do
+  for (( j=0; j < ${#upstrarr[@]}; j++ )); do
     # Do nothing if application IP is already included in the upstream list
-    if [ "$inip" = "$${upstrarr[j]}" ]; then
+    if [ "$inip" = "${upstrarr[j]}" ]; then
       is_present=true;
-      echo "Server $${upstrarr[j]} is already contained in the $inip upstream group"
+      echo "Server $inip is already contained in the ${arrlb[i]} upstream group"
     fi;
   done;
   # Add application IP to upstream list if application IP is not already
   # included in the upstream list
   if [ "$is_present" = false ]; then
-    curl -X POST -d '{"server": "'"$inip"'"}' -s 'http://'"$${arrlb[i]}"':8080/api/3/http/upstreams/upstream_app_pool/servers';
-    echo "Server $${upstrarr[j]} has been added to the $inip upstream group"
+    curl -X POST -d '{"server": "'"$inip"'"}' -s 'http://'"${arrlb[i]}"':8080/api/4/http/upstreams/upstream_app_pool/servers';
+    echo "Server $inip has been added to the ${arrlb[i]} upstream group"
   fi;
 done;
 
@@ -80,11 +80,11 @@ done;
 # Get IP of local machine
 inip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1');
 # Get list of all load balancer server instances IP and format list as an array
-gcloud compute instances list --format="value(networkInterfaces[0].accessConfigs[0].natIP)" --filter="name~'.*lb.*'"| while read -r lb; do
+gcloud compute instances list --format="value(networkInterfaces[0].accessConfigs[0].natIP)" --filter="name~'.*lb.*'" | while read -r lb; do
   # Loop through all load balancers and remove the application server IP from
   # the upstream servers list
-  for ID in $(curl -s 'http://'"$lb"':8080/api/3/http/upstreams/upstream_app_pool/servers' | grep -o '"id":[0-9]\+\','"server":"10.138.0.2:80"' | grep -o '"id":[0-9]\+' | grep -o '[0-9]\+'); do
-    curl -X DELETE -s 'http://'"$lb"':8080/api/3/http/upstreams/upstream_app_pool/servers/'"$ID"'';
+  for ID in $(curl -s 'http://'"$lb"':8080/api/4/http/upstreams/upstream_app_pool/servers' | grep -o '"id":[0-9]\+','"server":'"$inip"'' | grep -o '"id":[0-9]\+' | grep -o '[0-9]\+'); do
+    curl -X DELETE -s 'http://'"$lb"':8080/api/4/http/upstreams/upstream_app_pool/servers/'"$ID"'';
     echo "Server $inip has been removed from $lb upstream group"
   done;
 done;

@@ -1,0 +1,73 @@
+{
+  "description": "Create an NGINX Plus and two NGINX Open Source Images",
+  "variables": {
+    "home": "{{env `HOME`}}",
+    "license": "{{env `HOME`}}/.ssh/ngx-certs",
+    "project_id": "all-active-nginx-plus-lb",
+    "zone": "us-west1-a"
+  },
+  "builders": [
+    {
+      "type": "googlecompute",
+      "account_file": "{{user `home`}}/.gcloud/gcloud_credentials.json",
+      "project_id": "{{user `project_id`}}",
+      "source_image_family": "ubuntu-1804-lts",
+      "zone": "{{user `zone`}}",
+      "ssh_username": "ubuntu",
+      "name": "ngx-plus",
+      "image_name": "ngx-plus"
+    },
+    {
+      "type": "googlecompute",
+      "account_file": "{{user `home`}}/.gcloud/gcloud_credentials.json",
+      "project_id": "{{user `project_id`}}",
+      "source_image_family": "ubuntu-1804-lts",
+      "zone": "{{user `zone`}}",
+      "ssh_username": "ubuntu",
+      "name": "ngx-oss",
+      "image_name": "ngx-oss"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 60",
+        "sudo apt update",
+        "sudo apt install python-pip -y",
+        "sudo pip install ansible"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `license`}}",
+      "destination": "~/.ssh/ngx-certs",
+      "only": [
+        "ngx-plus"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "galaxy_file": "requirements.yml",
+      "playbook_file": "playbook-lb.yml",
+      "only": [
+        "ngx-plus"
+      ]
+    },
+    {
+      "type": "shell",
+      "script": "setup-instance.sh",
+      "only": [
+        "ngx-plus"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "galaxy_file": "requirements.yml",
+      "playbook_file": "playbook-app.yml",
+      "only": [
+        "ngx-oss"
+      ]
+    }
+  ]
+}
