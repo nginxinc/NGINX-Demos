@@ -2,7 +2,7 @@
 - hosts: localhost
   become: true
   roles:
-    - nginxinc.nginx
+    - role: nginxinc.nginx
   vars:
     nginx_html_demo_template_enable: true
     nginx_html_demo_template:

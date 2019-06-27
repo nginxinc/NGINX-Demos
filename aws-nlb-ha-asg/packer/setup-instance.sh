@@ -23,16 +23,22 @@ server {
     root /usr/share/nginx/html;
   }
 
+  location ~ /favicon.ico {
+    root /usr/share/nginx/images;
+  }
+
   location /app_one {
     proxy_set_header Host \$host;
     proxy_set_header X-Forwarded-For \$remote_addr;
     proxy_pass http://app_one/;
+    health_check;
   }
 
   location /app_two {
     proxy_set_header Host \$host;
     proxy_set_header X-Forwarded-For \$remote_addr;
     proxy_pass http://app_two/;
+    health_check;
   }
 }
 
@@ -55,14 +61,14 @@ sudo nginx -s reload
 cat > /tmp/aws.yaml <<EOF
 region: us-west-1
 api_endpoint: http://127.0.0.1:8080/api
-sync_interval_in_seconds: 5
+sync_interval_in_seconds: 1
 upstreams:
   - name: app_one
-    autoscaling_group: ngx-oss-1-autoscaling
+    autoscaling_group: ngx-oss-one-autoscaling
     port: 80
     kind: http
   - name: app_two
-    autoscaling_group: ngx-oss-2-autoscaling
+    autoscaling_group: ngx-oss-two-autoscaling
     port: 80
     kind: http
 EOF
