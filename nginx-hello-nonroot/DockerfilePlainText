@@ -5,4 +5,6 @@ RUN chmod -R a+w /var/cache/nginx/ \
         && chmod a+w /var/run/nginx.pid \
         && rm /etc/nginx/conf.d/*
 
-ADD hello-plain-text-nonroot.conf /etc/nginx/conf.d/
+COPY hello-plain-text-nonroot.conf /etc/nginx/conf.d/
+EXPOSE 8080
+USER nginx
