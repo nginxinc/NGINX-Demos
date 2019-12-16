@@ -19,6 +19,8 @@ utilizing *fleet* and *etcd*.
 
 *   **nginx-hello**: NGINX running as webserver in a docker container that serves a simple page containing the container's hostname, IP address and port
 
+*   **nginx-hello-nonroot**: NGINX running as webserver with non root privilege in a docker container that serves a simple page containing the container's hostname, IP address and port
+
 *   **nginx-openstack-heat**: Shows how to deploy and configure NGINX Plus to load balance a simple
 web application in OpenStack using Heat. Also the demo shows how NGINX Plus can be reconfigured so that
 whenever we create or delete our application instances, NGINX Plus is automatically reconfigured.
