@@ -1,7 +1,7 @@
 
 # NGINX webserver ran with non root privilege that serves a simple page containing its hostname, IP address and port as well as the request URI and the local time of the webserver.
 
-// to validate - The images are uploaded to Docker Hub -- https://hub.docker.com/r/nginxdemos/hello-nonroot/.
+The images are uploaded to Docker Hub -- https://hub.docker.com/r/nginxdemos/hello-nonroot/.
 
 How to run:
 ```
