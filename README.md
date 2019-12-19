@@ -15,6 +15,8 @@ utilizing *fleet* and *etcd*.
 
 *   **gcp-lb-ha-asg**: This demo contains a series of scripts that enable an easy deployment of a High Availability All Active Auto Scaling NGINX Plus Load Balancing configuration on Google Cloud. Adaptation of a guide found [here](https://www.nginx.com/resources/deployment-guides/all-active-nginx-plus-load-balancing-gce/).
 
+*   **go-hello-nonroot**: This is a simple Go webapp running in a docker container and returning the container's IP address, hostname and the system user running the app in the container.
+
 *   **mysql-galera-demo**: This demo uses NGINX Plus as a TCP load balancer for a MySQL Galera cluster consisting of two mysqld servers. It does round-robin load balancing between the 2 mysqld servers and also does active health checks using an xinetd script running on port 9200 inside each mysqld container.
 
 *   **nginx-hello**: NGINX running as webserver in a docker container that serves a simple page containing the container's hostname, IP address and port
