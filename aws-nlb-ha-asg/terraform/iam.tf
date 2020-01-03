@@ -1,6 +1,6 @@
 # Create AWS IAM role for AWS NGINX autoscaling tool
 resource "aws_iam_role" "main" {
-  name               = "aws-nlb-iam-role-temp"
+  name               = "aws-nlb-iam-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
