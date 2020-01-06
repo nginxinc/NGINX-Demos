@@ -27,9 +27,9 @@ The instructions assume you have the following:
 ## Setup
 
 1.  [Install](https://www.packer.io/intro/getting-started/install.html) Packer.
-    *   This solution was developed using **Packer v1.0.4** and as such might not work if a different version of Packer is employed. We will strive to update the code if any breaking changes are introduced in a future release of Packer.
+    *   The minimum version of Packer required is **Packer v1.5.0** and as such might not work if a different version of Packer is employed. We will strive to update the code if any breaking changes are introduced in a future release of Packer.
 2.  [Install](https://www.terraform.io/intro/getting-started/install.html) Terraform.
-    *   This solution was developed using **Terraform v0.10.8** and as such might not work if a different version of Terraform is employed. We will strive to update the code if any breaking changes are introduced in a future release of Terraform.
+    *   The minimum version of Terraform required is **Terraform v0.12.0** and as such might not work if a different version of Terraform is employed. We will strive to update the code if any breaking changes are introduced in a future release of Terraform.
 3.  Set your AWS credentials in the Packer and Terraform scripts:
 
     1.  For Packer, set your credentials in the variables block in `packer/packer.json`:
