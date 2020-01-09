@@ -1,5 +1,5 @@
 
-# NGINX webserver ran with non root privilege that serves a simple page containing its hostname, IP address and port as well as the request URI and the local time of the webserver.
+# NGINX webserver that runs with non-root privileges to serve a simple page containing its hostname, IP address and port as well as the request URI and the local time of the webserver.
 
 The images are uploaded to Docker Hub -- https://hub.docker.com/r/nginxdemos/nginx-hello/.
 

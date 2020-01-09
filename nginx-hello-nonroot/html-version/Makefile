@@ -2,7 +2,7 @@ VERSION=0.1
 PREFIX=nginxdemos/nginx-hello
 TAG=$(VERSION)
 
-all: build push test
+all: build push
 
 build:
 	@echo "Building image:"
@@ -12,4 +12,4 @@ push:
 	docker push $(PREFIX):$(TAG)
 test:
 	@echo "Running container:"
-	docker run -d -p 8080 --name nginx-hello $(PREFIX):$(TAG)
+	docker run --rm -p 8080:8080 $(PREFIX):$(TAG)
