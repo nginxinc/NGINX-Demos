@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"os/user"
@@ -11,34 +12,42 @@ import (
 	"time"
 )
 
-var id string
+var id, ip, userInfo string
 
 func main() {
-	id = generateID()
+	var err error
+
+	id, err = generateID()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ip, err = externalIP()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userInfo = currentUser()
+
 	http.HandleFunc("/coffee", cafeHandler)
 	http.HandleFunc("/tea", cafeHandler)
-	http.ListenAndServe(":8080", nil)
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func generateID() string {
+func generateID() (string, error) {
 	buf := make([]byte, 6)
 	_, err := rand.Read(buf)
 	if err != nil {
-		fmt.Println("error:", err)
-		return "nil"
+		return "", err
 	}
 	buf[0] |= 2
-	return fmt.Sprintf("%02x%02x%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5])
+	return fmt.Sprintf("%02x%02x%02x%02x%02x%02x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]), nil
 }
 
 func cafeHandler(w http.ResponseWriter, r *http.Request) {
-	ip, err := externalIP()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Fprintf(w, "Server address: "+ip+"\nServer name: "+id+
-		"\nDate: "+time.Now().Format(time.RFC3339)+"\nURI: "+
-		r.URL.String()+"\nCurrent System User: "+currentUser()+"\n")
+	fmt.Fprintf(w, "Server address: %v\nServer name: %v\nDate: %v\nURI: %s\nCurrent System User: %v\n",
+		ip, id, time.Now().Format(time.RFC3339), r.URL, userInfo)
 }
 
 func externalIP() (string, error) {
@@ -81,8 +90,7 @@ func externalIP() (string, error) {
 func currentUser() string {
 	user, err := user.Current()
 	if err != nil {
-		// fmt.Println(err)
-		return "uid=" + fmt.Sprint(syscall.Getuid())
+		return fmt.Sprintf("uid=%v", syscall.Getuid())
 	}
-	return fmt.Sprintf("username=" + user.Username + " uid=" + user.Uid)
+	return fmt.Sprintf("username=%s uid=%s", user.Username, user.Uid)
 }

@@ -4,7 +4,7 @@ The image is uploaded to Docker Hub -- https://hub.docker.com/r/nginxdemos/go-he
 
 How to run:
 ```
-$ docker run -P -d nginxdemos/go-hello
+$ docker run -p 8080:8080 nginxdemos/go-hello
 ```
 
 Now, assuming we found out the IP address and the port that mapped to port 8080 on the container, we can make a request to the webapp and get the result below: 
