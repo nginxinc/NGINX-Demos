@@ -1,0 +1,61 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: cafe
+spec:
+  host: cafe.example.com
+  tls:
+    secret: cafe-secret
+  upstreams:
+  - name: tea
+    service: tea-svc
+    port: 80
+  - name: coffee
+    service: coffee-svc
+    port: 80
+  - name: coffee-decaf
+    service: coffee-decaf-svc
+    port: 80
+  routes:
+  # prefix-based routing
+  - path: /tea
+    action:
+      pass: tea
+  - path: /coffee
+    action:
+      pass: coffee
+  # prefix-based routing with a split
+  - path: /coffee-split
+    splits:
+    - weight: 50
+      action:
+        pass: coffee
+    - weight: 50
+      action:
+        pass: coffee-decaf
+  # prefix-based routing with routing based on an argument
+  - path: /coffee-argument
+    matches:
+    - conditions:
+      - argument: choice
+        value: decaf
+      action:
+        pass: coffee-decaf
+    action:
+      pass: coffee
+  # routing based on a regex
+  - path: ~ latte
+    action:
+      return:
+        code: 404
+        type: text/html
+        body: <h1 align='center'>No more lattes, sorry!</h1>
+  # routing based on an exact match
+  - path: =/nginx
+    action:
+      redirect:
+        code: 302
+        url: https://nginx.org
+  # routing based on a prefix with delegation 
+  - path: /special
+    route: special/coffee
