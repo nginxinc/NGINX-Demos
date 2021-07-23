@@ -1,0 +1,62 @@
+name: Build Docker Images
+
+on:
+  schedule:
+    - cron:  '0 1 * * *'
+
+defaults:
+  run:
+    shell: bash
+env:
+  PLATFORMS: linux/arm/v6,linux/arm/v7,linux/arm64,linux/amd64,linux/ppc64le,linux/s390x,linux/386
+jobs:
+  build-docker:
+    name: Build and push Images
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - tag: nginxdemos/hello:latest,nginxdemos/hello:0.2
+            context: nginx-hello
+          - tag: nginxdemos/hello:plain-text,nginxdemos/hello:0.2-plain-text
+            context: nginx-hello
+            file: nginx-hello/DockerfilePlainText
+          - tag: nginxdemos/nginx-hello:latest,nginxdemos/nginx-hello:0.1
+            context: nginx-hello-nonroot/html-version
+          - tag: nginxdemos/nginx-hello:plain-text,nginxdemos/nginx-hello:0.1-plain-text
+            context: nginx-hello-nonroot/plain-text-version
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: arm/v6,arm,arm64,amd64,ppc64le,s390x,386
+      - name: Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Get variables
+        id: variables
+        run: |
+          image=$(cut -d"," -f1 <<< "${{ matrix.tag }}")
+          echo "::set-output name=image::${image}"
+      - name: Check if update needed for ${{ steps.variables.outputs.image }}
+        id: update
+        uses: lucacome/docker-image-update-checker@v1
+        with:
+          base-image: library/nginx:mainline-alpine
+          image: ${{ steps.variables.outputs.image }}
+      - name: DockerHub Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push to Dockerhub for nginx-hello
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          tags: ${{ matrix.tag }}
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+        if: ${{ steps.update.outputs.needs-updating == 'true' }}
