@@ -28,14 +28,6 @@ jobs:
             context: nginx-hello-nonroot/plain-text-version
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-        with:
-          platforms: arm/v6,arm,arm64,amd64,ppc64le,s390x,386
-      - name: Docker Buildx
-        uses: docker/setup-buildx-action@v1
       - name: Get variables
         id: variables
         run: |
@@ -47,6 +39,17 @@ jobs:
         with:
           base-image: library/nginx:mainline-alpine
           image: ${{ steps.variables.outputs.image }}
+      - name: Checkout
+        uses: actions/checkout@v2
+        if: ${{ steps.update.outputs.needs-updating == 'true' }}
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: arm/v6,arm,arm64,amd64,ppc64le,s390x,386
+        if: ${{ steps.update.outputs.needs-updating == 'true' }}
+      - name: Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        if: ${{ steps.update.outputs.needs-updating == 'true' }}
       - name: DockerHub Login
         uses: docker/login-action@v1
         with:
