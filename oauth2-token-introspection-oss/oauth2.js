@@ -63,3 +63,5 @@ function introspectAccessToken(r) {
     );
     r.return(401);
 }
+
+export default { introspectAccessToken }
