@@ -88,3 +88,5 @@ function tokenResult(r) {
         r.return(401);
     }
 }
+
+export default { introspectAccessToken }
