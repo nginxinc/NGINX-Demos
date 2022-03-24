@@ -17,14 +17,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - tag: nginxdemos/hello:latest,nginxdemos/hello:0.2
+          - tag: nginxdemos/hello:latest,nginxdemos/hello:0.3
             context: nginx-hello
-          - tag: nginxdemos/hello:plain-text,nginxdemos/hello:0.2-plain-text
+          - tag: nginxdemos/hello:plain-text,nginxdemos/hello:0.3-plain-text
             context: nginx-hello
             file: nginx-hello/DockerfilePlainText
-          - tag: nginxdemos/nginx-hello:latest,nginxdemos/nginx-hello:0.1
+          - tag: nginxdemos/nginx-hello:latest,nginxdemos/nginx-hello:0.2
             context: nginx-hello-nonroot/html-version
-          - tag: nginxdemos/nginx-hello:plain-text,nginxdemos/nginx-hello:0.1-plain-text
+          - tag: nginxdemos/nginx-hello:plain-text,nginxdemos/nginx-hello:0.2-plain-text
             context: nginx-hello-nonroot/plain-text-version
 
     steps:
