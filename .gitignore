@@ -21,3 +21,6 @@
 
 # Ignore Ansible retry files
 *.retry
+
+# Ignore IDEs
+.vscode
