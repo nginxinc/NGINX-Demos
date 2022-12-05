@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-clickhouse
+  annotations:
+    nfs.io/storage-path: clickhouse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickhouse
+  labels:
+    app: clickhouse
+spec:
+  selector:
+    matchLabels:
+      app: clickhouse
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+      - name: clickhouse
+        image: clickhouse/clickhouse-server:21.12.4.1
+        ports:
+        - name: binary
+          containerPort: 9000
+        - name: http
+          containerPort: 8123
+        volumeMounts:
+        - name: clickhouse-users
+          mountPath: /etc/clickhouse-server/users.xml
+          subPath: users.xml
+        - name: clickhouse-conf
+          mountPath: /etc/clickhouse-server/config.xml
+          subPath: config.xml
+        - name: clickhouse-storage
+          mountPath: /var/lib/clickhouse
+      volumes:
+      - name: clickhouse-users
+        configMap:
+          name: clickhouse-users
+      - name: clickhouse-conf
+        configMap:
+          name: clickhouse-conf
+      - name: clickhouse-storage
+        persistentVolumeClaim:
+          claimName: pvc-clickhouse
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickhouse
+  labels:
+    app: clickhouse
+spec:
+  ports:
+  - name: binary
+    port: 9000
+  - name: http
+    port: 8123
+  selector:
+    app: clickhouse
+  type: ClusterIP

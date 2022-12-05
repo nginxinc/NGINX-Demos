@@ -21,6 +21,8 @@ utilizing *fleet* and *etcd*.
 
 *   **nginx-hello-nonroot**: NGINX running as webserver with non root privilege in a docker container that serves a simple page containing the container's hostname, IP address and port
 
+*   **nginx-nms-docker**: This demo helps building a docker image to deploy NGINX Management Suite on containers without Helm. A helper script is provided for Helm deployments
+
 *   **nginx-openstack-heat**: Shows how to deploy and configure NGINX Plus to load balance a simple
 web application in OpenStack using Heat. Also the demo shows how NGINX Plus can be reconfigured so that
 whenever we create or delete our application instances, NGINX Plus is automatically reconfigured.
