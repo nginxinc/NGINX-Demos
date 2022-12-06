@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-grafana-data
+  annotations:
+    nfs.io/storage-path: grafana/data
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-grafana-log
+  annotations:
+    nfs.io/storage-path: grafana/log
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  labels:
+    app: grafana
+spec:
+  selector:
+    matchLabels:
+      app: grafana
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+        - name: grafana-log
+          mountPath: /var/log/grafana
+        env:
+          # Clickhouse datasource plugin installation
+          # https://grafana.com/grafana/plugins/vertamedia-clickhouse-datasource/?tab=installation
+          # grafana-cli plugins install vertamedia-clickhouse-datasource
+          - name: GF_INSTALL_PLUGINS
+            value: vertamedia-clickhouse-datasource
+      volumes:
+      - name: grafana-data
+        persistentVolumeClaim:
+          claimName: pvc-grafana-data
+      - name: grafana-log
+        persistentVolumeClaim:
+          claimName: pvc-grafana-log
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  labels:
+    app: grafana
+spec:
+  ports:
+  - port: 3000
+  selector:
+    app: grafana
+  type: ClusterIP

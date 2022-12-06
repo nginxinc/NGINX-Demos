@@ -1,0 +1,43 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: nim2
+spec:
+  host: nim2.f5.ff.lan
+  tls:
+    secret: nim2.f5.ff.lan
+  upstreams:
+  - name: nginx-nim2
+    service: nginx-nim2
+    port: 443
+    tls:
+      enable: true
+    client-max-body-size: 10m
+  - name: nginx-nim2-f5tt
+    service: nginx-nim2
+    port: 5000
+  routes:
+  - path: /
+    action:
+      pass: nginx-nim2
+  - path: /f5tt
+    action:
+      pass: nginx-nim2-f5tt
+
+---
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: grafana
+spec:
+  host: grafana.nim2.f5.ff.lan
+  tls:
+    secret: nim2.f5.ff.lan
+  upstreams:
+  - name: grafana
+    service: grafana
+    port: 3000
+  routes:
+  - path: /
+    action:
+      pass: grafana
