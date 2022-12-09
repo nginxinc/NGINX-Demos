@@ -31,7 +31,7 @@ This repository has been tested with:
 
 - Docker 20.10+ to build the image
 - Private registry to push the target Docker image
-- Kubernetes/Openshift cluster with dynamic storage provisioner enabled: see the [example](/contrib/pvc-provisioner)
+- Kubernetes/Openshift cluster with dynamic storage provisioner enabled: see the [example](contrib/pvc-provisioner)
 - NGINX Ingress Controller with `VirtualServer` CRD support (see https://docs.nginx.com/nginx-ingress-controller/configuration/virtualserver-and-virtualserverroute-resources/)
 - Access to F5/NGINX downloads to fetch NGINX Instance Manager 2.4.0+ installation .deb file and API Connectivity Manager 1.0+ installation .deb file
 - Linux host running Docker to build the image
@@ -153,7 +153,7 @@ Second Sight REST API (if enabled at build time - see the documentation at `http
 - `https://nim2.f5.ff.lan/f5tt/metrics`
 - Push mode (configured through env variables in `manifests/1.nginx-nim.yaml`)
 
-Grafana dashboard: `https://grafana.nim2.f5.ff.lan` - see [configuration details](/contrib/grafana)
+Grafana dashboard: `https://grafana.nim2.f5.ff.lan` - see [configuration details](contrib/grafana)
 
 Running pods are:
 
@@ -182,7 +182,7 @@ and then restart nginx-agent
 
 ## Additional tools
 
-- [Grafana dashboard for telemetry](/contrib/grafana)
+- [Grafana dashboard for telemetry](contrib/grafana)
 - [Helm installer](contrib/helm-installer)
 
 

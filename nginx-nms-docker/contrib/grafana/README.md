@@ -7,7 +7,7 @@ To configure the bundled Grafana container follow these steps:
 3. Go to configuration / data sources
 4. Add a new data source. In the search box type "clickhouse" and click "select". Configure the datasource as displayed here below. Set the password to "NGINXr0cks":
 
-<img src="/contrib/grafana/clickhouse-datasource.png"/>
+<img src="clickhouse-datasource.png"/>
 
 5. Click "Save and test": "Datasource is working" should be displayed
 6. Go to Dashboards / browse and click "Import"
@@ -15,4 +15,4 @@ To configure the bundled Grafana container follow these steps:
 8. Click import
 9. The NGINX Instance Manager 2 telemetry dashboard is up and running
 
-<img src="/contrib/grafana/grafana-dashboard.png"/>
+<img src="grafana-dashboard.png"/>
