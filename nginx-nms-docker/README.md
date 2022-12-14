@@ -24,7 +24,7 @@ A bash script to quickly install NGINX Management Suite through the official Hel
 This repository has been tested with:
 
 - NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0
-- NGINX Management Suite API Connectivity Manager 1.0.0, 1.1.0, 1.1.1, 1.2.0
+- NGINX Management Suite API Connectivity Manager 1.0.0, 1.1.0, 1.1.1, 1.2.0, 1.3.0
 - Security Monitoring 1.0.0
 
 ## Prerequisites
