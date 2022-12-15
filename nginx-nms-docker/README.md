@@ -12,7 +12,6 @@ Docker image creation is supported for:
 
 The image can optionally be built with [Second Sight](https://github.com/F5Networks/SecondSight) support
 
-
 ## Deployment through the official Helm chart
 
 A bash script to quickly install NGINX Management Suite through the official Helm chart is available here:
@@ -33,16 +32,13 @@ This repository has been tested with:
 - Private registry to push the target Docker image
 - Kubernetes/Openshift cluster with dynamic storage provisioner enabled: see the [example](contrib/pvc-provisioner)
 - NGINX Ingress Controller with `VirtualServer` CRD support (see https://docs.nginx.com/nginx-ingress-controller/configuration/virtualserver-and-virtualserverroute-resources/)
-- Access to F5/NGINX downloads to fetch NGINX Instance Manager 2.4.0+ installation .deb file and API Connectivity Manager 1.0+ installation .deb file
+- Access to F5/NGINX downloads to fetch NGINX Instance Manager 2.4.0+ installation .deb file and API Connectivity Manager 1.0+ installation .deb file (when running in manual mode)
+- Valid NGINX license certificate and key to fetch NGINX Management Suite packages (when running in automated mode)
 - Linux host running Docker to build the image
 
 ## How to build
 
-1. Clone this repo
-2. Download NGINX Instance Manager 2.4.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
-3. Optional: download API Connectivity Manager 1.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
-4. Optional: download Security Monitoring .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-sm_1.0.0-697204659~jammy_amd64.deb`) and copy it into `nim-files/`
-5. Build NGINX Instance Manager Docker image using:
+The install script can be used to build the Docker image using automated or manual build:
 
 ```
 $ ./scripts/buildNIM.sh 
@@ -57,21 +53,84 @@ NGINX Management Suite Docker image builder
  === Options:
 
  -h                     - This help
- -n [filename]          - The NGINX Instance Manager .deb package filename
- -a [filename]          - The API Connectivity Manager .deb package filename - optional
- -w [filename]          - The Security Monitoring .deb package filename - optional
  -t [target image]      - The Docker image name to be created
  -s                     - Enable Second Sight (https://github.com/F5Networks/SecondSight/) - optional
 
+ Manual build:
+
+ -n [filename]          - The NGINX Instance Manager .deb package filename
+ -a [filename]          - The API Connectivity Manager .deb package filename - optional
+ -w [filename]          - The Security Monitoring .deb package filename - optional
+
+ Automated build:
+
+ -i                     - Automated build - requires cert & key
+ -C [file.crt]          - Certificate file to pull packages from the official NGINX repository
+ -K [file.key]          - Key file to pull packages from the official NGINX repository
+ -A                     - Enable API Connectivity Manager
+ -W                     - Enable Security Monitoring
+
  === Examples:
 
- ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \
+ Manual build:
+        ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \
+                -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb \
+                -w nim-files/nms-sm_1.0.0-697204659~jammy_amd64.deb \
+                -t my.registry.tld/nginx-nms:2.6.0
+
+ Automated build:
+        ./scripts/buildNIM.sh -i -C nginx-repo.crt -K nginx-repo.key
+                -t my.registry.tld/nginx-nms:2.6.0
+```
+
+### Automated build
+
+1. Clone this repo
+2. Get your license certificate and key to fetch NGINX Management Suite packages from NGINX repository
+3. Build NGINX Instance Manager Docker image using:
+
+NGINX Instance Manager
+
+```
+$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key
+```
+
+NGINX Instance Manager and API Connectivity Manager
+
+```
+$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A
+```
+
+NGINX Instance Manager and Security Monitoring
+
+```
+$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -W
+```
+
+NGINX Instance Manager, API Connectivity Manager and Security Monitoring
+
+```
+$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W
+```
+
+### Manual build
+
+1. Clone this repo
+2. Download NGINX Instance Manager 2.4.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
+3. Optional: download API Connectivity Manager 1.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
+4. Optional: download Security Monitoring .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-sm_1.0.0-697204659~jammy_amd64.deb`) and copy it into `nim-files/`
+5. Build NGINX Instance Manager Docker image using:
+
+```
+./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \
         -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb \
         -w nim-files/nms-sm_1.0.0-697204659~jammy_amd64.deb \
         -t my.registry.tld/nginx-nms:2.6.0
 ```
 
-6. Edit `manifests/1.nginx-nim.yaml` and specify the correct image by modifying the "image" line and configure NGINX Instance Manager username, password and the base64-encoded license file for automated license activation. In order to use API Connectivity Manager an ACM license is required
+### Configuring and running
+
+1. Edit `manifests/1.nginx-nim.yaml` and specify the correct image by modifying the "image" line and configure NGINX Instance Manager username, password and the base64-encoded license file for automated license activation. In order to use API Connectivity Manager an ACM license is required
 
 ```
 image: your.registry.tld/nginx-nim2:tag
@@ -109,7 +168,7 @@ env:
     value: "NGINXr0cks"
 ```
 
-7. If Second Sight was built in the image, configure the relevant environment variables. See the documentation at https://github.com/F5Networks/SecondSight/#on-kubernetesopenshift
+2. If Second Sight was built in the image, configure the relevant environment variables. See the documentation at https://github.com/F5Networks/SecondSight/#on-kubernetesopenshift
 
 ```
 env:
@@ -128,16 +187,16 @@ env:
     value: "10"
 ```
 
-8. Check / modify files in `/manifests/certs` to customize the TLS certificate and key used for TLS offload
+3. Check / modify files in `/manifests/certs` to customize the TLS certificate and key used for TLS offload
 
-9. Start and stop using
+4. Start and stop using
 
 ```
 ./scripts/nimDockerStart.sh start
 ./scripts/nimDockerStart.sh stop
 ```
 
-10. After starting NGINX Instance Manager it will be accessible from outside the cluster at:
+5. After starting NGINX Instance Manager it will be accessible from outside the cluster at:
 
 NGINX Instance Manager GUI: `https://nim2.f5.ff.lan`
 NGINX Instance Manager gRPC port: `nim2.f5.ff.lan:30443`
@@ -165,7 +224,7 @@ grafana-6f58d455c7-8lk64      1/1     Running   0          5m8s   10.244.2.80   
 nginx-nim2-679987c54d-7rl6b   1/1     Running   0          5m8s   10.244.1.64   f5-node1   <none>           <none>
 ```
 
-11. For NGINX Instances running on VM/bare metal only: after installing the nginx-agent on NGINX Instances to be managed with NGINX Instance Manager 2, update the file `/etc/nginx-agent/nginx-agent.conf` and modify the line:
+6. For NGINX Instances running on VM/bare metal only: after installing the nginx-agent on NGINX Instances to be managed with NGINX Instance Manager 2, update the file `/etc/nginx-agent/nginx-agent.conf` and modify the line:
 
 ```
 grpcPort: 443
