@@ -103,7 +103,7 @@ if [ -z "${AUTOMATED_INSTALL}" ]
 then
 	docker build --no-cache --build-arg NIM_DEBFILE=$DEBFILE --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER --build-arg ACM_IMAGE=$ACM_IMAGE --build-arg SM_IMAGE=$SM_IMAGE -t $IMGNAME .
 else
-	docker build --build-arg NGINX_CERT=$NGINX_CERT --build-arg NGINX_KEY=$NGINX_KEY --build-arg ADD_ACM=$ADD_ACM --build-arg ADD_SM=$ADD_SM --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER -t $IMGNAME -f Dockerfile.automated .
+	docker build --no-cache --build-arg NGINX_CERT=$NGINX_CERT --build-arg NGINX_KEY=$NGINX_KEY --build-arg ADD_ACM=$ADD_ACM --build-arg ADD_SM=$ADD_SM --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER -t $IMGNAME -f Dockerfile.automated .
 fi
 
 docker push $IMGNAME
