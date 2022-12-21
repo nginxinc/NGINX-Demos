@@ -27,6 +27,18 @@ fi
 
 /etc/nms/scripts/basic_passwords.sh $NIM_USERNAME $NIM_PASSWORD
 
+# NGINX Management Suite version detection
+# NMS >= 2.7.0 configuration is yaml
+VERSION=`nms-core -v`
+A=${VERSION%\/*}
+B=${A##*\ }
+RELEASE=`echo $B | awk -F- '{print $2"."$3"."$4}'`
+
+echo -n "Detected NMS $RELEASE... "
+
+case $RELEASE in
+	2.4.0|2.5.0|2.5.1|2.6.0)
+		echo "legacy nms.conf"
 # Clickhouse configuration - dedicated pod
 echo -e "
 
@@ -35,6 +47,20 @@ clickhouse_address = $NIM_CLICKHOUSE_ADDRESS:$NIM_CLICKHOUSE_PORT
 clickhouse_username = '$NIM_CLICKHOUSE_USERNAME'
 clickhouse_password = '$NIM_CLICKHOUSE_PASSWORD'
 " >> /etc/nms/nms.conf
+	;;
+	*)
+		echo "YAML nms.conf"
+# Clickhouse configuration - dedicated pod
+echo -e "
+
+# Clickhouse config
+clickhouse:
+  address: $NIM_CLICKHOUSE_ADDRESS:$NIM_CLICKHOUSE_PORT
+  username: '$NIM_CLICKHOUSE_USERNAME'
+  password: '$NIM_CLICKHOUSE_PASSWORD'
+" >> /etc/nms/nms.conf
+	;;
+esac
 
 /etc/init.d/nginx start
 
