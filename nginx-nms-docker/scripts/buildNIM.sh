@@ -101,9 +101,12 @@ echo "==> Building NGINX Management Suite docker image"
 
 if [ -z "${AUTOMATED_INSTALL}" ]
 then
-	docker build --no-cache --build-arg NIM_DEBFILE=$DEBFILE --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER --build-arg ACM_IMAGE=$ACM_IMAGE --build-arg SM_IMAGE=$SM_IMAGE -t $IMGNAME .
+        docker build --no-cache --build-arg NIM_DEBFILE=$DEBFILE --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER \
+                --build-arg ACM_IMAGE=$ACM_IMAGE --build-arg SM_IMAGE=$SM_IMAGE -t $IMGNAME .
 else
-	docker build --no-cache --build-arg NGINX_CERT=$NGINX_CERT --build-arg NGINX_KEY=$NGINX_KEY --build-arg ADD_ACM=$ADD_ACM --build-arg ADD_SM=$ADD_SM --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER -t $IMGNAME -f Dockerfile.automated .
+	DOCKER_BUILDKIT=1 docker build --no-cache -f Dockerfile.automated --secret id=nginx-key,src=$NGINX_KEY --secret id=nginx-crt,src=$NGINX_CERT \
+                --build-arg ADD_ACM=$ADD_ACM --build-arg ADD_SM=$ADD_SM --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER \
+                -t $IMGNAME .
 fi
 
 docker push $IMGNAME
