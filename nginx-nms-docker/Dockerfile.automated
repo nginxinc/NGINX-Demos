@@ -4,38 +4,32 @@ ARG BUILD_WITH_SECONDSIGHT=false
 ARG ADD_ACM
 ARG ADD_SM
 
-ARG NGINX_CERT
-ARG NGINX_KEY
-
 # Initial setup
 RUN apt-get update && \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y -q build-essential git nano curl jq wget gawk \
-		nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat
-
-# Modules download and setup
-
-RUN mkdir -p /etc/ssl/nginx
-COPY $NGINX_CERT /etc/ssl/nginx/nginx-repo.crt
-COPY $NGINX_KEY /etc/ssl/nginx/nginx-repo.key
-
-RUN printf "deb https://pkgs.nginx.com/nms/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nms.list && \
-	wget -q -O /etc/apt/apt.conf.d/90pkgs-nginx https://cs.nginx.com/static/files/90pkgs-nginx && \
-	cat /etc/apt/apt.conf.d/90pkgs-nginx && \
-	wget -O /tmp/nginx_signing.key https://cs.nginx.com/static/keys/nginx_signing.key && \
-	apt-key add /tmp/nginx_signing.key && \
-	apt-get update && \
-	apt-get install -y nms-instance-manager && \
-	curl -s http://hg.nginx.org/nginx.org/raw-file/tip/xml/en/security_advisories.xml > /usr/share/nms/cve.xml && \
-	# Optional API Connectivity Manager
-	if [ "${ADD_ACM}" = "true" ] ; then \
-	apt-get -y install nms-api-connectivity-manager; fi && \
-	# Optional Security Monitoring
-	if [ "${ADD_SM}" = "true" ] ; then \
-	apt-get -y install nms-sm; fi
+		nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat && \
+	mkdir -p /etc/ssl/nginx /deployment
 
 COPY ./container/startNIM.sh /deployment/
-RUN chmod +x /deployment/startNIM.sh
 
+RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644 \
+        --mount=type=secret,id=nginx-key,dst=/etc/ssl/nginx/nginx-repo.key,mode=0644 \
+	set -x \
+	&& chmod +x /deployment/startNIM.sh \
+	&& printf "deb https://pkgs.nginx.com/nms/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nms.list \
+	&& wget -q -O /etc/apt/apt.conf.d/90pkgs-nginx https://cs.nginx.com/static/files/90pkgs-nginx \
+	&& cat /etc/apt/apt.conf.d/90pkgs-nginx \
+	&& wget -O /tmp/nginx_signing.key https://cs.nginx.com/static/keys/nginx_signing.key \
+	&& apt-key add /tmp/nginx_signing.key \
+	&& apt-get update \
+	&& apt-get install -y nms-instance-manager \
+	&& curl -s http://hg.nginx.org/nginx.org/raw-file/tip/xml/en/security_advisories.xml > /usr/share/nms/cve.xml \
+	# Optional API Connectivity Manager
+	&& if [ "${ADD_ACM}" = "true" ] ; then \
+	apt-get -y install nms-api-connectivity-manager; fi \
+	# Optional Security Monitoring
+	&& if [ "${ADD_SM}" = "true" ] ; then \
+	apt-get -y install nms-sm; fi
 
 # Optional Second Sight
 WORKDIR /deployment
