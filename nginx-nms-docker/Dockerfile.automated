@@ -1,13 +1,14 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 ARG BUILD_WITH_SECONDSIGHT=false
 ARG ADD_ACM
 ARG ADD_SM
+ARG ADD_PUM
 
 # Initial setup
 RUN apt-get update && \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y -q build-essential git nano curl jq wget gawk \
-		nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat && \
+		nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat sudo && \
 	mkdir -p /etc/ssl/nginx /deployment
 
 COPY ./container/startNIM.sh /deployment/
@@ -18,7 +19,6 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& chmod +x /deployment/startNIM.sh \
 	&& printf "deb https://pkgs.nginx.com/nms/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nms.list \
 	&& wget -q -O /etc/apt/apt.conf.d/90pkgs-nginx https://cs.nginx.com/static/files/90pkgs-nginx \
-	&& cat /etc/apt/apt.conf.d/90pkgs-nginx \
 	&& wget -O /tmp/nginx_signing.key https://cs.nginx.com/static/keys/nginx_signing.key \
 	&& apt-key add /tmp/nginx_signing.key \
 	&& apt-get update \
@@ -29,7 +29,10 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	apt-get -y install nms-api-connectivity-manager; fi \
 	# Optional Security Monitoring
 	&& if [ "${ADD_SM}" = "true" ] ; then \
-	apt-get -y install nms-sm; fi
+	apt-get -y install nms-sm; fi \
+	# Optional WAF Policy Compiler
+	&& if [ ! -z "${ADD_PUM}" ] ; then \
+	apt-get -y install nms-nap-compiler-$ADD_PUM; fi
 
 # Optional Second Sight
 WORKDIR /deployment
