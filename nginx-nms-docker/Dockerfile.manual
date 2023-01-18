@@ -1,20 +1,22 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 ARG NIM_DEBFILE
 ARG BUILD_WITH_SECONDSIGHT=false
 ARG ACM_IMAGE=nim-files/.placeholder
 ARG SM_IMAGE=nim-files/.placeholder
+ARG PUM_IMAGE=nim-files/.placeholder
 
 # Initial setup
 RUN apt-get update && \
-	DEBIAN_FRONTEND=noninteractive apt-get install -y -q build-essential git nano curl jq wget gawk \
-		nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat && \
-	mkdir -p deployment/setup
+        DEBIAN_FRONTEND=noninteractive apt-get install -y -q build-essential git nano curl jq wget gawk \
+                nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat sudo && \
+	mkdir -p /deployment/setup
 
 # NGINX Instance Manager 2.4.0+
 COPY $NIM_DEBFILE /deployment/setup/nim.deb
 COPY $ACM_IMAGE /deployment/setup/acm.deb
 COPY $SM_IMAGE /deployment/setup/sm.deb
+COPY $PUM_IMAGE /deployment/setup/pum.deb
 
 COPY ./container/startNIM.sh /deployment/
 RUN chmod +x /deployment/startNIM.sh
@@ -33,6 +35,10 @@ RUN if [ "$ACM_IMAGE" != "nim-files/.placeholder" ] ; then \
 # Optional Security Monitoring
 RUN if [ "$SM_IMAGE" != "nim-files/.placeholder" ] ; then \
 	apt-get -y install /deployment/setup/sm.deb; fi
+
+# Optional WAF Policy Compiler
+RUN if [ "$PUM_IMAGE" != "nim-files/.placeholder" ] ; then \
+	apt-get -y install /deployment/setup/pum.deb; fi
 
 RUN rm -r /deployment/setup
 

@@ -2,6 +2,8 @@
 
 This repository helps deploying NGINX Management Suite on containerized clusters by creating a docker image or deploying the official Helm chart with a simple bash script.
 
+It is also available as part of [official NGINX Demos](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker)
+
 ## Docker image creation
 
 Docker image creation is supported for:
@@ -9,8 +11,10 @@ Docker image creation is supported for:
 - [NGINX Instance Manager](https://docs.nginx.com/nginx-instance-manager/) 2.4.0+
 - [NGINX Management Suite API Connectivity Manager](https://docs.nginx.com/nginx-management-suite/acm/) 1.0.0+
 - [Security Monitoring](https://docs.nginx.com/nginx-management-suite/admin-guides/installation/install-guide/#install-nms-modules) 1.0.0+
+- [NGINX App Protect WAF compiler](https://docs.nginx.com/nginx-management-suite/nim/how-to/app-protect/setup-waf-config-management)
 
 The image can optionally be built with [Second Sight](https://github.com/F5Networks/SecondSight) support
+
 
 ## Deployment through the official Helm chart
 
@@ -25,6 +29,7 @@ This repository has been tested with:
 - NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0
 - NGINX Management Suite API Connectivity Manager 1.0.0, 1.1.0, 1.1.1, 1.2.0, 1.3.0, 1.3.1
 - Security Monitoring 1.0.0, 1.1.0
+- NGINX App Protect WAF compiler 3.1088.2, 4.2.0
 
 ## Prerequisites
 
@@ -38,7 +43,7 @@ This repository has been tested with:
 
 ## How to build
 
-The install script can be used to build the Docker image using automated or manual build:
+The install script can be used to build the Docker image using automated or manual install:
 
 ```
 $ ./scripts/buildNIM.sh 
@@ -53,22 +58,24 @@ NGINX Management Suite Docker image builder
  === Options:
 
  -h                     - This help
- -t [target image]      - The Docker image name to be created
+ -t [target image]      - Docker image name to be created
  -s                     - Enable Second Sight (https://github.com/F5Networks/SecondSight/) - optional
 
  Manual build:
 
- -n [filename]          - The NGINX Instance Manager .deb package filename
- -a [filename]          - The API Connectivity Manager .deb package filename - optional
- -w [filename]          - The Security Monitoring .deb package filename - optional
+ -n [filename]          - NGINX Instance Manager .deb package filename
+ -a [filename]          - API Connectivity Manager .deb package filename - optional
+ -w [filename]          - Security Monitoring .deb package filename - optional
+ -p [filename]          - WAF policy compiler .deb package filename - optional
 
  Automated build:
 
  -i                     - Automated build - requires cert & key
  -C [file.crt]          - Certificate file to pull packages from the official NGINX repository
  -K [file.key]          - Key file to pull packages from the official NGINX repository
- -A                     - Enable API Connectivity Manager
- -W                     - Enable Security Monitoring
+ -A                     - Enable API Connectivity Manager - optional
+ -W                     - Enable Security Monitoring - optional
+ -P [version]           - Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0] - optional
 
  === Examples:
 
@@ -76,11 +83,12 @@ NGINX Management Suite Docker image builder
         ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \
                 -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb \
                 -w nim-files/nms-sm_1.0.0-697204659~jammy_amd64.deb \
+                -p nim-files/nms-nap-compiler-v4.2.0.deb \
                 -t my.registry.tld/nginx-nms:2.6.0
 
  Automated build:
         ./scripts/buildNIM.sh -i -C nginx-repo.crt -K nginx-repo.key
-                -t my.registry.tld/nginx-nms:2.6.0
+                -A -W -P v4.2.0 -t my.registry.tld/nginx-nms:2.6.0
 ```
 
 ### Automated build
@@ -101,16 +109,16 @@ NGINX Instance Manager and API Connectivity Manager
 $ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A
 ```
 
-NGINX Instance Manager and Security Monitoring
+NGINX Instance Manager, Security Monitoring and WAF Policy Compiler
 
 ```
-$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -W
+$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -W -P v4.2.0
 ```
 
-NGINX Instance Manager, API Connectivity Manager and Security Monitoring
+NGINX Instance Manager, API Connectivity Manager, WAF Policy Compiler and Security Monitoring
 
 ```
-$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W
+$ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W -P v4.2.0
 ```
 
 ### Manual build
@@ -119,12 +127,14 @@ $ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C cert
 2. Download NGINX Instance Manager 2.4.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
 3. Optional: download API Connectivity Manager 1.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
 4. Optional: download Security Monitoring .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-sm_1.0.0-697204659~jammy_amd64.deb`) and copy it into `nim-files/`
-5. Build NGINX Instance Manager Docker image using:
+5. Optional: download WAF Policy Compiler .deb installation file (ie. `nms-nap-compiler-v4.2.0_4.2.0-1~jammy_amd64.deb`) and copy it into `nim-files/`
+6. Build NGINX Instance Manager Docker image using:
 
 ```
 ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \
         -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb \
         -w nim-files/nms-sm_1.0.0-697204659~jammy_amd64.deb \
+        -p nim-files/nms-nap-compiler-v4.2.0_4.2.0-1~jammy_amd64.deb \
         -t my.registry.tld/nginx-nms:2.6.0
 ```
 

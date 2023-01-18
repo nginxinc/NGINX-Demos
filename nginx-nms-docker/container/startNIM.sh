@@ -68,9 +68,11 @@ esac
 /bin/bash -c '`which mkdir` -p /var/lib/nms/dqlite/'
 /bin/bash -c '`which mkdir` -p /var/lib/nms/secrets/'
 /bin/bash -c '`which mkdir` -p /var/run/nms/'
+/bin/bash -c '`which mkdir` -p /var/log/nms/'
 /bin/bash -c '`which chown` -R nms:nms /var/log/nms/'
-/bin/bash -c '`which chown` -R nms:nms /var/lib/nms/'
 /bin/bash -c '`which chown` -R nms:nms /var/run/nms/'
+/bin/bash -c '`which chown` -R nms:nms /var/lib/nms/'
+/bin/bash -c '`which chmod` 0775 /var/log/nms/'
 /bin/bash -c '`which chown` -R nms:nms /etc/nms/certs/services/core'
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
 /bin/bash -c '`which chmod` 0700 /etc/nms/certs/services/core'
@@ -92,11 +94,24 @@ esac
 
 # Start nms ingestion - from /lib/systemd/system/nms-ingestion.service
 /bin/bash -c '`which mkdir` -p /var/run/nms/'
+/bin/bash -c '`which mkdir` -p /var/log/nms/'
 /bin/bash -c '`which chown` -R nms:nms /var/log/nms/'
+/bin/bash -c '`which chmod` 0775 /var/log/nms/'
 /bin/bash -c '`which chown` -R nms:nms /var/run/nms/'
 /usr/bin/nms-ingestion &
 
-# Start API Connectivity Manager
+# Start nms integrations - from /lib/systemd/system/nms-integrations.service
+/bin/bash -c '`which mkdir` -p /var/lib/nms/dqlite/'
+/bin/bash -c '`which mkdir` -p /var/run/nms/'
+/bin/bash -c '`which mkdir` -p /var/log/nms/'
+/bin/bash -c '`which chown` -R nms:nms /var/lib/nms/'
+/bin/bash -c '`which chown` -R nms:nms /var/run/nms/'
+/bin/bash -c '`which chown` -R nms:nms /var/log/nms/'
+/bin/bash -c '`which chmod` 0775 /var/log/nms/'
+/bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
+/usr/bin/nms-integrations &
+
+# Start API Connectivity Manager - from /lib/systemd/system/nms-acm.service
 sleep 5
 /usr/bin/nms-acm server &
 
