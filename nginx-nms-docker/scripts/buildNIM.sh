@@ -22,9 +22,9 @@ Automated build:\n\n
 -P [version]\t\t- Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0] - optional\n\n
 === Examples:\n\n
 Manual build:\n
-\t$0 -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \\\\\n
-\t\t-a nim-files/nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb \\\\\n
-\t\t-w nim-files/nms-sm_1.0.0-697204659~jammy_amd64.deb \\\\\n
+\t$0 -n nim-files/nms-instance-manager_2.6.0-698150575~focal_amd64.deb \\\\\n
+\t\t-a nim-files/nms-api-connectivity-manager_1.2.0.668430332~focal_amd64.deb \\\\\n
+\t\t-w nim-files/nms-sm_1.0.0-697204659~focal_amd64.deb \\\\\n
 \t\t-p nim-files/nms-nap-compiler-v4.2.0.deb \\\\\n
 \t\t-t my.registry.tld/nginx-nms:2.6.0\n\n
 Automated build:\n
