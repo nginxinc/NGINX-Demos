@@ -122,17 +122,17 @@ $ ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C cert
 ### Manual build
 
 1. Clone this repo
-2. Download NGINX Instance Manager 2.4.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
-3. Optional: download API Connectivity Manager 1.0+ .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb`) and copy it into `nim-files/`
-4. Optional: download Security Monitoring .deb installation file for Ubuntu 22.04 "jammy_amd64" (ie. `nms-sm_1.0.0-697204659~jammy_amd64.deb`) and copy it into `nim-files/`
-5. Optional: download WAF Policy Compiler .deb installation file (ie. `nms-nap-compiler-v4.2.0_4.2.0-1~jammy_amd64.deb`) and copy it into `nim-files/`
+2. Download NGINX Instance Manager 2.4.0+ .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
+3. Optional: download API Connectivity Manager 1.0+ .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
+4. Optional: download Security Monitoring .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
+5. Optional: download WAF Policy Compiler .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
 6. Build NGINX Instance Manager Docker image using:
 
 ```
-./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \
-        -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb \
-        -w nim-files/nms-sm_1.0.0-697204659~jammy_amd64.deb \
-        -p nim-files/nms-nap-compiler-v4.2.0_4.2.0-1~jammy_amd64.deb \
+./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~focal_amd64.deb \
+        -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~focal_amd64.deb \
+        -w nim-files/nms-sm_1.0.0-697204659~focal_amd64.deb \
+        -p nim-files/nms-nap-compiler-v4.2.0_4.2.0-1~focal_amd64.deb \
         -t my.registry.tld/nginx-nms:2.6.0
 ```
 
