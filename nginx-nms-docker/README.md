@@ -2,8 +2,6 @@
 
 This repository helps deploying NGINX Management Suite on containerized clusters by creating a docker image or deploying the official Helm chart with a simple bash script.
 
-It is also available as part of [official NGINX Demos](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker)
-
 ## Docker image creation
 
 Docker image creation is supported for:
