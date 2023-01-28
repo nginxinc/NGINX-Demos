@@ -78,9 +78,9 @@ NGINX Management Suite Docker image builder
  === Examples:
 
  Manual build:
-        ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~jammy_amd64.deb \
-                -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~jammy_amd64.deb \
-                -w nim-files/nms-sm_1.0.0-697204659~jammy_amd64.deb \
+        ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~focal_amd64.deb \
+                -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~focal_amd64.deb \
+                -w nim-files/nms-sm_1.0.0-697204659~focal_amd64.deb \
                 -p nim-files/nms-nap-compiler-v4.2.0.deb \
                 -t my.registry.tld/nginx-nms:2.6.0
 
