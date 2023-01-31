@@ -2,7 +2,7 @@ name: Build Docker Images
 
 on:
   schedule:
-    - cron:  '0 1 * * *'
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 defaults:
@@ -13,7 +13,7 @@ env:
 jobs:
   build-docker:
     name: Build and push Images
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
@@ -64,4 +64,6 @@ jobs:
           tags: ${{ matrix.tag }}
           platforms: ${{ env.PLATFORMS }}
           push: true
+          provenance: true
+          sbom: true
         if: ${{ steps.update.outputs.needs-updating == 'true' }}
