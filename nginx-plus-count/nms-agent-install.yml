@@ -1,0 +1,27 @@
+---
+- name: Install NGINX Management Suite (NMS)
+  hosts: nms
+  vars:
+    nms_version: 2.6.0*
+    nms_setup: install
+    nms_password: 'Password123'
+    nginx_setup: install
+    nginx_license:
+      certificate: "{{playbook_dir}}/nginx-repo.crt"
+      key: "{{playbook_dir}}/nginx-repo.key" 
+
+  tasks:
+    - name: Install NMS
+      ansible.builtin.include_role:
+        name: nginxinc.nms_install
+
+- name: Install NGINX Agent on data plane hosts
+  hosts: data
+  vars:
+    nms_fqdn:  "{{ groups.nms[0] }}"
+    nms_validate_certs: false
+
+  tasks:
+    - name: Install NGINX Agent on NGINX Plus Hosts
+      ansible.builtin.include_role:
+        name: nginxinc.nginx_management_suite.nms_agent_config

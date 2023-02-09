@@ -1,0 +1,4 @@
+collections:
+  - name: https://github.com/TuxInvader/ansible_collection_nginx_management_suite.git
+    type: git
+    version: main

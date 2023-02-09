@@ -1,0 +1,5 @@
+# from GitHub
+- src: https://github.com/nginxinc/ansible-role-nginx-management-suite.git
+  version: initial
+
+- src: https://github.com/nginxinc/ansible-role-nginx

@@ -1,0 +1,36 @@
+---
+- name: Upgrade NMS
+  hosts: nms
+  vars:
+    nms_setup: upgrade
+    nms_password: 'Password123'
+    nginx_setup: upgrade
+    nginx_license:
+      certificate: "{{playbook_dir}}/nginx-repo.crt"
+      key: "{{playbook_dir}}/nginx-repo.key" 
+
+  tasks:
+    - name: Upgrade NMS
+      ansible.builtin.include_role:
+        name: ansible-role-nginx-management-suite
+
+- name: Upgrade NGINX Agent on NGINX Plus Hosts
+  hosts: data
+  vars:
+    nms_fqdn:  "{{ groups.nms[0] }}"
+    nms_validate_certs: false
+
+  tasks:
+    - name: Remove file to force NGINX Agent Upgrade
+      ansible.builtin.file:
+        path: /etc/nginx-agent/nginx-agent.conf
+        state: absent
+
+    - name: Stopping nginx-agent
+      ansible.builtin.systemd:
+        name: nginx-agent
+        state: stopped
+
+    - name: Upgrade NGINX Agent on NGINX Plus Hosts
+      ansible.builtin.include_role:
+        name: nginxinc.nginx_management_suite.nms_agent_config

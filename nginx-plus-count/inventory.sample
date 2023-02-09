@@ -1,0 +1,6 @@
+[nms]
+x.x.x.x ansible_user=<username>  ansible_become=yes
+
+[data]
+y.y.y.y ansible_user=<username>  ansible_become=yes
+z.z.z.z ansible_user=<username>  ansible_become=yes
