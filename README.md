@@ -17,6 +17,8 @@ utilizing *fleet* and *etcd*.
 
 *   **mysql-galera-demo**: This demo uses NGINX Plus as a TCP load balancer for a MySQL Galera cluster consisting of two mysqld servers. It does round-robin load balancing between the 2 mysqld servers and also does active health checks using an xinetd script running on port 9200 inside each mysqld container.
 
+*   **nginx-agent-docker**: This demo helps building a docker image to deploy NGINX Plus and NGINX Agent for NGINX Management Suite, with optional support for NGINX App Protect WAF and NGINX Developer Portal for API Connectivity Manager
+
 *   **nginx-hello**: NGINX running as webserver in a docker container that serves a simple page containing the container's hostname, IP address and port
 
 *   **nginx-hello-nonroot**: NGINX running as webserver with non root privilege in a docker container that serves a simple page containing the container's hostname, IP address and port
