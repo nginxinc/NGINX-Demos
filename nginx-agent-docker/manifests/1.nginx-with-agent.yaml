@@ -24,7 +24,7 @@ spec:
           containerPort: 80
         env:
           - name: NIM_HOST
-            # Default value to use if NGINX Instance Manager is installed using https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker
+            # Default value to use if NGINX Instance Manager is installed using https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker or https://github.com/fabriziofiorucci/NGINX-NMS-Docker
             value: "nginx-nim2.nginx-nim2"
           - name: NIM_GRPC_PORT
             value: "443"
@@ -32,11 +32,16 @@ spec:
             value: "lab"
           - name: NIM_TAGS
             value: "preprod,devops"
-            # Optional if NGINX App Protect WAF is available in the docker image - set to "true" to enable
-          - name: NAP_WAF
-            value: "true"
-          - name: NAP_WAF_PRECOMPILED_POLICIES
-            value: "true"
+
+          # Optional if NGINX App Protect WAF is available in the docker image - set to "true" to enable
+          #- name: NAP_WAF
+          #  value: "true"
+          #- name: NAP_WAF_PRECOMPILED_POLICIES
+          #  value: "true"
+
+          # Optional if API Connectivity Manager Developer Portal is available in the docker image - set to "true" to enable
+          #- name: ACM_DEVPORTAL
+          #  value: "true"
 
 ---
 apiVersion: v1

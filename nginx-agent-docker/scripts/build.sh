@@ -82,6 +82,11 @@ then
 echo "=> Building with Developer Portal support"
 fi
 
+if [ ! -z "${NAP_WAF}" ]
+then
+echo "=> Building with NGINX App Protect WAF support"
+fi
+
 DOCKER_BUILDKIT=1 docker build --no-cache -f Dockerfile \
 	--secret id=nginx-key,src=$NGINX_KEY --secret id=nginx-crt,src=$NGINX_CERT \
 	--build-arg NMS_URL=$NMSURL --build-arg DEVPORTAL=$DEVPORTAL --build-arg NAP_WAF=$NAP_WAF -t $IMAGENAME .
