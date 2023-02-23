@@ -79,6 +79,7 @@ the build script will push the image to your private registry once build is comp
   - `NIM_TAGS` - comma separated list of tags for the NGINX Kubernetes Deployment
   - `NAP_WAF` - set to `"true"` to enable NGINX App Protect WAF (docker image built using `-w`)
   - `NAP_WAF_PRECOMPILED_POLICIES` - set to `"true"` to enable NGINX App Protect WAF precompiled policies (docker image built using `-w`)
+  - `ACM_DEVPORTAL` - set to `"true"` to enable API Connectivity Manager Developer Portal (docker image built using `-d`)
 
 2. Start and stop using
 
