@@ -24,7 +24,7 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& chmod +x /deployment/start.sh && touch /.dockerenv \
 # Install prerequisite packages:
 	&& apt-get -y update \
-	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 debian-archive-keyring \
+	&& apt-get -y install debian-archive-keyring \
 	&& wget -qO - https://cs.nginx.com/static/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null \
 	&& printf "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://pkgs.nginx.com/plus/debian `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nginx-plus.list \
 	&& wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx \
