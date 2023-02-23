@@ -6,7 +6,7 @@ ARG NAP_WAF=false
 
 # Initial packages setup
 RUN	apt-get -y update \
-	&& apt-get -y install -y apt-transport-https lsb-release ca-certificates wget gnupg2 wget curl \
+	&& apt-get -y install -y apt-transport-https lsb-release ca-certificates wget gnupg2 curl \
 # NGINX Instance Manager agent setup
 	&& mkdir -p /deployment /etc/ssl/nginx \
 # Agent installation
