@@ -22,7 +22,7 @@ This repository has been tested with NGINX agent for:
 
 ## Building the docker image
 
-The install script can be used to build the Docker image using automated or manual agent install:
+The install script can be used to build the Docker image:
 
 ```
 $ ./scripts/build.sh 
@@ -47,13 +47,13 @@ NGINX Plus & NGINX Instance Manager agent Docker image builder
  === Examples:
 
  NGINX Plus and NGINX Agent image:
- ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:2.7.0 -n https://nim.f5.ff.lan
+ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28 -n https://nim.f5.ff.lan
 
  NGINX Plus, NGINX App Protect WAF and NGINX Agent image:
- ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:2.7.0 -w -n https://nim.f5.ff.lan
+ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28-nap -w -n https://nim.f5.ff.lan
 
  NGINX Plus, Developer Portal support and NGINX Agent image:
- ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:2.7.0-devportal -d -n https://nim.f5.ff.lan 
+ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28-devportal -d -n https://nim.f5.ff.lan 
 ```
 
 1. Clone this repository
@@ -62,7 +62,7 @@ NGINX Plus & NGINX Instance Manager agent Docker image builder
 4. Build the Docker image using:
 
 ```
-$ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:automated -n https://ubuntu.ff.lan
+$ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28 -n https://ubuntu.ff.lan
 ```
 
 the build script will push the image to your private registry once build is complete.
@@ -70,7 +70,7 @@ the build script will push the image to your private registry once build is comp
 - the `-d` flag can be used to build a Docker image to run NGINX Plus in [Developer Portal](https://docs.nginx.com/nginx-management-suite/admin-guides/installation/on-prem/install-guide/#install-developer-portal) mode for [API Connectivity Manager](https://docs.nginx.com/nginx-management-suite/acm/about/architecture/)
 - the `-w` flag can be used to include NGINX App Protect WAF support in the docker image
 
-### Running the docker image
+### Running the docker image on Kubernetes
 
 1. Edit `manifests/1.nginx-nim.yaml` and specify the correct image by modifying the `image:` line, and set the following environment variables. Default values for `NIM_HOST` and `NIM_GRPC_PORT` can be used if NGINX Instance Manager is deployed using https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker
   - `NIM_HOST` - NGINX Instance Manager hostname/IP address
@@ -89,3 +89,20 @@ $ ./scripts/nginxWithAgentStart.sh stop
 ```
 
 3. After startup NGINX Plus instances will register to NGINX Instance Manager and will be displayed on the "instances" dashboard
+
+### Running the docker image on Docker
+
+1. Start using
+
+```
+NGINX Plus and NGINX Agent
+docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -d registry.ff.lan:31005/nginx-with-agent:r28
+
+NGINX Plus, NGINX Agent and NGINX App Protect WAF with precompiled policies
+docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -e "NAP_WAF=true" -e "NAP_WAF_PRECOMPILED_POLICIES=true" -d registry.ff.lan:31005/nginx-with-agent:r28-nap
+
+NGINX Plus, NGINX Agent and Developer portal
+docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -e "ACM_DEVPORTAL=true" -d registry.ff.lan:31005/nginx-with-agent:r28-devportal
+```
+
+2. After startup NGINX Plus instances will register to NGINX Instance Manager and will be displayed on the "instances" dashboard
