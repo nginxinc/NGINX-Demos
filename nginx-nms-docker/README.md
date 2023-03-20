@@ -73,7 +73,7 @@ NGINX Management Suite Docker image builder
  -K [file.key]          - Key file to pull packages from the official NGINX repository
  -A                     - Enable API Connectivity Manager - optional
  -W                     - Enable Security Monitoring - optional
- -P [version]           - Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0] - optional
+ -P [version]           - Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0|v4.100.1] - optional
 
  === Examples:
 
