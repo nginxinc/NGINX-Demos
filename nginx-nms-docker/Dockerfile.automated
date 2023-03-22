@@ -32,7 +32,9 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	apt-get -y install nms-sm; fi \
 	# Optional WAF Policy Compiler
 	&& if [ ! -z "${ADD_PUM}" ] ; then \
-	apt-get -y install nms-nap-compiler-$ADD_PUM; fi
+	apt-get -y install nms-nap-compiler-$ADD_PUM; fi \
+	# Set permissions
+	&& chmod +x /etc/nms/scripts/*.sh
 
 # Optional Second Sight
 WORKDIR /deployment

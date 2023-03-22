@@ -8,8 +8,8 @@ ARG PUM_IMAGE=nim-files/.placeholder
 
 # Initial setup
 RUN apt-get update && \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y -q build-essential git nano curl jq wget gawk \
-                nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat sudo && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y -q build-essential git nano curl jq wget gawk \
+		nginx lsb-release rsyslog systemd apt-transport-https ca-certificates netcat && \
 	mkdir -p /deployment/setup
 
 # NGINX Instance Manager 2.4.0+
@@ -39,6 +39,9 @@ RUN if [ "$SM_IMAGE" != "nim-files/.placeholder" ] ; then \
 # Optional WAF Policy Compiler
 RUN if [ "$PUM_IMAGE" != "nim-files/.placeholder" ] ; then \
 	apt-get -y install /deployment/setup/pum.deb; fi
+
+# Set permissions
+RUN chmod +x /etc/nms/scripts/*.sh
 
 RUN rm -r /deployment/setup
 
