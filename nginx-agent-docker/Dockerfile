@@ -49,7 +49,11 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 
 # Forward request logs to Docker log collector
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
-	&& ln -sf /dev/stderr /var/log/nginx/error.log
+	&& ln -sf /dev/stderr /var/log/nginx/error.log \
+
+	&& groupadd -g 1001 nginx-agent \
+	&& usermod root -G nginx-agent \
+	&& usermod nginx -G nginx-agent
 
 EXPOSE 80
 STOPSIGNAL SIGTERM
