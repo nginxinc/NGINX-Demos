@@ -113,7 +113,7 @@ esac
 
 # Start API Connectivity Manager - from /lib/systemd/system/nms-acm.service
 sleep 5
-/usr/bin/nms-acm server &
+sudo -u nms /usr/bin/nms-acm server &
 
 sleep 5
 
