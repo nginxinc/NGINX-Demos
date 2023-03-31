@@ -32,7 +32,7 @@ jobs:
         id: variables
         run: |
           image=$(cut -d"," -f1 <<< "${{ matrix.tag }}")
-          echo "::set-output name=image::${image}"
+          echo "image=${image}" >> $GITHUB_OUTPUT
       - name: Check if update needed for ${{ steps.variables.outputs.image }}
         id: update
         uses: lucacome/docker-image-update-checker@v1
