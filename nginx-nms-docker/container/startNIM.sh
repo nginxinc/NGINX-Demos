@@ -25,6 +25,8 @@ then
 	python3 /deployment/app.py &
 fi
 
+mkdir /nonexistent
+
 /etc/nms/scripts/basic_passwords.sh $NIM_USERNAME $NIM_PASSWORD
 
 # NGINX Management Suite version detection
@@ -77,7 +79,7 @@ esac
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
 /bin/bash -c '`which chmod` 0700 /etc/nms/certs/services/core'
 /bin/bash -c '`which chmod` 0600 /etc/nms/certs/services/core/*'
-sudo -u nms /usr/bin/nms-core &
+su - nms -c "/usr/bin/nms-core &" -s /bin/bash
 
 # Start nms dpm - from /lib/systemd/system/nms-dpm.service
 /bin/bash -c '`which mkdir` -p /var/lib/nms/streaming/'
@@ -90,7 +92,7 @@ sudo -u nms /usr/bin/nms-core &
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
 /bin/bash -c '`which chmod` 0700 /etc/nms/certs/services/dataplane-manager'
 /bin/bash -c '`which chmod` 0600 /etc/nms/certs/services/dataplane-manager/*'
-sudo -u nms /usr/bin/nms-dpm &
+su - nms -c "/usr/bin/nms-dpm &" -s /bin/bash
 
 # Start nms ingestion - from /lib/systemd/system/nms-ingestion.service
 /bin/bash -c '`which mkdir` -p /var/run/nms/'
@@ -98,7 +100,7 @@ sudo -u nms /usr/bin/nms-dpm &
 /bin/bash -c '`which chown` -R nms:nms /var/log/nms/'
 /bin/bash -c '`which chmod` 0775 /var/log/nms/'
 /bin/bash -c '`which chown` -R nms:nms /var/run/nms/'
-sudo -u nms /usr/bin/nms-ingestion &
+su - nms -c "/usr/bin/nms-ingestion &" -s /bin/bash
 
 # Start nms integrations - from /lib/systemd/system/nms-integrations.service
 /bin/bash -c '`which mkdir` -p /var/lib/nms/dqlite/'
@@ -109,11 +111,11 @@ sudo -u nms /usr/bin/nms-ingestion &
 /bin/bash -c '`which chown` -R nms:nms /var/log/nms/'
 /bin/bash -c '`which chmod` 0775 /var/log/nms/'
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
-sudo -u nms /usr/bin/nms-integrations &
+su - nms -c "/usr/bin/nms-integrations &" -s /bin/bash
 
 # Start API Connectivity Manager - from /lib/systemd/system/nms-acm.service
 sleep 5
-sudo -u nms /usr/bin/nms-acm server &
+su - nms -c "/usr/bin/nms-acm server &" -s /bin/bash
 
 sleep 5
 
