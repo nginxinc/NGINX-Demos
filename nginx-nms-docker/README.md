@@ -255,6 +255,8 @@ and then restart nginx-agent
 
 # Starting NGINX Management Suite
 
+## On Kubernetes
+
 ```
 $ ./scripts/nimDockerStart.sh start
 namespace/nginx-nim2 created
@@ -281,9 +283,19 @@ NGINX Management Suite GUI is now reachable from outside the cluster at:
 - gRPC: `nim2.f5.ff.lan:30443`
 - Second Sight: see [usage](https://github.com/F5Networks/SecondSight/blob/main/USAGE.md)
 
+## On docker-compose
+
+See [docker-compose](contrib/docker-compose)
+
 # Stopping NGINX Management Suite
+
+## On Kubernetes
 
 ```
 $ ./scripts/nimDockerStart.sh stop
 namespace "nginx-nim2" deleted
 ```
+
+## On docker-compose
+
+See [docker-compose](contrib/docker-compose)
