@@ -1,0 +1,36 @@
+version: "3"
+services:
+    clickhouse:
+     image: clickhouse/clickhouse-server:23.1.2.9
+     ports:
+     - "9000:9000"
+     environment:
+     - CLICKHOUSE_USER=${NIM_CLICKHOUSE_USERNAME}
+     - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+     - CLICKHOUSE_PASSWORD=${NIM_CLICKHOUSE_PASSWORD}
+     volumes:
+     - db-data:/var/lib/clickhouse
+     ulimits:
+      nproc: 65535
+      nofile:
+       soft: 262144
+       hard: 262144
+
+    nms:
+     image: ${NIM_IMAGE}
+     ports:
+     - "443:443"
+     environment:
+     - NIM_LICENSE=${NIM_LICENSE}
+     - NIM_USERNAME=${NIM_USERNAME}
+     - NIM_PASSWORD=${NIM_PASSWORD}
+     - NIM_CLICKHOUSE_ADDRESS=${NIM_CLICKHOUSE_ADDRESS}
+     - NIM_CLICKHOUSE_PORT=9000
+     - NIM_CLICKHOUSE_USERNAME=${NIM_CLICKHOUSE_USERNAME}
+     - NIM_CLICKHOUSE_PASSWORD=${NIM_CLICKHOUSE_PASSWORD}
+     volumes:
+     - nms-data:/var/lib/nms
+
+volumes:
+     db-data:
+     nms-data:
