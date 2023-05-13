@@ -9,7 +9,7 @@ This repository can be used to build a docker image with NGINX Plus and NGINX In
 This repository has been tested with NGINX agent for:
 
 - NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.10.0
-- API Connectivity Manager 1.4.0, 1.5.0
+- API Connectivity Manager 1.4.0, 1.5.0, 1.6.0
 - NGINX App Protect WAF 4.100.1+
 
 ## Prerequisites
