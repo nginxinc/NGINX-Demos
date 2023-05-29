@@ -10,9 +10,9 @@ Docker image creation is supported for:
 - [NGINX Management Suite API Connectivity Manager](https://docs.nginx.com/nginx-management-suite/acm/) 1.0.0+
 - [Security Monitoring](https://docs.nginx.com/nginx-management-suite/security/) 1.0.0+
 - [NGINX App Protect WAF compiler](https://docs.nginx.com/nginx-management-suite/nim/how-to/app-protect/setup-waf-config-management)
+- [NGINX App Delivery Manager](https://docs.nginx.com/nginx-management-suite/adm/) 4.0.0+
 
 The image can optionally be built with [Second Sight](https://github.com/F5Networks/SecondSight) support
-
 
 ## Deployment through the official Helm chart
 
@@ -24,10 +24,11 @@ A bash script to quickly install NGINX Management Suite through the official Hel
 
 This repository has been tested with:
 
-- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0
+- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1
 - NGINX Management Suite API Connectivity Manager 1.0.0, 1.1.0, 1.1.1, 1.2.0, 1.3.0, 1.3.1, 1.4.0, 1.4.1, 1.5.0, 1.6.0
 - Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0
 - NGINX App Protect WAF compiler 3.1088.2, 4.2.0, 4.100.1, 4.218.0
+- NGINX App Delivery Manager 4.0.0
 
 ## Prerequisites
 
@@ -74,6 +75,7 @@ NGINX Management Suite Docker image builder
  -A                     - Enable API Connectivity Manager - optional
  -W                     - Enable Security Monitoring - optional
  -P [version]           - Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0|v4.100.1|v4.218.0] - optional
+ -D                     - Enable App Delivery Manager - optional
 
  === Examples:
 
@@ -86,7 +88,7 @@ NGINX Management Suite Docker image builder
 
  Automated build:
         ./scripts/buildNIM.sh -i -C nginx-repo.crt -K nginx-repo.key
-                -A -W -P v4.218.0 -t my.registry.tld/nginx-nms:2.9.0
+                -A -W -P v4.218.0 -D -t my.registry.tld/nginx-nms:2.9.0
 ```
 
 ### Automated build
@@ -117,6 +119,12 @@ NGINX Instance Manager, API Connectivity Manager, WAF Policy Compiler and Securi
 
 ```
 ./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W -P v4.2.0
+```
+
+NGINX Instance Manager, API Connectivity Manager, WAF Policy Compiler, Security Monitoring and App Delivery Manager
+
+```
+./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W -P v4.2.0 -D
 ```
 
 ### Manual build
@@ -251,6 +259,7 @@ and then restart nginx-agent
 
 - [Grafana dashboard for telemetry](contrib/grafana)
 - [Helm installer](contrib/helm-installer)
+- [Docker compose](contrib/docker-compose)
 
 
 # Starting NGINX Management Suite

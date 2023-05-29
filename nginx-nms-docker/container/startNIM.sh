@@ -64,8 +64,6 @@ clickhouse:
 	;;
 esac
 
-/etc/init.d/nginx start
-
 # Start nms core - from /lib/systemd/system/nms-core.service
 /bin/bash -c '`which mkdir` -p /var/lib/nms/dqlite/'
 /bin/bash -c '`which mkdir` -p /var/lib/nms/secrets/'
@@ -114,12 +112,25 @@ su - nms -c "/usr/bin/nms-ingestion &" -s /bin/bash
 su - nms -c "/usr/bin/nms-integrations &" -s /bin/bash
 
 # Start API Connectivity Manager - from /lib/systemd/system/nms-acm.service
-sleep 5
-su - nms -c "/usr/bin/nms-acm server &" -s /bin/bash
+if [ -f /usr/bin/nms-acm ]
+then
+	sleep 5
+	su - nms -c "/usr/bin/nms-acm server &" -s /bin/bash
+fi
+
+# Start App Delivery Manager
+if [ -f /usr/bin/nms-adm ]
+then
+	/bin/bash -c '`which mkdir` -p /var/run/nms/modules/adm'
+	/bin/bash -c '`which chown` -R nms:nms /var/run/nms/modules/adm'
+	su - nms -c "/usr/bin/nms-adm server &" -s /bin/bash
+fi
 
 sleep 5
 
 chmod 666 /var/run/nms/*.sock
+
+/etc/init.d/nginx start
 
 # License activation
 if ((${#NIM_LICENSE[@]}))

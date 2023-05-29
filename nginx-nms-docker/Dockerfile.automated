@@ -4,6 +4,7 @@ ARG BUILD_WITH_SECONDSIGHT=false
 ARG ADD_ACM
 ARG ADD_SM
 ARG ADD_PUM
+ARG ADD_ADM
 
 # Initial setup
 RUN apt-get update && \
@@ -17,7 +18,8 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
         --mount=type=secret,id=nginx-key,dst=/etc/ssl/nginx/nginx-repo.key,mode=0644 \
 	set -x \
 	&& chmod +x /deployment/startNIM.sh \
-	&& printf "deb https://pkgs.nginx.com/nms/ubuntu `lsb_release -cs` nginx-plus\n" | tee /etc/apt/sources.list.d/nms.list \
+	&& printf "deb https://pkgs.nginx.com/nms/ubuntu `lsb_release -cs` nginx-plus\n" > /etc/apt/sources.list.d/nms.list \
+	&& printf "deb https://pkgs.nginx.com/adm/ubuntu `lsb_release -cs` nginx-plus\n" >> /etc/apt/sources.list.d/nms.list \
 	&& wget -q -O /etc/apt/apt.conf.d/90pkgs-nginx https://cs.nginx.com/static/files/90pkgs-nginx \
 	&& wget -O /tmp/nginx_signing.key https://cs.nginx.com/static/keys/nginx_signing.key \
 	&& apt-key add /tmp/nginx_signing.key \
@@ -33,6 +35,9 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	# Optional WAF Policy Compiler
 	&& if [ ! -z "${ADD_PUM}" ] ; then \
 	apt-get -y install nms-nap-compiler-$ADD_PUM; fi \
+	# Optional App Delivery Manager
+	&& if [ ! -z "${ADD_ADM}" ] ; then \
+	apt-get -y install nms-app-delivery-manager; fi \
 	# Set permissions
 	&& chmod +x /etc/nms/scripts/*.sh
 
