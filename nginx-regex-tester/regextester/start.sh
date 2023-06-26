@@ -10,7 +10,7 @@ fi
 
 echo "NGINX started"
 
-unitd --modules /usr/lib/unit/modules/ --log /var/log/unit.log
+unitd --control unix:/run/control.unit.sock
 
 i=$(curl --unix-socket /run/control.unit.sock -s -o /dev/null -w "%{http_code}" localhost/config)
 if [ "$i" != "200" ]; then
