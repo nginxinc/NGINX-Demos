@@ -24,9 +24,9 @@ A bash script to quickly install NGINX Management Suite through the official Hel
 
 This repository has been tested with:
 
-- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0
+- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0, 2.12.0
 - NGINX Management Suite API Connectivity Manager 1.0.0, 1.1.0, 1.1.1, 1.2.0, 1.3.0, 1.3.1, 1.4.0, 1.4.1, 1.5.0, 1.6.0, 1.7.0
-- Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0
+- Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0
 - NGINX App Protect WAF compiler 3.1088.2, 4.2.0, 4.100.1, 4.218.0
 - NGINX App Delivery Manager 4.0.0
 
@@ -74,7 +74,7 @@ NGINX Management Suite Docker image builder
  -K [file.key]          - Key file to pull packages from the official NGINX repository
  -A                     - Enable API Connectivity Manager - optional
  -W                     - Enable Security Monitoring - optional
- -P [version]           - Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0|v4.100.1|v4.218.0|v4.279.0] - optional
+ -P [version]           - Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0|v4.100.1|v4.218.0|v4.279.0|v4.402.0] - optional
  -D                     - Enable App Delivery Manager - optional
 
  === Examples:
