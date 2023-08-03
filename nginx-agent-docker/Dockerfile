@@ -4,9 +4,6 @@ ARG NMS_URL
 ARG DEVPORTAL=false
 ARG NAP_WAF=false
 
-# Startup script
-COPY ./container/start.sh /deployment/
-
 # Initial packages setup
 RUN	apt-get -y update \
 	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 curl debian-archive-keyring \
@@ -18,8 +15,6 @@ RUN	apt-get -y update \
 RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644 \
 	--mount=type=secret,id=nginx-key,dst=/etc/ssl/nginx/nginx-repo.key,mode=0644 \
 	set -x \
-# Startup script
-	&& chmod +x /deployment/start.sh && touch /.dockerenv \
 # Install prerequisite packages:
 	&& wget -qO - https://cs.nginx.com/static/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg \
 	&& printf "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://pkgs.nginx.com/plus/debian `lsb_release -cs` nginx-plus\n" > /etc/apt/sources.list.d/nginx-plus.list \
@@ -55,6 +50,11 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 
 # NGINX Instance Manager agent installation
 	&& bash -c 'curl -k $NMS_URL/install/nginx-agent | sh' && echo "Agent installed from NMS"
+
+# Startup script
+COPY ./container/start.sh /deployment/
+RUN	chmod +x /deployment/start.sh && touch /.dockerenv
+
 
 EXPOSE 80
 STOPSIGNAL SIGTERM
