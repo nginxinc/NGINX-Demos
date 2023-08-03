@@ -4,19 +4,17 @@ ARG NMS_URL
 ARG DEVPORTAL=false
 ARG NAP_WAF=false
 
-# Initial packages setup
-RUN	apt-get -y update \
-	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 curl debian-archive-keyring \
-# NGINX Instance Manager agent setup
-	&& mkdir -p /deployment /etc/ssl/nginx \
-# Agent installation
-	&& bash -c 'curl -k $NMS_URL/install/nginx-agent | sh' && echo "Agent installed from NMS"
-
 # Startup script
 COPY ./container/start.sh /deployment/
 
-# Download certificate and key from the customer portal (https://account.f5.com)
-# and copy to the build context
+# Initial packages setup
+RUN	apt-get -y update \
+	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 curl debian-archive-keyring \
+	&& mkdir -p /deployment /etc/ssl/nginx \
+	&& addgroup --system --gid 20983 nginx \
+	&& adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 20983 nginx
+
+# Use certificate and key from kubernetes secret
 RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644 \
 	--mount=type=secret,id=nginx-key,dst=/etc/ssl/nginx/nginx-repo.key,mode=0644 \
 	set -x \
@@ -53,7 +51,10 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 
 	&& groupadd -g 1001 nginx-agent \
 	&& usermod root -G nginx-agent \
-	&& usermod nginx -G nginx-agent
+	&& usermod nginx -G nginx-agent \
+
+# NGINX Instance Manager agent installation
+	&& bash -c 'curl -k $NMS_URL/install/nginx-agent | sh' && echo "Agent installed from NMS"
 
 EXPOSE 80
 STOPSIGNAL SIGTERM
