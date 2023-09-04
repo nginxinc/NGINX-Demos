@@ -11,7 +11,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build('OnurOzcelikSE/NGINX-Demos', './nginx-hello')
+                    def dockerImage = docker.build('onurozcelikse/NGINX-Demos', './nginx-hello')
                 }
             }
         }
