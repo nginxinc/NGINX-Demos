@@ -40,7 +40,7 @@ jobs:
           base-image: library/nginx:mainline-alpine
           image: ${{ steps.variables.outputs.image }}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ steps.update.outputs.needs-updating == 'true' }}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
