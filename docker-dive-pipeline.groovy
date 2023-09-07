@@ -8,7 +8,9 @@ pipeline {
     parameters {
         string(name: 'BUILD_NUMBER', description: 'Build number from the previous pipeline')
     }
-
+    
+    def dockerTaggedImage = ""
+    
     stages {
         stage('Pull Docker Image') {
             steps {
