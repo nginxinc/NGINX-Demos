@@ -10,9 +10,7 @@ pipeline {
     }
     
 
-    
     stages {
-        def dockerTaggedImage = ""
         stage('Pull Docker Image') {
             steps {
                 script {
@@ -31,6 +29,11 @@ pipeline {
         stage('Analyze Tagged Docker Image with Dive') {
             steps {
                 script {
+                    // Get the BUILD_NUMBER parameter
+                    def buildNumber = params.BUILD_NUMBER
+
+                    // Define the tagged image
+                    def dockerTaggedImage = "${DOCKER_REPOSITORY}:${buildNumber}"
                     // Define the Dive command with parameters
                     def diveCommand = "dive --ci --lowestEfficiency ${env.LOWEST_EFFICIENCY} --highestUserWastedPercent ${env.HIGHEST_USER_WASTED_PERCENT} --highestWastedBytes ${env.HIGHEST_WASTED_BYTES} ${dockerTaggedImage}"
 
