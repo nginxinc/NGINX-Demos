@@ -16,11 +16,16 @@ pipeline {
             steps {
                 script {
                     def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
-                    withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh "docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD} docker.io"
-                        echo 'Logged in to DockerHub'
 
-                        sh "docker build -t ${dockerImageTag} ./nginx-hello"
+                    // Use withCredentials to securely pass Docker Hub credentials
+                    withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        echo 'Logged in to DockerHub securely'
+
+                        // Use --password-stdin to securely pass the password to docker login
+                        sh """
+                        echo \${DOCKER_PASSWORD} | docker login --username \${DOCKER_USERNAME} --password-stdin docker.io
+                        docker build -t ${dockerImageTag} ./nginx-hello
+                        """
                         echo 'Docker image built'
                     }
                 }
