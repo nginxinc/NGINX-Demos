@@ -8,6 +8,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
+                // Checkout the Git repository
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: 'https://github.com/OnurOzcelikSE/NGINX-Demos.git']]])
                 echo 'Repository cloned'
             }
@@ -15,6 +16,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+<<<<<<< HEAD
+=======
+                    // Define the Docker image tag
+>>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                     def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
 
                     // Use withCredentials to securely pass Docker Hub credentials
@@ -35,7 +40,14 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+<<<<<<< HEAD
                     def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
+=======
+                    // Define the Docker image tag again
+                    def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
+
+                    // Push the Docker image
+>>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                     sh "docker push ${dockerImageTag}"
                     echo 'Docker image pushed'
                 }
@@ -45,7 +57,14 @@ pipeline {
         stage('Clean Up') {
             steps {
                 script {
+<<<<<<< HEAD
                     def imageName = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
+=======
+                    // Define the image name for cleanup
+                    def imageName = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
+
+                    // Remove the Docker image
+>>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                     sh "docker rmi ${imageName}"
                     echo 'Cleanup completed'
                 }
@@ -63,6 +82,7 @@ pipeline {
 
         stage('Trigger Next Pipeline') {
             steps {
+<<<<<<< HEAD
                 def buildNumberString = env.BUILD_NUMBER.toString()
                 build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: buildNumberString)]
             }
@@ -108,6 +128,11 @@ pipeline {
                     } else {
                         error("Dive found inefficiencies in the ${taggedImage} Docker image.")
                     }
+=======
+                script {
+                    def buildNumberString = env.BUILD_NUMBER.toString()
+                    build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: buildNumberString)]
+>>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                 }
             }
         }
