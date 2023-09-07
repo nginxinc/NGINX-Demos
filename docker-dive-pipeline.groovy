@@ -4,6 +4,20 @@ pipeline {
     environment {
         DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
     }
+    properties([
+     parameters([
+       booleanParam(
+         defaultValue: false,
+         description: 'isFoo should be false',
+         name: 'isFoo'
+       ),
+       booleanParam(
+         defaultValue: true,
+         description: 'isBar should be true',
+         name: 'isBar'
+       ),
+     ])
+   ])
 
     parameters {
         string(name: 'BUILD_NUMBER', description: 'Build number from the previous pipeline')
@@ -17,10 +31,10 @@ pipeline {
                     def buildNumber = params.BUILD_NUMBER
 
                     // Define the tagged image
-                    def taggedImage = "${DOCKER_REPOSITORY}:${buildNumber}"
+                    def dockerTaggedImage = "${DOCKER_REPOSITORY}:${buildNumber}"
 
                     // Pull the Docker image
-                    sh "docker pull ${taggedImage}"
+                    sh "docker pull ${dockerTaggedImage}"
                 }
             }
         }
