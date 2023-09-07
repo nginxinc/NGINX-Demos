@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
         LOWEST_EFFICIENCY = '0.95'
-        HIGHEST_USER_WASTED_PERCENT = '20MB'
-        HIGHEST_WASTED_BYTES = '0.20'
+        HIGHEST_USER_WASTED_PERCENT = '0.20'
+        HIGHEST_WASTED_BYTES = '20MB'
     }
 
     parameters {
