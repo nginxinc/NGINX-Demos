@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REPOSITORY = 'OnurOzcelikSE/NGINX-Demos'
+        DOCKER_REPOSITORY = 'onuroOzcelikse/nginx-demos'
     }
 
     stages {
