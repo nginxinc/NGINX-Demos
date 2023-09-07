@@ -16,10 +16,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-<<<<<<< HEAD
-=======
                     // Define the Docker image tag
->>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                     def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
 
                     // Use withCredentials to securely pass Docker Hub credentials
@@ -40,14 +37,10 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-<<<<<<< HEAD
-                    def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
-=======
                     // Define the Docker image tag again
                     def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
 
                     // Push the Docker image
->>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                     sh "docker push ${dockerImageTag}"
                     echo 'Docker image pushed'
                 }
@@ -57,82 +50,21 @@ pipeline {
         stage('Clean Up') {
             steps {
                 script {
-<<<<<<< HEAD
-                    def imageName = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
-=======
                     // Define the image name for cleanup
                     def imageName = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
 
                     // Remove the Docker image
->>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                     sh "docker rmi ${imageName}"
                     echo 'Cleanup completed'
                 }
             }
         }
 
-        stage('Create and Run Pipeline') {
-            steps {
-                script {
-                    // Load and execute the Jenkinsfile for the new pipeline
-                    load 'docker-dive-pipeline/Jenkinsfile'
-                }
-            }
-        }
-
         stage('Trigger Next Pipeline') {
             steps {
-<<<<<<< HEAD
-                def buildNumberString = env.BUILD_NUMBER.toString()
-                build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: buildNumberString)]
-            }
-        }
-    }
-}
-
-
-pipeline {
-    agent any
-
-    environment {
-        DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
-        LOWEST_EFFICIENCY = '0.7'
-        HIGHEST_USER_WASTED_PERCENT = '0.2'
-        HIGHEST_WASTED_BYTES = '100000000'
-    }
-
-    parameters {
-        string(name: 'BUILD_NUMBER', description: 'Build number from the previous pipeline')
-    }
-
-    stages {
-        stage('Pull Docker Image') {
-            steps {
-                script {
-                    def buildNumber = params.BUILD_NUMBER
-                    def taggedImage = "${DOCKER_REPOSITORY}:${buildNumber}"
-                    sh "docker pull ${taggedImage}"
-                }
-            }
-        }
-
-        stage('Analyze Tagged Docker Image with Dive') {
-            steps {
-                script {
-                    def diveCommand = "dive --ci --lowestEfficiency ${LOWEST_EFFICIENCY} --highestUserWastedPercent ${HIGHEST_USER_WASTED_PERCENT} --highestWastedBytes ${HIGHEST_WASTED_BYTES} ${taggedImage}"
-
-                    def status = sh(script: diveCommand, returnStatus: true)
-
-                    if (status == 0) {
-                        echo "Dive analysis completed successfully for ${taggedImage}."
-                    } else {
-                        error("Dive found inefficiencies in the ${taggedImage} Docker image.")
-                    }
-=======
                 script {
                     def buildNumberString = env.BUILD_NUMBER.toString()
                     build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: buildNumberString)]
->>>>>>> fdbd1a44e64d83458a72701a53066819e8e99895
                 }
             }
         }
