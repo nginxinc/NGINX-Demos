@@ -9,9 +9,10 @@ pipeline {
         string(name: 'BUILD_NUMBER', description: 'Build number from the previous pipeline')
     }
     
-    def dockerTaggedImage = ""
+
     
     stages {
+        def dockerTaggedImage = ""
         stage('Pull Docker Image') {
             steps {
                 script {
