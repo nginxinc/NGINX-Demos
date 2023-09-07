@@ -65,7 +65,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REPOSITORY = 'OnurOzcelikSE/NGINX-Demos'
+        DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
         LOWEST_EFFICIENCY = '0.7'
         HIGHEST_USER_WASTED_PERCENT = '0.2'
         HIGHEST_WASTED_BYTES = '100000000'
