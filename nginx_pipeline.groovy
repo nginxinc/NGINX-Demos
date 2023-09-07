@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REPOSITORY = 'OnurOzcelikSE/NGINX-Demos'
+        DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
     }
 
     stages {
@@ -52,9 +52,19 @@ pipeline {
             }
         }
 
+        stage('Create and Run Pipeline') {
+            steps {
+                script {
+                    // Load and execute the Jenkinsfile for the new pipeline
+                    load 'docker-dive-pipeline/Jenkinsfile'
+                }
+            }
+        }
+
         stage('Trigger Next Pipeline') {
             steps {
-                build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: env.BUILD_NUMBER)]
+                def buildNumberString = env.BUILD_NUMBER.toString()
+                build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: buildNumberString)]
             }
         }
     }
@@ -65,7 +75,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REPOSITORY = 'OnurOzcelikSE/NGINX-Demos'
+        DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
         LOWEST_EFFICIENCY = '0.7'
         HIGHEST_USER_WASTED_PERCENT = '0.2'
         HIGHEST_WASTED_BYTES = '100000000'
