@@ -15,13 +15,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"            
-                    withCredentials([(credentialsId: 'DOCKER_REGISTRY_CREDENTIALS', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD)']) {
+                    def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
+                    withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_CREDENTIALS', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh "docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD} docker.io"
                         echo 'Logged in to DockerHub'
 
                         sh "docker build -t ${dockerImageTag} ./nginx-hello"
-                        echo 'Docker image builded'
+                        echo 'Docker image built'
                     }
                 }
             }
@@ -30,6 +30,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+                    def dockerImageTag = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
                     sh "docker push ${dockerImageTag}"
                     echo 'Docker image pushed'
                 }
@@ -38,9 +39,9 @@ pipeline {
 
         stage('Clean Up') {
             steps {
-                script{
-                def imageName = ${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}
-                    sh "rm -f ${imageName}"
+                script {
+                    def imageName = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
+                    sh "docker rmi ${imageName}"
                     echo 'Cleanup completed'
                 }
             }
@@ -48,13 +49,12 @@ pipeline {
 
         stage('Trigger Next Pipeline') {
             steps {
-                script {
-                    build job: 'docker-image'
-                }
+                build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: env.BUILD_NUMBER)]
             }
         }
     }
 }
+
 
 pipeline {
     agent any
@@ -62,8 +62,8 @@ pipeline {
     environment {
         DOCKER_REPOSITORY = 'OnurOzcelikSE/NGINX-Demos'
         LOWEST_EFFICIENCY = '0.7'
-        HIGHES_USER_WASTED_PERCENT= '0.2'
-        HIGHEST_WASTED_YTS = '100000000'
+        HIGHEST_USER_WASTED_PERCENT = '0.2'
+        HIGHEST_WASTED_BYTES = '100000000'
     }
 
     parameters {
@@ -71,29 +71,28 @@ pipeline {
     }
 
     stages {
-        stage ('Pull Docker Image') {
+        stage('Pull Docker Image') {
             steps {
                 script {
                     def buildNumber = params.BUILD_NUMBER
-                    def taggedImage = "${DOCKER_REPOSITORY}:${env.BUILD_NUMBER}"
+                    def taggedImage = "${DOCKER_REPOSITORY}:${buildNumber}"
                     sh "docker pull ${taggedImage}"
                 }
             }
         }
-    
-    stage('Analyze Tagged Docker Image with Dive'){
-        steps {
-            script {
-                def diveCommand = "dive --ci --lowestEfficiency ${LOWEST_EFFICIENCY} --highestUserWastedPercent ${HIGHEST_USER_WASTED_PERCENT} --highestWastedBytes ${HIGHEST_WASTED_BYTES} ${taggedImage}"
 
-                def status = sh(script: diveCommand, returnStatus: true)
+        stage('Analyze Tagged Docker Image with Dive') {
+            steps {
+                script {
+                    def diveCommand = "dive --ci --lowestEfficiency ${LOWEST_EFFICIENCY} --highestUserWastedPercent ${HIGHEST_USER_WASTED_PERCENT} --highestWastedBytes ${HIGHEST_WASTED_BYTES} ${taggedImage}"
 
-                if (status == 0) {
-                    echo "Dive analysis completed successfully for ${taggedImage}."
-                }
-                else {
-                    error("Dive found inefficiencies in the ${taggedImage} Docker image.")
-                }
+                    def status = sh(script: diveCommand, returnStatus: true)
+
+                    if (status == 0) {
+                        echo "Dive analysis completed successfully for ${taggedImage}."
+                    } else {
+                        error("Dive found inefficiencies in the ${taggedImage} Docker image.")
+                    }
                 }
             }
         }
