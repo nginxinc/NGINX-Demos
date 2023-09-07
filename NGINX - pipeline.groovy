@@ -15,6 +15,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+<<<<<<< HEAD
                     def registryCredentials = [
                         usernamePassword(
                             credentialsId: 'DOCKERHUB_CREDENTIALS.id',
@@ -30,6 +31,9 @@ pipeline {
                         dockerImage.push()
                     echo 'Docker image builded'
                     }
+=======
+                    def dockerImage = docker.build('onurozcelikse/NGINX-Demos', './nginx-hello')
+>>>>>>> f1941c9b63582313fbdccf2e19b77b7182d1f330
                 }
             }
         }
