@@ -4,20 +4,6 @@ pipeline {
     environment {
         DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
     }
-    options([
-     parameters([
-       booleanParam(
-         defaultValue: false,
-         description: 'isFoo should be false',
-         name: 'isFoo'
-       ),
-       booleanParam(
-         defaultValue: true,
-         description: 'isBar should be true',
-         name: 'isBar'
-       ),
-     ])
-   ])
 
     parameters {
         string(name: 'BUILD_NUMBER', description: 'Build number from the previous pipeline')
