@@ -35,9 +35,9 @@ pipeline {
                     def status = sh(script: diveCommand, returnStatus: true)
 
                     if (status == 0) {
-                        echo "Dive analysis completed successfully for ${taggedImage}."
+                        echo "Dive analysis completed successfully for ${DockerTaggedImage}."
                     } else {
-                        error("Dive found inefficiencies in the ${taggedImage} Docker image.")
+                        error("Dive found inefficiencies in the ${DockerTaggedImage} Docker image.")
                     }
                 }
             }
