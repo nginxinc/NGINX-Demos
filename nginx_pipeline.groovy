@@ -63,7 +63,7 @@ pipeline {
         stage('Trigger Next Pipeline') {
             steps {
                 def buildNumberString = env.BUILD_NUMBER.toString()
-                build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: buildNumberString)]
+                build job: 'docker-dive-pipeline', parameters: [[$class: 'StringParameterValue', name: 'BUILD_NUMBER', value: buildNumberString]]
             }
         }
     }
