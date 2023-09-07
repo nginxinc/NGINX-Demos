@@ -52,6 +52,15 @@ pipeline {
             }
         }
 
+        stage('Create and Run Pipeline') {
+            steps {
+                script {
+                    // Load and execute the Jenkinsfile for the new pipeline
+                    load 'docker-dive-pipeline/Jenkinsfile'
+                }
+            }
+        }
+
         stage('Trigger Next Pipeline') {
             steps {
                 build job: 'docker-dive-pipeline', parameters: [string(name: 'BUILD_NUMBER', value: env.BUILD_NUMBER)]
