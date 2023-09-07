@@ -29,15 +29,15 @@ pipeline {
             steps {
                 script {
                     // Define the Dive command with parameters
-                    def diveCommand = "dive --ci --lowestEfficiency ${env.LOWEST_EFFICIENCY} --highestUserWastedPercent ${env.HIGHEST_USER_WASTED_PERCENT} --highestWastedBytes ${env.HIGHEST_WASTED_BYTES} ${DockerTaggedImage}"
+                    def diveCommand = "dive --ci --lowestEfficiency ${env.LOWEST_EFFICIENCY} --highestUserWastedPercent ${env.HIGHEST_USER_WASTED_PERCENT} --highestWastedBytes ${env.HIGHEST_WASTED_BYTES} ${dockerTaggedImage}"
 
                     // Execute Dive and capture the status
                     def status = sh(script: diveCommand, returnStatus: true)
 
                     if (status == 0) {
-                        echo "Dive analysis completed successfully for ${DockerTaggedImage}."
+                        echo "Dive analysis completed successfully for ${dockerTaggedImage}."
                     } else {
-                        error("Dive found inefficiencies in the ${DockerTaggedImage} Docker image.")
+                        error("Dive found inefficiencies in the ${dockerTaggedImage} Docker image.")
                     }
                 }
             }
