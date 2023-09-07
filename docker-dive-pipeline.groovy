@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
     }
-    properties([
+    options([
      parameters([
        booleanParam(
          defaultValue: false,
