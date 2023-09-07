@@ -38,7 +38,7 @@ pipeline {
                     // Define the tagged image
                     def dockerTaggedImage = "${DOCKER_REPOSITORY}:${buildNumber}"
                     // Define the Dive command with parameters
-                    def diveCommand = "dive --ci --lowestEfficiency ${env.LOWEST_EFFICIENCY} --highestUserWastedPercent ${env.HIGHEST_USER_WASTED_PERCENT} --highestWastedBytes ${env.HIGHEST_WASTED_BYTES} ${dockerTaggedImage}"
+                    def diveCommand = "dive --ci --lowestEfficiency '${env.LOWEST_EFFICIENCY}' --highestUserWastedPercent '${env.HIGHEST_USER_WASTED_PERCENT}' --highestWastedBytes '${env.HIGHEST_WASTED_BYTES}' ${dockerTaggedImage}"
 
                     // Execute Dive and capture the status
                     def status = sh(script: diveCommand, returnStatus: true)
