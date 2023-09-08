@@ -56,9 +56,9 @@ pipeline {
             steps {
                 script {
                     // Print the values of environment variables
-                    echo "Lowest Efficiency": ${env.LOWEST_EFFICIENCY}"
-                    echo "Highest User Wasted Percent": ${env.HIGHEST_USER_WASTED_PERCENT}"
-                    echo "Highest Wasted Bytes": ${env.HIGHEST_WASTED_BYTES}"
+                    echo "Lowest Efficiency: ${env.LOWEST_EFFICIENCY}"
+                    echo "Highest User Wasted Percent: ${env.HIGHEST_USER_WASTED_PERCENT}"
+                    echo "Highest Wasted Bytes: ${env.HIGHEST_WASTED_BYTES}"
                 }
             }
         }
