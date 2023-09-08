@@ -55,10 +55,17 @@ pipeline {
                 stage('Print Environment Variables') {
             steps {
                 script {
-                    // Print the values of environment variables
-                    echo "Lowest Efficiency: ${env.LOWEST_EFFICIENCY}"
-                    echo "Highest User Wasted Percent: ${env.HIGHEST_USER_WASTED_PERCENT}"
-                    echo "Highest Wasted Bytes: ${env.HIGHEST_WASTED_BYTES}"
+                    // Execute Dive and capture the output
+                    def diveOutput = sh(script: diveCommand, returnStdout: true).trim()
+
+                    // Parse the Dive output to extract and print the desired values
+                    def efficiency = (diveOutput =~ /efficiency:\s+([\d.]+ %)/)[0][1]
+                    def userWastedPercent = (diveOutput =~ /userWastedPercent:\s+([\d.]+ %)/)[0][1]
+                    def wastedBytes = (diveOutput =~ /wastedBytes:\s+([\d,]+ bytes)/)[0][1]
+
+                    echo "Lowest Efficiency: ${efficiency}"
+                    echo "Highest User Wasted Percent: ${userWastedPercent}"
+                    echo "Highest Wasted Bytes: ${wastedBytes}"
                 }
             }
         }
