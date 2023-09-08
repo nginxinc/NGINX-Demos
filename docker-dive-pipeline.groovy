@@ -48,13 +48,7 @@ pipeline {
                     } else {
                         error("Dive found inefficiencies in the ${dockerTaggedImage} Docker image.")
                     }
-                }
-            }
-        }
-
-                stage('Print Environment Variables') {
-            steps {
-                script {
+                    
                     // Execute Dive and capture the output
                     def diveOutput = sh(script: diveCommand, returnStdout: true).trim()
 
