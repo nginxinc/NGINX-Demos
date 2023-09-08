@@ -29,17 +29,6 @@ pipeline {
             }
         }
         
-        stage('Print Environment Variables') {
-            steps {
-                script {
-                    // Print the values of environment variables
-                    echo "LOWEST_EFFICIENCY: ${env.LOWEST_EFFICIENCY}"
-                    echo "HIGHEST_USER_WASTED_PERCENT: ${env.HIGHEST_USER_WASTED_PERCENT}"
-                    echo "HIGHEST_WASTED_BYTES: ${env.HIGHEST_WASTED_BYTES}"
-                }
-            }
-        }
-
         stage('Analyze Tagged Docker Image with Dive') {
             steps {
                 script {
@@ -59,6 +48,17 @@ pipeline {
                     } else {
                         error("Dive found inefficiencies in the ${dockerTaggedImage} Docker image.")
                     }
+                }
+            }
+        }
+
+                stage('Print Environment Variables') {
+            steps {
+                script {
+                    // Print the values of environment variables
+                    echo "Lowest Efficiency": ${env.LOWEST_EFFICIENCY}"
+                    echo "Highest User Wasted Percent": ${env.HIGHEST_USER_WASTED_PERCENT}"
+                    echo "Highest Wasted Bytes": ${env.HIGHEST_WASTED_BYTES}"
                 }
             }
         }
