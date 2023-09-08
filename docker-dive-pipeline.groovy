@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         DOCKER_REPOSITORY = 'onurozcelikse/nginx-demos'
-        LOWEST_EFFICIENCY = '3.95'
-        HIGHEST_USER_WASTED_PERCENT = '0.10'
-        HIGHEST_WASTED_BYTES = '10MB'
+        LOWEST_EFFICIENCY = '0.95'
+        HIGHEST_USER_WASTED_PERCENT = '0.20'
+        HIGHEST_WASTED_BYTES = '20MB'
     }
 
     parameters {
@@ -25,6 +25,17 @@ pipeline {
 
                     // Pull the Docker image
                     sh "docker pull ${dockerTaggedImage}"
+                }
+            }
+        }
+        
+        stage('Print Environment Variables') {
+            steps {
+                script {
+                    // Print the values of environment variables
+                    echo "LOWEST_EFFICIENCY: ${env.LOWEST_EFFICIENCY}"
+                    echo "HIGHEST_USER_WASTED_PERCENT: ${env.HIGHEST_USER_WASTED_PERCENT}"
+                    echo "HIGHEST_WASTED_BYTES: ${env.HIGHEST_WASTED_BYTES}"
                 }
             }
         }
