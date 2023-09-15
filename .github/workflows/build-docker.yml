@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
         if: ${{ steps.update.outputs.needs-updating == 'true' }}
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: arm/v6,arm,arm64,amd64,ppc64le,s390x,386
         if: ${{ steps.update.outputs.needs-updating == 'true' }}
