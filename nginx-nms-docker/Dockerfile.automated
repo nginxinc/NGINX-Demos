@@ -39,7 +39,9 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& if [ ! -z "${ADD_ADM}" ] ; then \
 	apt-get -y install nms-app-delivery-manager; fi \
 	# Set permissions
-	&& chmod +x /etc/nms/scripts/*.sh
+	&& chmod +x /etc/nms/scripts/*.sh \
+	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+	&& chmod +x /usr/bin/yq
 
 # Optional Second Sight
 WORKDIR /deployment
