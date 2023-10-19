@@ -70,6 +70,11 @@ yq '.clickhouse.address=strenv(NIM_CLICKHOUSE_ADDRESSPORT)|.clickhouse.username=
 mv /etc/nms/nms.conf-updated /etc/nms/nms.conf
 chown nms:nms /etc/nms/nms.conf
 chmod 644 /etc/nms/nms.conf
+
+yq '.clickhouse.address="tcp://"+strenv(NIM_CLICKHOUSE_ADDRESSPORT)|.clickhouse.username=strenv(NIM_CLICKHOUSE_USERNAME)|.clickhouse.password=strenv(NIM_CLICKHOUSE_PASSWORD)' /etc/nms/nms-sm-conf.yaml > /etc/nms/nms-sm-conf.yaml-updated
+cp /etc/nms/nms-sm-conf.yaml-updated /etc/nms/nms-sm-conf.yaml
+chown nms:nms /etc/nms/nms-sm-conf.yaml
+chmod 644 /etc/nms/nms-sm-conf.yaml
 	;;
 esac
 
@@ -136,6 +141,12 @@ then
 fi
 
 sleep 5
+
+# Start Security Monitoring
+if [ -f /usr/bin/nms-sm ]
+then
+	su - nms -c "/usr/bin/nms-sm start &" -s /bin/bash
+fi
 
 chmod 666 /var/run/nms/*.sock
 
