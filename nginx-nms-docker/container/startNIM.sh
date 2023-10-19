@@ -72,7 +72,7 @@ chown nms:nms /etc/nms/nms.conf
 chmod 644 /etc/nms/nms.conf
 
 yq '.clickhouse.address="tcp://"+strenv(NIM_CLICKHOUSE_ADDRESSPORT)|.clickhouse.username=strenv(NIM_CLICKHOUSE_USERNAME)|.clickhouse.password=strenv(NIM_CLICKHOUSE_PASSWORD)' /etc/nms/nms-sm-conf.yaml > /etc/nms/nms-sm-conf.yaml-updated
-cp /etc/nms/nms-sm-conf.yaml-updated /etc/nms/nms-sm-conf.yaml
+mv /etc/nms/nms-sm-conf.yaml-updated /etc/nms/nms-sm-conf.yaml
 chown nms:nms /etc/nms/nms-sm-conf.yaml
 chmod 644 /etc/nms/nms-sm-conf.yaml
 	;;
