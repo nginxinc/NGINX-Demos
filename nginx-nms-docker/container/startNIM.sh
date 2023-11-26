@@ -50,8 +50,8 @@ clickhouse_username = '$NIM_CLICKHOUSE_USERNAME'
 clickhouse_password = '$NIM_CLICKHOUSE_PASSWORD'
 " >> /etc/nms/nms.conf
 	;;
-	*)
-		echo "YAML nms.conf"
+	2.7.0|2.8.0|2.9.0|2.9.1|2.10.0|2.10.1|2.11.0|2.12.0)
+		echo "YAML nms.conf <= 2.12"
 # Clickhouse configuration - dedicated pod
 echo -e "
 
@@ -61,6 +61,20 @@ clickhouse:
   username: '$NIM_CLICKHOUSE_USERNAME'
   password: '$NIM_CLICKHOUSE_PASSWORD'
 " >> /etc/nms/nms.conf
+	;;
+	*)
+		echo "YAML nms.conf >= 2.13"
+# Clickhouse configuration - dedicated pod
+export NIM_CLICKHOUSE_ADDRESSPORT=$NIM_CLICKHOUSE_ADDRESS:$NIM_CLICKHOUSE_PORT
+yq '.clickhouse.address=strenv(NIM_CLICKHOUSE_ADDRESSPORT)|.clickhouse.username=strenv(NIM_CLICKHOUSE_USERNAME)|.clickhouse.password=strenv(NIM_CLICKHOUSE_PASSWORD)' /etc/nms/nms.conf > /etc/nms/nms.conf-updated
+mv /etc/nms/nms.conf-updated /etc/nms/nms.conf
+chown nms:nms /etc/nms/nms.conf
+chmod 644 /etc/nms/nms.conf
+
+yq '.clickhouse.address="tcp://"+strenv(NIM_CLICKHOUSE_ADDRESSPORT)|.clickhouse.username=strenv(NIM_CLICKHOUSE_USERNAME)|.clickhouse.password=strenv(NIM_CLICKHOUSE_PASSWORD)' /etc/nms/nms-sm-conf.yaml > /etc/nms/nms-sm-conf.yaml-updated
+mv /etc/nms/nms-sm-conf.yaml-updated /etc/nms/nms-sm-conf.yaml
+chown nms:nms /etc/nms/nms-sm-conf.yaml
+chmod 644 /etc/nms/nms-sm-conf.yaml
 	;;
 esac
 
@@ -127,6 +141,12 @@ then
 fi
 
 sleep 5
+
+# Start Security Monitoring
+if [ -f /usr/bin/nms-sm ]
+then
+	su - nms -c "/usr/bin/nms-sm start &" -s /bin/bash
+fi
 
 chmod 666 /var/run/nms/*.sock
 

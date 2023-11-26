@@ -19,7 +19,8 @@ Automated build:\n\n
 -K [file.key]\t\t- Key file to pull packages from the official NGINX repository\n
 -A\t\t\t- Enable API Connectivity Manager - optional\n
 -W\t\t\t- Enable Security Monitoring - optional\n
--P [version]\t\t- Enable WAF policy compiler, version can be [v3.1088.2|v4.2.0|v4.100.1|v4.218.0|v4.279.0] - optional\n\n
+-P [version]\t\t- Enable WAF policy compiler, version can be any [v3.1088.2|v4.100.1|v4.2.0|v4.218.0|v4.279.0|v4.402.0|v4.457.0] - optional\n
+-D\t\t\t- Enable App Delivery Manager - optional\n\n
 === Examples:\n\n
 Manual build:\n
 \t$0 -n nim-files/nms-instance-manager_2.6.0-698150575~focal_amd64.deb \\\\\n
@@ -29,13 +30,13 @@ Manual build:\n
 \t\t-t my.registry.tld/nginx-nms:2.6.0\n\n
 Automated build:\n
 \t$0 -i -C nginx-repo.crt -K nginx-repo.key\n
-\t\t-A -W -P v4.218.0 -D -t my.registry.tld/nginx-nms:2.9.0\n
+\t\t-A -W -P v4.457.0 -D -t my.registry.tld/nginx-nms:2.13.1\n
 "
 
 # Defaults
 COUNTER=false
 
-while getopts 'hn:a:w:p:t:siC:K:AWP:' OPTION
+while getopts 'hn:a:w:p:t:siC:K:AWP:D' OPTION
 do
 	case "$OPTION" in
 		h)
@@ -78,6 +79,9 @@ do
                 P)
                         ADD_PUM=$OPTARG
                 ;;
+		D)
+			ADD_ADM=true
+		;;
 	esac
 done
 
@@ -113,7 +117,8 @@ then
                 --build-arg ACM_IMAGE=$ACM_IMAGE --build-arg SM_IMAGE=$SM_IMAGE --build-arg PUM_IMAGE=$PUM_IMAGE -t $IMGNAME .
 else
 	DOCKER_BUILDKIT=1 docker build --no-cache -f Dockerfile.automated --secret id=nginx-key,src=$NGINX_KEY --secret id=nginx-crt,src=$NGINX_CERT \
-                --build-arg ADD_ACM=$ADD_ACM --build-arg ADD_SM=$ADD_SM --build-arg ADD_PUM=$ADD_PUM --build-arg BUILD_WITH_SECONDSIGHT=$COUNTER \
+                --build-arg ADD_ACM=$ADD_ACM --build-arg ADD_SM=$ADD_SM --build-arg ADD_PUM=$ADD_PUM --build-arg ADD_ADM=$ADD_ADM \
+		--build-arg BUILD_WITH_SECONDSIGHT=$COUNTER \
                 -t $IMGNAME .
 fi
 
