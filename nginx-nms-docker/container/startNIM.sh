@@ -50,8 +50,8 @@ clickhouse_username = '$NIM_CLICKHOUSE_USERNAME'
 clickhouse_password = '$NIM_CLICKHOUSE_PASSWORD'
 " >> /etc/nms/nms.conf
 	;;
-	*)
-		echo "YAML nms.conf"
+	2.7.0|2.8.0|2.9.0|2.9.1|2.10.0|2.10.1|2.11.0|2.12.0)
+		echo "YAML nms.conf <= 2.12"
 # Clickhouse configuration - dedicated pod
 echo -e "
 
@@ -61,6 +61,20 @@ clickhouse:
   username: '$NIM_CLICKHOUSE_USERNAME'
   password: '$NIM_CLICKHOUSE_PASSWORD'
 " >> /etc/nms/nms.conf
+	;;
+	*)
+		echo "YAML nms.conf >= 2.13"
+# Clickhouse configuration - dedicated pod
+export NIM_CLICKHOUSE_ADDRESSPORT=$NIM_CLICKHOUSE_ADDRESS:$NIM_CLICKHOUSE_PORT
+yq '.clickhouse.address=strenv(NIM_CLICKHOUSE_ADDRESSPORT)|.clickhouse.username=strenv(NIM_CLICKHOUSE_USERNAME)|.clickhouse.password=strenv(NIM_CLICKHOUSE_PASSWORD)' /etc/nms/nms.conf > /etc/nms/nms.conf-updated
+mv /etc/nms/nms.conf-updated /etc/nms/nms.conf
+chown nms:nms /etc/nms/nms.conf
+chmod 644 /etc/nms/nms.conf
+
+yq '.clickhouse.address="tcp://"+strenv(NIM_CLICKHOUSE_ADDRESSPORT)|.clickhouse.username=strenv(NIM_CLICKHOUSE_USERNAME)|.clickhouse.password=strenv(NIM_CLICKHOUSE_PASSWORD)' /etc/nms/nms-sm-conf.yaml > /etc/nms/nms-sm-conf.yaml-updated
+mv /etc/nms/nms-sm-conf.yaml-updated /etc/nms/nms-sm-conf.yaml
+chown nms:nms /etc/nms/nms-sm-conf.yaml
+chmod 644 /etc/nms/nms-sm-conf.yaml
 	;;
 esac
 
@@ -77,7 +91,7 @@ esac
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
 /bin/bash -c '`which chmod` 0700 /etc/nms/certs/services/core'
 /bin/bash -c '`which chmod` 0600 /etc/nms/certs/services/core/*'
-su - nms -c "/usr/bin/nms-core &" -s /bin/bash
+su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-core &' -s /bin/bash
 
 # Start nms dpm - from /lib/systemd/system/nms-dpm.service
 /bin/bash -c '`which mkdir` -p /var/lib/nms/streaming/'
@@ -90,7 +104,7 @@ su - nms -c "/usr/bin/nms-core &" -s /bin/bash
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
 /bin/bash -c '`which chmod` 0700 /etc/nms/certs/services/dataplane-manager'
 /bin/bash -c '`which chmod` 0600 /etc/nms/certs/services/dataplane-manager/*'
-su - nms -c "/usr/bin/nms-dpm &" -s /bin/bash
+su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-dpm &' -s /bin/bash
 
 # Start nms ingestion - from /lib/systemd/system/nms-ingestion.service
 /bin/bash -c '`which mkdir` -p /var/run/nms/'
@@ -98,7 +112,7 @@ su - nms -c "/usr/bin/nms-dpm &" -s /bin/bash
 /bin/bash -c '`which chown` -R nms:nms /var/log/nms/'
 /bin/bash -c '`which chmod` 0775 /var/log/nms/'
 /bin/bash -c '`which chown` -R nms:nms /var/run/nms/'
-su - nms -c "/usr/bin/nms-ingestion &" -s /bin/bash
+su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-ingestion &' -s /bin/bash
 
 # Start nms integrations - from /lib/systemd/system/nms-integrations.service
 /bin/bash -c '`which mkdir` -p /var/lib/nms/dqlite/'
@@ -109,13 +123,13 @@ su - nms -c "/usr/bin/nms-ingestion &" -s /bin/bash
 /bin/bash -c '`which chown` -R nms:nms /var/log/nms/'
 /bin/bash -c '`which chmod` 0775 /var/log/nms/'
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
-su - nms -c "/usr/bin/nms-integrations &" -s /bin/bash
+su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-integrations &' -s /bin/bash
 
 # Start API Connectivity Manager - from /lib/systemd/system/nms-acm.service
 if [ -f /usr/bin/nms-acm ]
 then
 	sleep 5
-	su - nms -c "/usr/bin/nms-acm server &" -s /bin/bash
+	su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-acm server &' -s /bin/bash
 fi
 
 # Start App Delivery Manager
@@ -123,10 +137,16 @@ if [ -f /usr/bin/nms-adm ]
 then
 	/bin/bash -c '`which mkdir` -p /var/run/nms/modules/adm'
 	/bin/bash -c '`which chown` -R nms:nms /var/run/nms/modules/adm'
-	su - nms -c "/usr/bin/nms-adm server &" -s /bin/bash
+	su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-adm server &' -s /bin/bash
 fi
 
 sleep 5
+
+# Start Security Monitoring
+if [ -f /usr/bin/nms-sm ]
+then
+	su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-sm start &' -s /bin/bash
+fi
 
 chmod 666 /var/run/nms/*.sock
 
