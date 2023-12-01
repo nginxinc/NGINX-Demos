@@ -27,18 +27,35 @@ if [[ ! -z "$NIM_TAGS" ]]; then
    PARM="${PARM} --tags $NIM_TAGS"
 fi
 
+if [[ "$NIM_ADVANCED_METRICS" == "true" ]]; then
+   if [ $OLD_AGENT == "false" ]
+   then
+      EXTRA_EXTENSIONS="- advanced-metrics"
+
+      cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
+
+# Advanced metrics
+advanced_metrics:
+  socket_path: /var/run/nginx-agent/advanced-metrics.sock
+  aggregation_period: 1s
+  publishing_period: 3s
+  table_sizes_limits:
+    staging_table_max_size: 1000
+    staging_table_threshold: 1000
+    priority_table_max_size: 1000
+    priority_table_threshold: 1000
+__EOT__
+   fi
+fi
+
 if [[ "$NAP_WAF" == "true" ]]; then
    if [ $OLD_AGENT == "true" ]
    then
       PARM="${PARM} --nginx-app-protect-report-interval 15s --nap-monitoring-collector-buffer-size 50000 --nap-monitoring-processor-buffer-size 50000 --nap-monitoring-syslog-ip 127.0.0.1 --nap-monitoring-syslog-port 514"
    else
-      cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
+      EXTRA_EXTENSIONS=$EXTRA_EXTENSIONS"\n- nginx-app-protect\n- nap-monitoring"
 
-# Enable NAP and Advanced Metrics
-extensions:
-  - advanced-metrics
-  - nginx-app-protect
-  - nap-monitoring
+      cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
 
 # NGINX App Protect Monitoring config
 nap_monitoring:
@@ -62,7 +79,6 @@ __EOT__
    done
 
    chown nginx:nginx /opt/app_protect/pipe/*
-fi
 
 if [[ "$NAP_WAF_PRECOMPILED_POLICIES" == "true" ]]; then
    if [ $OLD_AGENT == "true" ]
@@ -76,6 +92,17 @@ nginx_app_protect:
   precompiled_publication: true
 __EOT__
    fi
+fi
+
+fi
+
+if [[ "$EXTRA_EXTENSIONS" != "" ]]; then
+  cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
+
+# Enable extensions
+extensions:
+`echo -e $EXTRA_EXTENSIONS | sed "s/^/\ \ /g"`
+__EOT__
 fi
 
 if [[ "$ACM_DEVPORTAL" == "true" ]]; then

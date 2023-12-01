@@ -8,7 +8,7 @@ This repository can be used to build a docker image with NGINX Plus and NGINX In
 
 This repository has been tested with NGINX agent for:
 
-- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0
+- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1
 - API Connectivity Manager 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0
 - NGINX App Protect WAF 4.100.1+
 
@@ -75,8 +75,9 @@ the build script will push the image to your private registry once build is comp
 1. Edit `manifests/1.nginx-nim.yaml` and specify the correct image by modifying the `image:` line, and set the following environment variables. Default values for `NIM_HOST` and `NIM_GRPC_PORT` can be used if NGINX Instance Manager is deployed using https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker
   - `NIM_HOST` - NGINX Instance Manager hostname/IP address
   - `NIM_GRPC_PORT` - NGINX Instance Manager gRPC port.
-  - `NIM_INSTANCEGROUP` - instance group for the NGINX Kubernetes Deployment
-  - `NIM_TAGS` - comma separated list of tags for the NGINX Kubernetes Deployment
+  - `NIM_INSTANCEGROUP` - instance group for the NGINX instance
+  - `NIM_TAGS` - comma separated list of tags for the NGINX instance
+  - `NIM_ADVANCED_METRICS` - set to `"true"` to enable advanced metrics collection
   - `NAP_WAF` - set to `"true"` to enable NGINX App Protect WAF (docker image built using `-w`)
   - `NAP_WAF_PRECOMPILED_POLICIES` - set to `"true"` to enable NGINX App Protect WAF precompiled policies (docker image built using `-w`)
   - `ACM_DEVPORTAL` - set to `"true"` to enable API Connectivity Manager Developer Portal (docker image built using `-d`)

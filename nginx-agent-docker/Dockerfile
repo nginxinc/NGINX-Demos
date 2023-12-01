@@ -6,7 +6,7 @@ ARG NAP_WAF=false
 
 # Initial packages setup
 RUN	apt-get -y update \
-	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 curl debian-archive-keyring \
+	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 curl debian-archive-keyring iproute2 \
 	&& mkdir -p /deployment /etc/ssl/nginx \
 	&& addgroup --system --gid 20983 nginx \
 	&& adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 20983 nginx
