@@ -27,6 +27,27 @@ if [[ ! -z "$NIM_TAGS" ]]; then
    PARM="${PARM} --tags $NIM_TAGS"
 fi
 
+if [[ "$NIM_ADVANCED_METRICS" == "true" ]]; then
+   if [ $OLD_AGENT == "false" ]
+   then
+      EXTRA_EXTENSIONS="- advanced-metrics"
+
+      cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
+
+# Advanced metrics
+advanced_metrics:
+  socket_path: /var/run/nginx-agent/advanced-metrics.sock
+  aggregation_period: 1s
+  publishing_period: 3s
+  table_sizes_limits:
+    staging_table_max_size: 1000
+    staging_table_threshold: 1000
+    priority_table_max_size: 1000
+    priority_table_threshold: 1000
+__EOT__
+   fi
+fi
+
 if [[ "$NAP_WAF" == "true" ]]; then
    if [ $OLD_AGENT == "true" ]
    then
@@ -36,9 +57,9 @@ if [[ "$NAP_WAF" == "true" ]]; then
 
 # Enable NAP and Advanced Metrics
 extensions:
-  - advanced-metrics
   - nginx-app-protect
   - nap-monitoring
+  $EXTRA_EXTENSIONS
 
 # NGINX App Protect Monitoring config
 nap_monitoring:
