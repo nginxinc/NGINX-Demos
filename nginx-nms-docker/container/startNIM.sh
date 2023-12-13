@@ -132,14 +132,6 @@ then
 	su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-acm server &' -s /bin/bash
 fi
 
-# Start App Delivery Manager
-if [ -f /usr/bin/nms-adm ]
-then
-	/bin/bash -c '`which mkdir` -p /var/run/nms/modules/adm'
-	/bin/bash -c '`which chown` -R nms:nms /var/run/nms/modules/adm'
-	su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-adm server &' -s /bin/bash
-fi
-
 sleep 5
 
 # Start Security Monitoring
