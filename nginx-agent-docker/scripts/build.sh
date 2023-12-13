@@ -12,18 +12,14 @@ $0 [options]\n\n
 -C [file.crt]\t\t- Certificate to pull packages from the official NGINX repository\n
 -K [file.key]\t\t- Key to pull packages from the official NGINX repository\n
 -n [URL]\t\t- NGINX Instance Manager URL to fetch the agent\n
--d\t\t\t- Build support for NGINX API Gateway Developer Portal\n
 -w\t\t\t- Add NGINX App Protect WAF\n\n
 === Examples:\n\n
 NGINX Plus and NGINX Agent image:\n
-  $0 -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28 -n https://nim.f5.ff.lan\n\n
+  $0 -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:latest -n https://nim.f5.ff.lan\n\n
 NGINX Plus, NGINX App Protect WAF and NGINX Agent image:\n
-  $0 -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28-nap -w -n https://nim.f5.ff.lan\n\n
-NGINX Plus, Developer Portal support and NGINX Agent image:\n
-  $0 -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28-devportal -d -n https://nim.f5.ff.lan
-\n"
+  $0 -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:latest-nap -w -n https://nim.f5.ff.lan\n"
 
-while getopts 'ht:C:K:a:n:dw' OPTION
+while getopts 'ht:C:K:a:n:w' OPTION
 do
 	case "$OPTION" in
 		h)
@@ -41,9 +37,6 @@ do
 		;;
 		n)
 			NMSURL=$OPTARG
-		;;
-		d)
-			DEVPORTAL=true
 		;;
 		w)
 			NAP_WAF=true
@@ -77,11 +70,6 @@ fi
 
 echo "=> Target docker image is $IMAGENAME"
 
-if [ ! -z "${DEVPORTAL}" ]
-then
-echo "=> Building with Developer Portal support"
-fi
-
 if [ ! -z "${NAP_WAF}" ]
 then
 echo "=> Building with NGINX App Protect WAF support"
@@ -89,7 +77,7 @@ fi
 
 DOCKER_BUILDKIT=1 docker build --no-cache -f Dockerfile \
 	--secret id=nginx-key,src=$NGINX_KEY --secret id=nginx-crt,src=$NGINX_CERT \
-	--build-arg NMS_URL=$NMSURL --build-arg DEVPORTAL=$DEVPORTAL --build-arg NAP_WAF=$NAP_WAF -t $IMAGENAME .
+	--build-arg NMS_URL=$NMSURL --build-arg NAP_WAF=$NAP_WAF -t $IMAGENAME .
 
 echo "=> Build complete for $IMAGENAME"
 docker push $IMAGENAME

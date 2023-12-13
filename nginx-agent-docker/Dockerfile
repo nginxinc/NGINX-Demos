@@ -1,7 +1,6 @@
 FROM debian:bullseye-slim
 
 ARG NMS_URL
-ARG DEVPORTAL=false
 ARG NAP_WAF=false
 
 # Initial packages setup
@@ -29,16 +28,6 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& printf "deb [signed-by=/usr/share/keyrings/app-protect-security-updates.gpg] https://pkgs.nginx.com/app-protect-security-updates/debian `lsb_release -cs` nginx-plus\n" >> /etc/apt/sources.list.d/nginx-app-protect.list \
 	&& apt-get -y update \
 	&& apt-get -y install app-protect app-protect-attack-signatures; fi \
-
-# Optional API Connectivity Manager DevPortal
-# https://docs.nginx.com/nginx-management-suite/admin-guides/installation/on-prem/install-guide/
-	&& if [ "$DEVPORTAL" = "true" ] ; then \
-	printf "deb https://pkgs.nginx.com/nms/debian `lsb_release -cs` nginx-plus\n" > /etc/apt/sources.list.d/nms.list \
-	&& apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62 \
-	&& apt-get -y update \
-	&& apt-get -y install nginx-devportal nginx-devportal-ui \
-	&& echo 'DB_TYPE="sqlite"' >> /etc/nginx-devportal/devportal.conf \
-	&& echo 'DB_PATH="/var/lib/nginx-devportal"' >> /etc/nginx-devportal/devportal.conf; fi \
 
 # Forward request logs to Docker log collector
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
