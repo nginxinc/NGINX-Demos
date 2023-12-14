@@ -105,8 +105,4 @@ extensions:
 __EOT__
 fi
 
-if [[ "$ACM_DEVPORTAL" == "true" ]]; then
-   nginx-devportal server &
-fi
-
 sg nginx-agent "/usr/bin/nginx-agent $PARM"

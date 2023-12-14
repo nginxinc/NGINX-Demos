@@ -10,7 +10,6 @@ Docker image creation is supported for:
 - [NGINX API Connectivity Manager](https://docs.nginx.com/nginx-management-suite/acm/) 1.0.0+
 - [Security Monitoring](https://docs.nginx.com/nginx-management-suite/security/) 1.0.0+
 - [NGINX App Protect WAF compiler](https://docs.nginx.com/nginx-management-suite/nim/how-to/app-protect/setup-waf-config-management)
-- [NGINX App Delivery Manager](https://docs.nginx.com/nginx-management-suite/adm/) 4.0.0+
 
 The image can optionally be built with [Second Sight](https://github.com/F5Networks/SecondSight) support
 
@@ -24,11 +23,10 @@ A bash script to quickly install NGINX Management Suite through the official Hel
 
 This repository has been tested with:
 
-- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0
+- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1, 2.15.0
 - NGINX API Connectivity Manager 1.0.0, 1.1.0, 1.1.1, 1.2.0, 1.3.0, 1.3.1, 1.4.0, 1.4.1, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.9.1
-- Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0
+- Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.7.1
 - NGINX App Protect WAF compiler v3.1088.2, v4.100.1, v4.2.0, v4.218.0, v4.279.0, v4.402.0, v4.457.0, v4.583.0
-- NGINX App Delivery Manager 4.0.0
 
 ## Prerequisites
 
@@ -47,7 +45,7 @@ This repository has been tested with:
 The install script can be used to build the Docker image using automated or manual install:
 
 ```
-$ ./scripts/buildNIM.sh 
+$ ./scripts/buildNIM.sh
 NGINX Management Suite Docker image builder
 
  This tool builds a Docker image to run NGINX Management Suite
@@ -77,7 +75,6 @@ NGINX Management Suite Docker image builder
  -A                     - Enable API Connectivity Manager - optional
  -W                     - Enable Security Monitoring - optional
  -P [version]           - Enable WAF policy compiler, version can be any [v3.1088.2|v4.100.1|v4.2.0|v4.218.0|v4.279.0|v4.402.0|v4.457.0|v4.583.0] - optional
- -D                     - Enable App Delivery Manager - optional
 
  === Examples:
 
@@ -90,7 +87,7 @@ NGINX Management Suite Docker image builder
 
  Automated build:
         ./scripts/buildNIM.sh -i -C nginx-repo.crt -K nginx-repo.key
-                -A -W -P v4.583.0 -D -t my.registry.tld/nginx-nms:2.14.1
+                -A -W -P v4.583.0 -t my.registry.tld/nginx-nms:latest
 ```
 
 ### Automated build
@@ -102,31 +99,25 @@ NGINX Management Suite Docker image builder
 NGINX Instance Manager
 
 ```
-./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key
+./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key
 ```
 
 NGINX Instance Manager and API Connectivity Manager
 
 ```
-./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A
+./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A
 ```
 
 NGINX Instance Manager, Security Monitoring and WAF Policy Compiler
 
 ```
-./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -W -P v4.2.0
+./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -W -P v4.457.0
 ```
 
 NGINX Instance Manager, API Connectivity Manager, WAF Policy Compiler and Security Monitoring
 
 ```
-./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W -P v4.2.0
-```
-
-NGINX Instance Manager, API Connectivity Manager, WAF Policy Compiler, Security Monitoring and App Delivery Manager
-
-```
-./scripts/buildNIM.sh -t registry.ff.lan:31005/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W -P v4.2.0 -D
+./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W -P v4.457.0
 ```
 
 ### Manual build

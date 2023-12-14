@@ -8,8 +8,7 @@ This repository can be used to build a docker image with NGINX Plus and NGINX In
 
 This repository has been tested with NGINX agent for:
 
-- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1
-- API Connectivity Manager 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0
+- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1, 2.15.0
 - NGINX App Protect WAF 4.100.1+
 
 ## Prerequisites
@@ -41,19 +40,15 @@ NGINX Plus & NGINX Instance Manager agent Docker image builder
  -C [file.crt]          - Certificate to pull packages from the official NGINX repository
  -K [file.key]          - Key to pull packages from the official NGINX repository
  -n [URL]               - NGINX Instance Manager URL to fetch the agent
- -d                     - Build support for NGINX API Gateway Developer Portal
  -w                     - Add NGINX App Protect WAF
 
  === Examples:
 
  NGINX Plus and NGINX Agent image:
- ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28 -n https://nim.f5.ff.lan
+ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:latest -n https://nim.f5.ff.lan
 
  NGINX Plus, NGINX App Protect WAF and NGINX Agent image:
- ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28-nap -w -n https://nim.f5.ff.lan
-
- NGINX Plus, Developer Portal support and NGINX Agent image:
- ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28-devportal -d -n https://nim.f5.ff.lan 
+ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:latest-nap -w -n https://nim.f5.ff.lan
 ```
 
 1. Clone this repository
@@ -67,7 +62,6 @@ $ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:3100
 
 the build script will push the image to your private registry once build is complete.
 
-- the `-d` flag can be used to build a Docker image to run NGINX Plus in [Developer Portal](https://docs.nginx.com/nginx-management-suite/admin-guides/installation/on-prem/install-guide/#install-developer-portal) mode for [API Connectivity Manager](https://docs.nginx.com/nginx-management-suite/acm/about/architecture/)
 - the `-w` flag can be used to include NGINX App Protect WAF support in the docker image
 
 ### Running the docker image on Kubernetes
@@ -80,7 +74,6 @@ the build script will push the image to your private registry once build is comp
   - `NIM_ADVANCED_METRICS` - set to `"true"` to enable advanced metrics collection
   - `NAP_WAF` - set to `"true"` to enable NGINX App Protect WAF (docker image built using `-w`)
   - `NAP_WAF_PRECOMPILED_POLICIES` - set to `"true"` to enable NGINX App Protect WAF precompiled policies (docker image built using `-w`)
-  - `ACM_DEVPORTAL` - set to `"true"` to enable API Connectivity Manager Developer Portal (docker image built using `-d`)
 
 2. Start and stop using
 
@@ -97,13 +90,10 @@ $ ./scripts/nginxWithAgentStart.sh stop
 
 ```
 NGINX Plus and NGINX Agent
-docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -d registry.ff.lan:31005/nginx-with-agent:r28
+docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -d registry.ff.lan:31005/nginx-with-agent:latest
 
 NGINX Plus, NGINX Agent and NGINX App Protect WAF with precompiled policies
-docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -e "NAP_WAF=true" -e "NAP_WAF_PRECOMPILED_POLICIES=true" -d registry.ff.lan:31005/nginx-with-agent:r28-nap
-
-NGINX Plus, NGINX Agent and Developer portal
-docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -e "ACM_DEVPORTAL=true" -d registry.ff.lan:31005/nginx-with-agent:r28-devportal
+docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -e "NAP_WAF=true" -e "NAP_WAF_PRECOMPILED_POLICIES=true" -d registry.ff.lan:31005/nginx-with-agent:latest-nap
 ```
 
 2. After startup NGINX Plus instances will register to NGINX Instance Manager and will be displayed on the "instances" dashboard
