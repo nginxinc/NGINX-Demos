@@ -8,7 +8,9 @@ RUN	apt-get -y update \
 	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 curl debian-archive-keyring iproute2 \
 	&& mkdir -p /deployment /etc/ssl/nginx \
 	&& addgroup --system --gid 20983 nginx \
-	&& adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 20983 nginx
+	&& adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 20983 nginx \
+        && wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+        && chmod +x /usr/bin/yq
 
 # Use certificate and key from kubernetes secret
 RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644 \
@@ -38,7 +40,9 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& usermod nginx -G nginx-agent \
 
 # NGINX Instance Manager agent installation
-	&& bash -c 'curl -k $NMS_URL/install/nginx-agent | sh' && echo "Agent installed from NMS"
+	&& if [ `curl -o /dev/null -sk -w "%{http_code}\n" $NMS_URL/install/nginx-agent` = 200 ] ; then \
+	bash -c 'curl -k $NMS_URL/install/nginx-agent | sh' && echo "NGINX Agent installed"; else \
+	bash -c 'export DATAPLANE_KEY="placeholder" && curl -k $NMS_URL/nginx-agent/install | sh || :' && echo "NGINX Agent installed"; fi
 
 # Startup script
 COPY ./container/start.sh /deployment/
