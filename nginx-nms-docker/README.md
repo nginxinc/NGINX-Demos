@@ -121,7 +121,7 @@ NGINX Instance Manager, Security Monitoring and WAF Policy Compiler
 
 ### Configuring and running
 
-1. Edit `manifests/1.nginx-nim.yaml` and specify the correct image by modifying the "image" line and configure NGINX Instance Manager username, password and the base64-encoded license file for automated license activation. In order to use API Connectivity Manager an ACM license is required
+1. Edit `manifests/1.nginx-nim.yaml` and specify the correct image by modifying the "image" line and configure NGINX Instance Manager username, password and the base64-encoded license file for automated license activation.
 
 ```
 image: your.registry.tld/nginx-nim2:tag
