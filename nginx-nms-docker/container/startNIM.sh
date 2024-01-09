@@ -125,13 +125,6 @@ su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat 
 /bin/bash -c '`which chown` nms:nms /etc/nms/certs/services/ca.crt'
 su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-integrations &' -s /bin/bash
 
-# Start API Connectivity Manager - from /lib/systemd/system/nms-acm.service
-if [ -f /usr/bin/nms-acm ]
-then
-	sleep 5
-	su - nms -c 'function repeat { while [ 1 ] ; do "$@" ; sleep 1 ; done; };repeat /usr/bin/nms-acm server &' -s /bin/bash
-fi
-
 sleep 5
 
 # Start Security Monitoring

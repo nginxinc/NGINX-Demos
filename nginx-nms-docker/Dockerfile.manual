@@ -2,7 +2,6 @@ FROM ubuntu:20.04
 
 ARG NIM_DEBFILE
 ARG BUILD_WITH_SECONDSIGHT=false
-ARG ACM_IMAGE=nim-files/.placeholder
 ARG SM_IMAGE=nim-files/.placeholder
 ARG PUM_IMAGE=nim-files/.placeholder
 
@@ -14,7 +13,6 @@ RUN apt-get update && \
 
 # NGINX Instance Manager 2.4.0+
 COPY $NIM_DEBFILE /deployment/setup/nim.deb
-COPY $ACM_IMAGE /deployment/setup/acm.deb
 COPY $SM_IMAGE /deployment/setup/sm.deb
 COPY $PUM_IMAGE /deployment/setup/pum.deb
 
@@ -27,10 +25,6 @@ COPY $NIM_DEBFILE /deployment/setup/nim.deb
 
 RUN apt-get -y install /deployment/setup/nim.deb && \
 	curl -s http://hg.nginx.org/nginx.org/raw-file/tip/xml/en/security_advisories.xml > /usr/share/nms/cve.xml
-
-# Optional API Connectivity Manager
-RUN if [ "$ACM_IMAGE" != "nim-files/.placeholder" ] ; then \
-	apt-get -y install /deployment/setup/acm.deb; fi
 
 # Optional Security Monitoring
 RUN if [ "$SM_IMAGE" != "nim-files/.placeholder" ] ; then \
