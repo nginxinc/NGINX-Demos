@@ -27,24 +27,25 @@ if [[ ! -z "$NIM_TAGS" ]]; then
    PARM="${PARM} --tags $NIM_TAGS"
 fi
 
+if [[ ! -z "$NIM_TOKEN" ]]; then
+      yq -i '
+	.server.token=strenv(NIM_TOKEN)
+	' /etc/nginx-agent/nginx-agent.conf
+fi
+
 if [[ "$NIM_ADVANCED_METRICS" == "true" ]]; then
    if [ $OLD_AGENT == "false" ]
    then
-      EXTRA_EXTENSIONS="- advanced-metrics"
-
-      cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
-
-# Advanced metrics
-advanced_metrics:
-  socket_path: /var/run/nginx-agent/advanced-metrics.sock
-  aggregation_period: 1s
-  publishing_period: 3s
-  table_sizes_limits:
-    staging_table_max_size: 1000
-    staging_table_threshold: 1000
-    priority_table_max_size: 1000
-    priority_table_threshold: 1000
-__EOT__
+      yq -i '
+	.advanced_metrics.socket_path="/var/run/nginx-agent/advanced-metrics.sock" |
+	.advanced_metrics.aggregation_period="1s" |
+	.advanced_metrics.publishing_period="3s" |
+	.advanced_metrics.table_sizes_limits.staging_table_max_size=1000 |
+	.advanced_metrics.table_sizes_limits.staging_table_threshold=1000 |
+	.advanced_metrics.table_sizes_limits.priority_table_max_size=1000 |
+	.advanced_metrics.table_sizes_limits.priority_table_threshold= 1000 |
+	.extensions += ["advanced-metrics"]
+	' /etc/nginx-agent/nginx-agent.conf
    fi
 fi
 
@@ -53,21 +54,15 @@ if [[ "$NAP_WAF" == "true" ]]; then
    then
       PARM="${PARM} --nginx-app-protect-report-interval 15s --nap-monitoring-collector-buffer-size 50000 --nap-monitoring-processor-buffer-size 50000 --nap-monitoring-syslog-ip 127.0.0.1 --nap-monitoring-syslog-port 514"
    else
-      EXTRA_EXTENSIONS=$EXTRA_EXTENSIONS"\n- nginx-app-protect\n- nap-monitoring"
+      export FQDN=127.0.0.1
 
-      cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
-
-# NGINX App Protect Monitoring config
-nap_monitoring:
-  # Buffer size for collector. Will contain log lines and parsed log lines
-  collector_buffer_size: 50000
-  # Buffer size for processor. Will contain log lines and parsed log lines
-  processor_buffer_size: 50000
-  # Syslog server IP address the collector will be listening to
-  syslog_ip: "127.0.0.1"
-  # Syslog server port the collector will be listening to
-  syslog_port: 514
-__EOT__
+      yq -i '
+	.nap_monitoring.collector_buffer_size=50000 |
+	.nap_monitoring.processor_buffer_size=50000 |
+	.nap_monitoring.syslog_ip=strenv(FQDN) |
+	.nap_monitoring.syslog_port=514 |
+	.extensions += ["nginx-app-protect","nap-monitoring"]
+	' /etc/nginx-agent/nginx-agent.conf
    fi
 
    su - nginx -s /bin/bash -c "/opt/app_protect/bin/bd_agent &"
@@ -85,24 +80,12 @@ if [[ "$NAP_WAF_PRECOMPILED_POLICIES" == "true" ]]; then
    then
       PARM="${PARM} --nginx-app-protect-precompiled-publication"
    else
-      cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
-
-# Enable NGINX App Protect WAF precompiled policies
-nginx_app_protect:
-  precompiled_publication: true
-__EOT__
+      yq -i '
+	.nginx_app_protect.precompiled_publication=true
+	' /etc/nginx-agent/nginx-agent.conf
    fi
 fi
 
-fi
-
-if [[ "$EXTRA_EXTENSIONS" != "" ]]; then
-  cat - << __EOT__ >> /etc/nginx-agent/nginx-agent.conf
-
-# Enable extensions
-extensions:
-`echo -e $EXTRA_EXTENSIONS | sed "s/^/\ \ /g"`
-__EOT__
 fi
 
 sg nginx-agent "/usr/bin/nginx-agent $PARM"
