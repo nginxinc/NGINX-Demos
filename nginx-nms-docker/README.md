@@ -7,7 +7,6 @@ This repository helps deploying NGINX Management Suite on containerized clusters
 Docker image creation is supported for:
 
 - [NGINX Instance Manager](https://docs.nginx.com/nginx-instance-manager/) 2.4.0+
-- [NGINX API Connectivity Manager](https://docs.nginx.com/nginx-management-suite/acm/) 1.0.0+
 - [Security Monitoring](https://docs.nginx.com/nginx-management-suite/security/) 1.0.0+
 - [NGINX App Protect WAF compiler](https://docs.nginx.com/nginx-management-suite/nim/how-to/app-protect/setup-waf-config-management)
 
@@ -24,7 +23,6 @@ A bash script to quickly install NGINX Management Suite through the official Hel
 This repository has been tested with:
 
 - NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1, 2.15.0
-- NGINX API Connectivity Manager 1.0.0, 1.1.0, 1.1.1, 1.2.0, 1.3.0, 1.3.1, 1.4.0, 1.4.1, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0, 1.9.1
 - Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.7.1
 - NGINX App Protect WAF compiler v3.1088.2, v4.100.1, v4.2.0, v4.218.0, v4.279.0, v4.402.0, v4.457.0, v4.583.0
 
@@ -36,7 +34,7 @@ This repository has been tested with:
 - Private registry to push the target Docker image
 - Kubernetes cluster with dynamic storage provisioner enabled: see the [example](contrib/pvc-provisioner)
 - NGINX Ingress Controller with `VirtualServer` CRD support (see https://docs.nginx.com/nginx-ingress-controller/configuration/virtualserver-and-virtualserverroute-resources/)
-- Access to F5/NGINX downloads to fetch NGINX Instance Manager 2.4.0+ installation .deb file and API Connectivity Manager 1.0+ installation .deb file (when running in manual mode)
+- Access to F5/NGINX downloads to fetch NGINX Instance Manager 2.4.0+ installation .deb file (when running in manual mode)
 - Valid NGINX license certificate and key to fetch NGINX Management Suite packages (when running in automated mode)
 - Linux host running Docker to build the image
 
@@ -63,7 +61,6 @@ NGINX Management Suite Docker image builder
  Manual build:
 
  -n [filename]          - NGINX Instance Manager .deb package filename
- -a [filename]          - API Connectivity Manager .deb package filename - optional
  -w [filename]          - Security Monitoring .deb package filename - optional
  -p [filename]          - WAF policy compiler .deb package filename - optional
 
@@ -72,7 +69,6 @@ NGINX Management Suite Docker image builder
  -i                     - Automated build - requires cert & key
  -C [file.crt]          - Certificate file to pull packages from the official NGINX repository
  -K [file.key]          - Key file to pull packages from the official NGINX repository
- -A                     - Enable API Connectivity Manager - optional
  -W                     - Enable Security Monitoring - optional
  -P [version]           - Enable WAF policy compiler, version can be any [v3.1088.2|v4.100.1|v4.2.0|v4.218.0|v4.279.0|v4.402.0|v4.457.0|v4.583.0] - optional
 
@@ -80,14 +76,13 @@ NGINX Management Suite Docker image builder
 
  Manual build:
         ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~focal_amd64.deb \
-                -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~focal_amd64.deb \
                 -w nim-files/nms-sm_1.0.0-697204659~focal_amd64.deb \
                 -p nim-files/nms-nap-compiler-v4.2.0.deb \
                 -t my.registry.tld/nginx-nms:2.6.0
 
  Automated build:
         ./scripts/buildNIM.sh -i -C nginx-repo.crt -K nginx-repo.key
-                -A -W -P v4.583.0 -t my.registry.tld/nginx-nms:latest
+                -W -P v4.583.0 -t my.registry.tld/nginx-nms:latest
 ```
 
 ### Automated build
@@ -102,22 +97,10 @@ NGINX Instance Manager
 ./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key
 ```
 
-NGINX Instance Manager and API Connectivity Manager
-
-```
-./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A
-```
-
 NGINX Instance Manager, Security Monitoring and WAF Policy Compiler
 
 ```
 ./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -W -P v4.457.0
-```
-
-NGINX Instance Manager, API Connectivity Manager, WAF Policy Compiler and Security Monitoring
-
-```
-./scripts/buildNIM.sh -t YOUR_DOCKER_REGISTRY/nginx-nim2:automated -i -C certs/nginx-repo.crt -K certs/nginx-repo.key -A -W -P v4.457.0
 ```
 
 ### Manual build
@@ -131,7 +114,6 @@ NGINX Instance Manager, API Connectivity Manager, WAF Policy Compiler and Securi
 
 ```
 ./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~focal_amd64.deb \
-        -a nim-files/nms-api-connectivity-manager_1.2.0.668430332~focal_amd64.deb \
         -w nim-files/nms-sm_1.0.0-697204659~focal_amd64.deb \
         -p nim-files/nms-nap-compiler-v4.2.0_4.2.0-1~focal_amd64.deb \
         -t my.registry.tld/nginx-nms:2.6.0
