@@ -46,7 +46,7 @@ jobs:
           image: ${{ steps.variables.outputs.image }}
       - name: Checkout
         uses: actions/checkout@v4
-        if: ${{ steps.update.outputs.needs-updating == 'true' || inputs.force == 'true '}}
+        if: ${{ steps.update.outputs.needs-updating == 'true' || inputs.force == 'true' }}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
         with:
