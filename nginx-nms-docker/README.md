@@ -22,9 +22,9 @@ A bash script to quickly install NGINX Management Suite through the official Hel
 
 This repository has been tested with:
 
-- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1, 2.15.0
+- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1, 2.15.0, 2.15.1
 - Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.7.1
-- NGINX App Protect WAF compiler v3.1088.2, v4.100.1, v4.2.0, v4.218.0, v4.279.0, v4.402.0, v4.457.0, v4.583.0
+- NGINX App Protect WAF compiler v3.1088.2, v4.100.1, v4.2.0, v4.218.0, v4.279.0, v4.402.0, v4.457.0, v4.583.0, v4.641, v4.762.0
 
 ## Prerequisites
 
