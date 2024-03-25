@@ -60,7 +60,7 @@ spec:
   - name: api
     port: 8080
   selector:
-    app: nginx
+    app: nginx-nim
   type: ClusterIP
 
 ---
