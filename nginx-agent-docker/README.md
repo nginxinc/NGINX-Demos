@@ -6,17 +6,19 @@ This repository can be used to build a docker image with NGINX Plus and NGINX In
 
 ## Tested releases
 
-This repository has been tested with NGINX agent for:
+This repository has been tested with: NGINX agent for:
 
-- NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1, 2.15.0
+- NGINX Agent 2.14+
+- NGINX Instance Manager 2.15+
 - NGINX App Protect WAF 4.100.1+
+- NGINX One Cloud Console
 
 ## Prerequisites
 
 - Linux host running Docker to build the image
 - NGINX Plus license
-- One of 
-  - [NGINX Instance Manager](https://docs.nginx.com/nginx-instance-manager/)         
+- One of
+  - [NGINX Instance Manager](https://docs.nginx.com/nginx-instance-manager/)
   - [NGINX One Cloud Console](https://docs.nginx.com/nginx-one/)
 - Openshift/Kubernetes cluster
 

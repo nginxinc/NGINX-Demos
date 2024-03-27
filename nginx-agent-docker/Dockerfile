@@ -22,7 +22,6 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90pkgs-nginx \
 	&& apt-get -y update \
 	&& apt-get -y install nginx-plus nginx-plus-module-njs nginx-plus-module-prometheus \
-
 # Optional NGINX App Protect WAF
 	&& if [ "$NAP_WAF" = "true" ] ; then \
 	wget -qO - https://cs.nginx.com/static/keys/app-protect-security-updates.key | gpg --dearmor > /usr/share/keyrings/app-protect-security-updates.gpg \
@@ -30,19 +29,17 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& printf "deb [signed-by=/usr/share/keyrings/app-protect-security-updates.gpg] https://pkgs.nginx.com/app-protect-security-updates/debian `lsb_release -cs` nginx-plus\n" >> /etc/apt/sources.list.d/nginx-app-protect.list \
 	&& apt-get -y update \
 	&& apt-get -y install app-protect app-protect-attack-signatures; fi \
-
 # Forward request logs to Docker log collector
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
 	&& ln -sf /dev/stderr /var/log/nginx/error.log \
-
+# User and group
 	&& groupadd -g 1001 nginx-agent \
 	&& usermod root -G nginx-agent \
 	&& usermod nginx -G nginx-agent \
-
 # NGINX Instance Manager agent installation
 	&& if [ `curl -o /dev/null -sk -w "%{http_code}\n" $NMS_URL/install/nginx-agent` = 200 ] ; then \
-	bash -c 'curl -k $NMS_URL/install/nginx-agent | sh' && echo "NGINX Agent installed"; else \
-	bash -c 'export DATAPLANE_KEY="placeholder" && curl -k $NMS_URL/nginx-agent/install | sh || :' && echo "NGINX Agent installed"; fi
+	bash -c 'export DATA_PLANE_KEY="placeholder" && curl -k $NMS_URL/install/nginx-agent | sh' && echo "NGINX Agent installed"; else \
+	bash -c 'export DATA_PLANE_KEY="placeholder" && curl -k $NMS_URL/nginx-agent/install | sh || :' && echo "NGINX Agent installed"; fi
 
 # Startup script
 COPY ./container/start.sh /deployment/
