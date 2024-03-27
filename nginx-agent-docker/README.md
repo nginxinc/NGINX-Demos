@@ -93,11 +93,16 @@ $ ./scripts/nginxWithAgentStart.sh stop
 1. Start using
 
 ```
-NGINX Plus and NGINX Agent
-docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -d registry.ff.lan:31005/nginx-with-agent:latest
-
-NGINX Plus, NGINX Agent and NGINX App Protect WAF with precompiled policies
-docker run --name nginx-plus -d -e "NIM_HOST=<NIM_FQDN_OR_IP>" -e "NIM_GRPC_PORT=<GPRC_PORT>" -e "NAP_WAF=true" -e "NAP_WAF_PRECOMPILED_POLICIES=true" -d registry.ff.lan:31005/nginx-with-agent:latest-nap
+docker run --rm --name nginx -p [PORT_TO_EXPOSE] \
+        -e "NIM_HOST=<NGINX_INSTANCE_MANAGER_FQDN_OR_IP>" \
+        -e "NIM_GRPC_PORT=<GRPC_PORT>" \
+        -e "NIM_TOKEN=<OPTIONAL_AUTHENTICATION_TOKEN>" \
+        -e "NIM_INSTANCEGROUP=<OPTIONAL_INSTANCE_GROUP_NAME>" \
+        -e "NIM_TAGS=<OPTIONAL_COMMA_DELIMITED_TAG_LIST>" \
+        -e "NIM_ADVANCED_METRICS=[true|false]" \
+        -e "NAP_WAF=[true|false]" \
+        -e "NAP_WAF_PRECOMPILED_POLICIES=[true|false]" \
+        <NGINX_DOCKER_IMAGE_NAME:TAG>
 ```
 
 2. After startup NGINX Plus instances will register to NGINX Instance Manager and will be displayed on the "instances" dashboard
