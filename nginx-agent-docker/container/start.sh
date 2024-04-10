@@ -31,6 +31,12 @@ if [[ ! -z "$NIM_TOKEN" ]]; then
 	' /etc/nginx-agent/nginx-agent.conf
 fi
 
+if [[ ! -z "$AGENT_LOGLEVEL" ]]; then
+      yq -i '
+	.log.level=strenv(AGENT_LOGLEVEL)
+	' /etc/nginx-agent/nginx-agent.conf
+fi
+
 if [[ "$NIM_ADVANCED_METRICS" == "true" ]]; then
 	yq -i '
 	.advanced_metrics.socket_path="/var/run/nginx-agent/advanced-metrics.sock" |

@@ -78,6 +78,7 @@ the build script will push the image to your private registry once build is comp
   - `NIM_ADVANCED_METRICS` - set to `"true"` to enable advanced metrics collection
   - `NAP_WAF` - set to `"true"` to enable NGINX App Protect WAF (docker image built using `-w`)
   - `NAP_WAF_PRECOMPILED_POLICIES` - set to `"true"` to enable NGINX App Protect WAF precompiled policies (docker image built using `-w`)
+  - `AGENT_LOGLEVEL` - NGINX Agent loglevel, optional. If not specified defaults to `info`
 
 2. Start and stop using
 
@@ -102,6 +103,7 @@ docker run --rm --name nginx -p [PORT_TO_EXPOSE] \
         -e "NIM_ADVANCED_METRICS=[true|false]" \
         -e "NAP_WAF=[true|false]" \
         -e "NAP_WAF_PRECOMPILED_POLICIES=[true|false]" \
+        -e "AGENT_LOGLEVEL=[panic|fatal|error|info|debug|trace]" \
         <NGINX_DOCKER_IMAGE_NAME:TAG>
 ```
 

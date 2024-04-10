@@ -39,6 +39,10 @@ spec:
           - name: NIM_ADVANCED_METRICS
             value: "true"
 
+          # Optional to set NGINX Agent loglevel - default is "info"
+          #- name: AGENT_LOGLEVEL
+          #  value: "info"
+
           # Optional if NGINX App Protect WAF is available in the docker image - set to "true" to enable
           #- name: NAP_WAF
           #  value: "true"
