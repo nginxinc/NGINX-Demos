@@ -1,0 +1,30 @@
+FROM nginx:stable-bullseye-perl
+
+ARG NMS_URL
+
+# Initial packages setup
+RUN apt-get -y update \
+	&& apt-get -y install wget gpg \
+	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+	&& chmod +x /usr/bin/yq \
+	&& set -x \
+# Forward request logs to Docker log collector
+	&& ln -sf /dev/stdout /var/log/nginx/access.log \
+	&& ln -sf /dev/stderr /var/log/nginx/error.log \
+# User and group
+	&& groupadd -g 1001 nginx-agent \
+	&& usermod root -G nginx-agent \
+	&& usermod nginx -G nginx-agent \
+# NGINX Instance Manager agent installation
+	&& if [ `curl -o /dev/null -sk -w "%{http_code}\n" $NMS_URL/install/nginx-agent` = 200 ] ; then \
+	bash -c 'export DATA_PLANE_KEY="placeholder" && curl -k $NMS_URL/install/nginx-agent | sh' && echo "NGINX Agent installed"; else \
+	bash -c 'export DATA_PLANE_KEY="placeholder" && curl -k $NMS_URL/nginx-agent/install | sh || :' && echo "NGINX Agent installed"; fi
+
+# Startup script
+COPY ./container/start.sh /deployment/
+RUN chmod +x /deployment/start.sh && touch /.dockerenv
+
+EXPOSE 80
+STOPSIGNAL SIGTERM
+
+CMD /deployment/start.sh

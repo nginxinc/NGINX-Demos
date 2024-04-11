@@ -2,12 +2,14 @@
 
 ## Description
 
-This repository can be used to build a docker image with NGINX Plus and NGINX Instance Manager Agent (https://docs.nginx.com/nginx-instance-manager/).
+This repository can be used to build a docker image with NGINX (Plus or Opensource) and NGINX Instance Manager Agent (https://docs.nginx.com/nginx-instance-manager/).
 
 ## Tested releases
 
 This repository has been tested with: NGINX agent for:
 
+- NGINX Plus R29+
+- NGINX Opensource 1.24.0+
 - NGINX Agent 2.14+
 - NGINX Instance Manager 2.15+
 - NGINX App Protect WAF 4.100.1+
@@ -27,10 +29,9 @@ This repository has been tested with: NGINX agent for:
 The install script can be used to build the Docker image:
 
 ```
-$ ./scripts/build.sh 
-NGINX Plus & NGINX Instance Manager agent Docker image builder
+NGINX Opensource/Plus & NGINX Agent Docker image builder
 
- This tool builds a Docker image to run NGINX Plus and NGINX Instance Manager agent
+ This tool builds a Docker image to run NGINX Opensource/Plus and NGINX Agent
 
  === Usage:
 
@@ -42,8 +43,9 @@ NGINX Plus & NGINX Instance Manager agent Docker image builder
  -t [target image]      - The Docker image to be created
  -C [file.crt]          - Certificate to pull packages from the official NGINX repository
  -K [file.key]          - Key to pull packages from the official NGINX repository
- -n [URL]               - NGINX Instance Manager URL to fetch the agent
- -w                     - Add NGINX App Protect WAF
+ -n [URL]               - NGINX Instance Manager / NGINX SaaS console URL to fetch the agent
+ -w                     - Add NGINX App Protect WAF (requires NGINX Plus)
+ -O                     - Use NGINX Opensource instead of NGINX Plus
 
  === Examples:
 
@@ -52,20 +54,17 @@ NGINX Plus & NGINX Instance Manager agent Docker image builder
 
  NGINX Plus, NGINX App Protect WAF and NGINX Agent image:
  ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:latest-nap -w -n https://nim.f5.ff.lan
+
+ NGINX Opensource and NGINX Agent image:
+ ./scripts/build.sh -O -t registry.ff.lan:31005/nginx-oss-with-agent:latest -n https://nim.f5.ff.lan
 ```
 
 1. Clone this repository
-2. Get your license certificate and key to fetch NGINX Management Suite packages from NGINX repository
-3. [Install](https://docs.nginx.com/nginx-management-suite/) and start NGINX Management Suite / NGINX Instance Manager
-4. Build the Docker image using:
-
-```
-$ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:r28 -n https://ubuntu.ff.lan
-```
+2. For NGINX Plus only: get your license certificate and key to fetch NGINX Management Suite packages from NGINX repository
+3. [Install](https://docs.nginx.com/nginx-management-suite/) and start NGINX Management Suite / NGINX Instance Manager. Skip this step if using the NGINX SaaS console
+4. Build the Docker image using `./scripts/build.sh`
 
 the build script will push the image to your private registry once build is complete.
-
-- the `-w` flag can be used to include NGINX App Protect WAF support in the docker image
 
 ### Running the docker image on Kubernetes
 
@@ -75,9 +74,9 @@ the build script will push the image to your private registry once build is comp
   - `NIM_TOKEN` - NGINX One Cloud Console authentication token
   - `NIM_INSTANCEGROUP` - instance group for the NGINX instance
   - `NIM_TAGS` - comma separated list of tags for the NGINX instance
-  - `NIM_ADVANCED_METRICS` - set to `"true"` to enable advanced metrics collection
-  - `NAP_WAF` - set to `"true"` to enable NGINX App Protect WAF (docker image built using `-w`)
-  - `NAP_WAF_PRECOMPILED_POLICIES` - set to `"true"` to enable NGINX App Protect WAF precompiled policies (docker image built using `-w`)
+  - `NIM_ADVANCED_METRICS` - set to `"true"` to enable advanced metrics collection - NGINX Plus only
+  - `NAP_WAF` - set to `"true"` to enable NGINX App Protect WAF (docker image built using `-w`) - NGINX Plus only
+  - `NAP_WAF_PRECOMPILED_POLICIES` - set to `"true"` to enable NGINX App Protect WAF precompiled policies (docker image built using `-w`) - NGINX Plus only
   - `AGENT_LOGLEVEL` - NGINX Agent loglevel, optional. If not specified defaults to `info`
 
 2. Start and stop using
@@ -87,7 +86,7 @@ $ ./scripts/nginxWithAgentStart.sh start
 $ ./scripts/nginxWithAgentStart.sh stop
 ```
 
-3. After startup NGINX Plus instances will register to NGINX Instance Manager and will be displayed on the "instances" dashboard
+3. After startup NGINX instances will register to NGINX Instance Manager / NGINX SaaS console and will be displayed on the "instances" dashboard
 
 ### Running the docker image on Docker
 
