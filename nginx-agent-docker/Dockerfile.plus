@@ -4,13 +4,13 @@ ARG NMS_URL
 ARG NAP_WAF=false
 
 # Initial packages setup
-RUN	apt-get -y update \
+RUN apt-get -y update \
 	&& apt-get -y install apt-transport-https lsb-release ca-certificates wget gnupg2 curl debian-archive-keyring iproute2 \
 	&& mkdir -p /deployment /etc/ssl/nginx \
 	&& addgroup --system --gid 20983 nginx \
 	&& adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 20983 nginx \
-        && wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
-        && chmod +x /usr/bin/yq
+	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+	&& chmod +x /usr/bin/yq
 
 # Use certificate and key from kubernetes secret
 RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644 \
@@ -43,8 +43,7 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 
 # Startup script
 COPY ./container/start.sh /deployment/
-RUN	chmod +x /deployment/start.sh && touch /.dockerenv
-
+RUN chmod +x /deployment/start.sh && touch /.dockerenv
 
 EXPOSE 80
 STOPSIGNAL SIGTERM
