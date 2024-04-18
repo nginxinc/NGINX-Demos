@@ -24,20 +24,18 @@ WORKDIR /deployment/setup
 COPY $NIM_DEBFILE /deployment/setup/nim.deb
 
 RUN apt-get -y install /deployment/setup/nim.deb && \
-	curl -s http://hg.nginx.org/nginx.org/raw-file/tip/xml/en/security_advisories.xml > /usr/share/nms/cve.xml
-
-# Optional Security Monitoring
-RUN if [ "$SM_IMAGE" != "nim-files/.placeholder" ] ; then \
-	apt-get -y install /deployment/setup/sm.deb; fi
-
-# Optional WAF Policy Compiler
-RUN if [ "$PUM_IMAGE" != "nim-files/.placeholder" ] ; then \
-	apt-get -y install /deployment/setup/pum.deb; fi
-
-# Set permissions
-RUN chmod +x /etc/nms/scripts/*.sh
-
-RUN rm -r /deployment/setup
+	curl -s http://hg.nginx.org/nginx.org/raw-file/tip/xml/en/security_advisories.xml > /usr/share/nms/cve.xml \
+	# Optional Security Monitoring
+	&& if [ "$SM_IMAGE" != "nim-files/.placeholder" ] ; then \
+	apt-get -y install /deployment/setup/sm.deb; fi \
+	# Optional WAF Policy Compiler
+	&& if [ "$PUM_IMAGE" != "nim-files/.placeholder" ] ; then \
+	apt-get -y install /deployment/setup/pum.deb; fi \
+	# Set permissions
+	&& chmod +x /etc/nms/scripts/*.sh \
+	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+	&& chmod +x /usr/bin/yq \
+	&& rm -r /deployment/setup
 
 # Optional Second Sight
 WORKDIR /deployment

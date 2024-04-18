@@ -1,6 +1,6 @@
-# NGINX Management Suite for Docker
+# NGINX Instance Manager for Docker
 
-This repository helps deploying NGINX Management Suite on containerized clusters by creating a docker image or deploying the official Helm chart with a simple bash script.
+This repository helps deploying NGINX Instance Manager on containerized clusters by creating a docker image.
 
 ## Docker image creation
 
@@ -12,19 +12,13 @@ Docker image creation is supported for:
 
 The image can optionally be built with [Second Sight](https://github.com/F5Networks/SecondSight) support
 
-## Deployment through the official Helm chart
-
-A bash script to quickly install NGINX Management Suite through the official Helm chart is available here:
-
-- [Helm installer](contrib/helm-installer)
-
 ## Tested releases
 
 This repository has been tested with:
 
 - NGINX Instance Manager 2.4.0, 2.5.0, 2.5.1, 2.6.0, 2.7.0, 2.8.0, 2.9.0, 2.9.1, 2.10.0, 2.10.1, 2.11.0, 2.12.0, 2.13.0, 2.13.1, 2.14.0, 2.14.1, 2.15.0, 2.15.1
 - Security Monitoring 1.0.0, 1.1.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.7.1
-- NGINX App Protect WAF compiler v3.1088.2, v4.100.1, v4.2.0, v4.218.0, v4.279.0, v4.402.0, v4.457.0, v4.583.0, v4.641, v4.762.0
+- NGINX App Protect WAF compiler v3.1088.2, v4.100.1, v4.2.0, v4.218.0, v4.279.0, v4.402.0, v4.457.0, v4.583.0, v4.641, v4.762
 
 ## Prerequisites
 
@@ -35,7 +29,7 @@ This repository has been tested with:
 - Kubernetes cluster with dynamic storage provisioner enabled: see the [example](contrib/pvc-provisioner)
 - NGINX Ingress Controller with `VirtualServer` CRD support (see https://docs.nginx.com/nginx-ingress-controller/configuration/virtualserver-and-virtualserverroute-resources/)
 - Access to F5/NGINX downloads to fetch NGINX Instance Manager 2.4.0+ installation .deb file (when running in manual mode)
-- Valid NGINX license certificate and key to fetch NGINX Management Suite packages (when running in automated mode)
+- Valid NGINX license certificate and key to fetch NGINX Instance Manager packages (when running in automated mode)
 - Linux host running Docker to build the image
 
 ## How to build
@@ -44,9 +38,9 @@ The install script can be used to build the Docker image using automated or manu
 
 ```
 $ ./scripts/buildNIM.sh
-NGINX Management Suite Docker image builder
+NGINX Instance Manager Docker image builder
 
- This tool builds a Docker image to run NGINX Management Suite
+ This tool builds a Docker image to run NGINX Instance Manager
 
  === Usage:
 
@@ -88,7 +82,7 @@ NGINX Management Suite Docker image builder
 ### Automated build
 
 1. Clone this repo
-2. Get your license certificate and key to fetch NGINX Management Suite packages from NGINX repository
+2. Get your license certificate and key to fetch NGINX Instance Manager packages from NGINX repository
 3. Build NGINX Instance Manager Docker image using:
 
 NGINX Instance Manager
@@ -105,18 +99,33 @@ NGINX Instance Manager, Security Monitoring and WAF Policy Compiler
 
 ### Manual build
 
-1. Clone this repo
+1. Clone this repository
 2. Download NGINX Instance Manager 2.4.0+ .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
-3. Optional: download API Connectivity Manager 1.0+ .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
-4. Optional: download Security Monitoring .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
-5. Optional: download WAF Policy Compiler .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
-6. Build NGINX Instance Manager Docker image using:
+3. Optional: download Security Monitoring .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
+4. Optional: download WAF Policy Compiler .deb installation file for Ubuntu 20.04 and copy it into `nim-files/`
+5. Build NGINX Instance Manager Docker image using the provided script
+
+Example:
 
 ```
-./scripts/buildNIM.sh -n nim-files/nms-instance-manager_2.6.0-698150575~focal_amd64.deb \
-        -w nim-files/nms-sm_1.0.0-697204659~focal_amd64.deb \
-        -p nim-files/nms-nap-compiler-v4.2.0_4.2.0-1~focal_amd64.deb \
-        -t my.registry.tld/nginx-nms:2.6.0
+cd nim-files
+
+apt-cache madison nms-instance-manager
+apt-get download nms-instance-manager=2.15.1-1175574316~focal
+
+apt-cache madison nms-sm
+apt-get download nms-sm=1.7.1-1046510610~focal
+
+apt-cache search nms-nap-compiler
+apt-get download nms-nap-compiler-v4.815.0
+
+cd ..
+
+./scripts/buildNIM.sh \
+        -t my-private-registry/nginx-instance-manager:2.15.1-nap-v4.815.0-manualbuild \
+        -n nim-files/nms-instance-manager_2.15.1-1175574316~focal_amd64.deb \
+        -w nim-files/nms-sm_1.7.1-1046510610~focal_amd64.deb \
+        -p nim-files/nms-nap-compiler-v4.815.0_4.815.0-1~focal_amd64.deb
 ```
 
 ### Configuring and running
@@ -233,11 +242,10 @@ and then restart nginx-agent
 ## Additional tools
 
 - [Grafana dashboard for telemetry](contrib/grafana)
-- [Helm installer](contrib/helm-installer)
 - [Docker compose](contrib/docker-compose)
 
 
-# Starting NGINX Management Suite
+# Starting NGINX Instance Manager
 
 ## On Kubernetes
 
@@ -262,7 +270,7 @@ grafana-6f58d455c7-8lk64      1/1     Running   0          5m8s   10.244.2.80   
 nginx-nim2-679987c54d-7rl6b   1/1     Running   0          5m8s   10.244.1.64   f5-node1   <none>           <none>
 ```
 
-NGINX Management Suite GUI is now reachable from outside the cluster at:
+NGINX Instance Manager GUI is now reachable from outside the cluster at:
 - Web GUI: `https://nim2.f5.ff.lan`
 - gRPC: `nim2.f5.ff.lan:30443`
 - Second Sight: see [usage](https://github.com/F5Networks/SecondSight/blob/main/USAGE.md)
@@ -271,7 +279,7 @@ NGINX Management Suite GUI is now reachable from outside the cluster at:
 
 See [docker-compose](contrib/docker-compose)
 
-# Stopping NGINX Management Suite
+# Stopping NGINX Instance Manager
 
 ## On Kubernetes
 
