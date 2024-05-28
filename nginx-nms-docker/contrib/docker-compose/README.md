@@ -1,4 +1,4 @@
-# Docker-compose for NGINX Management Suite
+# Docker-compose for NGINX Instance Manager
 
 1. Edit the `.env` file configuring the NGINX Management Suite docker image name and the base64-encoded license
 2. Start NGINX Management Suite using
