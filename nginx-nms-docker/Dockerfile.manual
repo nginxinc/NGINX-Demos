@@ -33,7 +33,7 @@ RUN apt-get -y install /deployment/setup/nim.deb && \
 	apt-get -y install /deployment/setup/pum.deb; fi \
 	# Set permissions
 	&& chmod +x /etc/nms/scripts/*.sh \
-	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
+	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_`dpkg --print-architecture` -O /usr/bin/yq \
 	&& chmod +x /usr/bin/yq \
 	&& rm -r /deployment/setup
 
