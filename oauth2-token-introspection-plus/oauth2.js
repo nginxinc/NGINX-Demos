@@ -26,7 +26,7 @@ function introspectAccessToken(r) {
         var authHeader = "";
         if (r.variables.oauth_client_id.length) {
             var basicAuthPlaintext = r.variables.oauth_client_id + ":" + r.variables.oauth_client_secret;
-            authHeader = "Basic " + basicAuthPlaintext.toBytes().toString('base64');    
+            authHeader = "Basic " + Buffer.from(basicAuthPlaintext).toString('base64');
         } else {
             authHeader = "Bearer " + r.variables.oauth_client_secret;
         }
@@ -43,18 +43,18 @@ function introspectAccessToken(r) {
 
                 // We have a response from authorization server, validate it has expected JSON schema
                 try {
-                    r.log("OAuth token introspection response: " + reply.responseBody)
-                    var response = JSON.parse(reply.responseBody); // Test for valid JSON so that we only store good responses
+                    r.log("OAuth token introspection response: " + reply.responseText);
+                    var response = JSON.parse(reply.responseText); // Test for valid JSON so that we only store good responses
                     if (response.active.length) {
                         r.variables.token_data = response.toString('base64'); // Store this repsonse in keyval zone
                         tokenResult(r);
                     } else {
-                        r.error("OAuth error in token introspection response: " + reply.responseBody);
+                        r.error("OAuth error in token introspection response: " + reply.responseText);
                         r.return(401);
                         return;
                     }
                 } catch (e) {
-                    r.error("OAuth token introspection response is not JSON: " + reply.responseBody);
+                    r.error("OAuth token introspection response is not JSON: " + reply.responseText);
                     r.return(401);
                 }
             }
