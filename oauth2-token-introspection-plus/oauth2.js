@@ -10,7 +10,7 @@
  * 204: token is active
  * 403: token is not active
  * 401: error condition (details written to error log at error level)
- * 
+ *
  * Metadata contained within the token introspection JSON response is converted to response
  * headers. These in turn are available to the auth_request location with the auth_request_set
  * directive. Each member of the response is available to nginx as $sent_http_token_<member name>
@@ -26,7 +26,7 @@ function introspectAccessToken(r) {
         var authHeader = "";
         if (r.variables.oauth_client_id.length) {
             var basicAuthPlaintext = r.variables.oauth_client_id + ":" + r.variables.oauth_client_secret;
-            authHeader = "Basic " + basicAuthPlaintext.toBytes().toString('base64');    
+            authHeader = "Basic " + basicAuthPlaintext.toBytes().toString('base64');
         } else {
             authHeader = "Bearer " + r.variables.oauth_client_secret;
         }
@@ -45,8 +45,8 @@ function introspectAccessToken(r) {
                 try {
                     r.log("OAuth token introspection response: " + reply.responseBody)
                     var response = JSON.parse(reply.responseBody); // Test for valid JSON so that we only store good responses
-                    if (response.active.length) {
-                        r.variables.token_data = response.toString('base64'); // Store this repsonse in keyval zone
+                    if (response.active) {
+                        r.variables.token_data = reply.responseBody.toBytes().toString('base64'); // Store this repsonse in keyval zone
                         tokenResult(r);
                     } else {
                         r.error("OAuth error in token introspection response: " + reply.responseBody);
