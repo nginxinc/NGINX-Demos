@@ -8,5 +8,6 @@
     "fileMatch": [
       "kubernetes-demo-nginx-ingress-resources/.+\\.yaml$"
     ]
-  }
+  },
+  "ignorePresets": ["helpers:pinGitHubActionDigests"]
 }
