@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:24.04
 
 # Download certificate and key from the customer portal (https://cs.nginx.com)
 # and copy to the build context
