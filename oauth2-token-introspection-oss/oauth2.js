@@ -19,13 +19,13 @@ function introspectAccessToken(r) {
     var authHeader = "";
     if (r.variables.oauth_client_id.length) {
         var basicAuthPlaintext = r.variables.oauth_client_id + ":" + r.variables.oauth_client_secret;
-        authHeader = "Basic " + basicAuthPlaintext.toBytes().toString('base64');    
+        authHeader = "Basic " + Buffer.from(basicAuthPlaintext).toString('base64');
     } else {
         authHeader = "Bearer " + r.variables.oauth_client_secret;
     }
 
     // Make the OAuth 2.0 Token Introspection request
-    r.log("OAuth sending introspection request with token: " + r.variables.access_token)
+    r.log("OAuth sending introspection request with token: " + r.variables.access_token);
     r.subrequest("/_oauth2_send_introspection_request", "token=" + r.variables.access_token + "&authorization=" + authHeader,
         function(reply) {
             if (reply.status != 200) {
@@ -35,8 +35,8 @@ function introspectAccessToken(r) {
 
             // We have a response from authorization server, validate it has expected JSON schema
             try {
-                r.log("OAuth token introspection response: " + reply.responseBody)
-                var response = JSON.parse(reply.responseBody);
+                r.log("OAuth token introspection response: " + reply.responseText);
+                var response = JSON.parse(reply.responseText);
                 // TODO: check for errors in the JSON response first
                 // We have a valid introspection response
                 // Check for validation success
