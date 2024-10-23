@@ -1,7 +1,7 @@
 version: "3"
 services:
     clickhouse:
-     image: clickhouse/clickhouse-server:23.1.2.9
+     image: clickhouse/clickhouse-server:24.8.4.13
      ports:
      - "9000:9000"
      environment:
