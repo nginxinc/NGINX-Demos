@@ -17,7 +17,7 @@ Automated build:\n\n
 -C [file.crt]\t\t- Certificate file to pull packages from the official NGINX repository\n
 -K [file.key]\t\t- Key file to pull packages from the official NGINX repository\n
 -W\t\t\t- Enable Security Monitoring - optional\n
--P [version]\t\t- Enable WAF policy compiler, version can be any [v3.1088.2|v4.100.1|v4.2.0|v4.218.0|v4.279.0|v4.402.0|v4.457.0|v4.583.0|v4.641|v4.762|v4.815.0|v5.17.0|v5.48.0] - optional\n\n
+-P [version]\t\t- Enable WAF policy compiler, version can be any [v3.1088.2|v4.100.1|v4.2.0|v4.218.0|v4.279.0|v4.402.0|v4.457.0|v4.583.0|v4.641|v4.762|v4.815.0|v5.17.0|v5.48.0|v5.144.0] - optional\n\n
 === Examples:\n\n
 Manual build:\n
 \t$0 -t my-private-registry/nginx-instance-manager:2.15.1-nap-v4.815.0-manualbuild \\\\\\n
@@ -25,8 +25,8 @@ Manual build:\n
 \t\t-w nim-files/nms-sm_1.7.1-1046510610~focal_amd64.deb \\\\\n
 \t\t-p nim-files/nms-nap-compiler-v4.815.0_4.815.0-1~focal_amd64.deb\n\n
 Automated build:\n
-\t$0 -i -C nginx-repo.crt -K nginx-repo.key\n
-\t\t-W -P v4.583.0 -t my.registry.tld/nginx-nms:latest\n
+\t$0 -i -C nginx-repo.crt -K nginx-repo.key \\\\\n
+\t\t-W -P v5.144.0 -t my.registry.tld/nginx-nms:latest\n
 "
 
 # Defaults
