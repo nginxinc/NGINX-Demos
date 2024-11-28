@@ -6,13 +6,13 @@ nginxplus:
   - "8080:8080"
 
 redis-master:
-  image: redis:3
+  image: redis:7
   container_name: redis-master
   ports:
   - "63791:6379"
 
 redis-slave1:
-  image: redis:3
+  image: redis:7
   command: redis-server --slaveof redis-master 6379
   container_name: redis-slave1
   links:
@@ -21,7 +21,7 @@ redis-slave1:
   - "63792:6379"
 
 redis-slave2:
-  image: redis:3
+  image: redis:7
   command: redis-server --slaveof redis-master 6379
   container_name: redis-slave2
   links:
