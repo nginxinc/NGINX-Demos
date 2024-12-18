@@ -1,5 +1,15 @@
 #!/bin/bash
 
+if [[ `whoami` == "nginx" ]]; then
+  IS_UNPRIVILEGED="true"
+else
+  IS_UNPRIVILEGED=
+fi
+
+if [[ ! -z "$NGINX_LICENSE" ]]; then
+   echo ${NGINX_LICENSE} > /etc/nginx/license.jwt
+fi
+
 nginx
 sleep 2
 
@@ -61,8 +71,13 @@ if [[ "$NAP_WAF" == "true" ]]; then
     .extensions += ["nginx-app-protect","nap-monitoring"]
     ' /etc/nginx-agent/nginx-agent.conf
 
-  su - nginx -s /bin/bash -c "/opt/app_protect/bin/bd_agent &"
-  su - nginx -s /bin/bash -c "/usr/share/ts/bin/bd-socket-plugin tmm_count 4 proc_cpuinfo_cpu_mhz 2000000 total_xml_memory 471859200 total_umu_max_size 3129344 sys_max_account_id 1024 no_static_config &"
+  if [[ "$IS_UNPRIVILEGED" ]]; then
+    /opt/app_protect/bin/bd_agent &
+    /usr/share/ts/bin/bd-socket-plugin tmm_count 4 proc_cpuinfo_cpu_mhz 2000000 total_xml_memory 471859200 total_umu_max_size 3129344 sys_max_account_id 1024 no_static_config &
+  else
+    su - nginx -s /bin/bash -c "/opt/app_protect/bin/bd_agent &"
+    su - nginx -s /bin/bash -c "/usr/share/ts/bin/bd-socket-plugin tmm_count 4 proc_cpuinfo_cpu_mhz 2000000 total_xml_memory 471859200 total_umu_max_size 3129344 sys_max_account_id 1024 no_static_config &"
+  fi
 
   while ([ ! -e /opt/app_protect/pipe/app_protect_plugin_socket ] || [ ! -e /opt/app_protect/pipe/ts_agent_pipe ])
   do
@@ -79,4 +94,8 @@ fi
 
 fi
 
-sg nginx-agent "/usr/bin/nginx-agent $PARM"
+if [[ "$IS_UNPRIVILEGED" ]]; then
+  /usr/bin/nginx-agent $PARM
+else
+  sg nginx-agent "/usr/bin/nginx-agent $PARM"
+fi

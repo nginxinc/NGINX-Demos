@@ -1,12 +1,19 @@
-# NGINX Plus and NGINX Agent - Docker image builder
+# NGINX Docker image builder
 
 ## Description
 
-This repository can be used to build a docker image with NGINX (Plus or Opensource) and NGINX Instance Manager Agent (https://docs.nginx.com/nginx-instance-manager/).
+This repository can be used to build a docker image that includes:
+
+- [NGINX Plus](https://docs.nginx.com/nginx) in privileged or unprivileged/non-root mode
+- [NGINX Open Source](https://nginx.org/)
+- [NGINX App Protect WAF](https://docs.nginx.com/nginx-app-protect-waf)
+- [NGINX Agent](https://docs.nginx.com/nginx-agent)
+
+It is also available as part of [official NGINX Demos](https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-agent-docker)
 
 ## Tested releases
 
-This repository has been tested with: NGINX agent for:
+This repository has been tested with:
 
 - NGINX Plus R29+
 - NGINX Opensource 1.24.0+
@@ -19,19 +26,19 @@ This repository has been tested with: NGINX agent for:
 
 - Linux host running Docker to build the image
 - NGINX Plus license
-- One of
+- Access to either control plane:
   - [NGINX Instance Manager](https://docs.nginx.com/nginx-instance-manager/)
   - [NGINX One Cloud Console](https://docs.nginx.com/nginx-one/)
-- Openshift/Kubernetes cluster
+- Docker/Docker-compose or Openshift/Kubernetes cluster
 
 ## Building the docker image
 
 The install script can be used to build the Docker image:
 
 ```
-NGINX Opensource/Plus & NGINX Agent Docker image builder
+NGINX Plus & NGINX Instance Manager agent Docker image builder
 
- This tool builds a Docker image to run NGINX Opensource/Plus and NGINX Agent
+ This tool builds a Docker image to run NGINX Plus and NGINX Instance Manager agent
 
  === Usage:
 
@@ -43,9 +50,10 @@ NGINX Opensource/Plus & NGINX Agent Docker image builder
  -t [target image]      - The Docker image to be created
  -C [file.crt]          - Certificate to pull packages from the official NGINX repository
  -K [file.key]          - Key to pull packages from the official NGINX repository
- -n [URL]               - NGINX Instance Manager / NGINX SaaS console URL to fetch the agent
+ -n [URL]               - NGINX Instance Manager URL to fetch the agent
  -w                     - Add NGINX App Protect WAF (requires NGINX Plus)
  -O                     - Use NGINX Opensource instead of NGINX Plus
+ -u                     - Build unprivileged image (only for NGINX Plus)
 
  === Examples:
 
@@ -54,6 +62,9 @@ NGINX Opensource/Plus & NGINX Agent Docker image builder
 
  NGINX Plus, NGINX App Protect WAF and NGINX Agent image:
  ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:latest-nap -w -n https://nim.f5.ff.lan
+
+ NGINX Plus, NGINX App Protect WAF and NGINX Agent unprivileged image:
+ ./scripts/build.sh -C nginx-repo.crt -K nginx-repo.key -t registry.ff.lan:31005/nginx-with-agent:latest-nap -w -n https://nim.f5.ff.lan -u
 
  NGINX Opensource and NGINX Agent image:
  ./scripts/build.sh -O -t registry.ff.lan:31005/nginx-oss-with-agent:latest -n https://nim.f5.ff.lan
@@ -69,6 +80,7 @@ the build script will push the image to your private registry once build is comp
 ### Running the docker image on Kubernetes
 
 1. Edit `manifests/1.nginx-nim.yaml` and specify the correct image by modifying the `image:` line, and set the following environment variables. Default values for `NIM_HOST` and `NIM_GRPC_PORT` can be used if NGINX Instance Manager is deployed using https://github.com/nginxinc/NGINX-Demos/tree/master/nginx-nms-docker
+  - `NGINX_LICENSE` - NGINX R33+ JWT license token
   - `NIM_HOST` - NGINX Instance Manager hostname/IP address
   - `NIM_GRPC_PORT` - NGINX Instance Manager gRPC port
   - `NIM_TOKEN` - NGINX One Cloud Console authentication token
@@ -86,7 +98,7 @@ $ ./scripts/nginxWithAgentStart.sh start
 $ ./scripts/nginxWithAgentStart.sh stop
 ```
 
-3. After startup NGINX instances will register to NGINX Instance Manager / NGINX SaaS console and will be displayed on the "instances" dashboard
+3. After startup NGINX instances will register to NGINX Instance Manager / NGINX One console and will be displayed on the "instances" dashboard
 
 ### Running the docker image on Docker
 
@@ -94,7 +106,8 @@ $ ./scripts/nginxWithAgentStart.sh stop
 
 ```
 docker run --rm --name nginx -p [PORT_TO_EXPOSE] \
-        -e "NIM_HOST=<NGINX_INSTANCE_MANAGER_FQDN_OR_IP>" \
+        -e "NGINX_LICENSE=<NGINX_JWT_LICENSE_TOKEN>" \
+        -e "NIM_HOST=<NGINX_CONTROL_PLANE_FQDN_OR_IP>" \
         -e "NIM_GRPC_PORT=<GRPC_PORT>" \
         -e "NIM_TOKEN=<OPTIONAL_AUTHENTICATION_TOKEN>" \
         -e "NIM_INSTANCEGROUP=<OPTIONAL_INSTANCE_GROUP_NAME>" \
@@ -106,4 +119,4 @@ docker run --rm --name nginx -p [PORT_TO_EXPOSE] \
         <NGINX_DOCKER_IMAGE_NAME:TAG>
 ```
 
-2. After startup NGINX Plus instances will register to NGINX Instance Manager and will be displayed on the "instances" dashboard
+2. After startup NGINX Plus instances will register to NGINX Instance Manager / NGINX One Console and will be displayed on the "instances" dashboard
