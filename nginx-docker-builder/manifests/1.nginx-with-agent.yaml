@@ -23,6 +23,9 @@ spec:
         - name: http
           containerPort: 80
         env:
+          - name: NGINX_LICENSE
+            # NGINX Plus R33+ JWT license token
+            value: "NGINX_JWT_LICENSE_TOKEN"
           - name: NIM_HOST
             # NGINX Instance Manager hostname or IP address
             value: "nginx-nim2.nginx-nim2"
