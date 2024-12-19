@@ -1,6 +1,7 @@
 FROM nginx:stable-bullseye-perl
 
 ARG NMS_URL
+ARG NGINX_AGENT=false
 
 # Initial packages setup
 RUN apt-get -y update \
@@ -15,10 +16,13 @@ RUN apt-get -y update \
 	&& groupadd -g 1001 nginx-agent \
 	&& usermod root -G nginx-agent \
 	&& usermod nginx -G nginx-agent \
-# NGINX Instance Manager agent installation
-	&& if [ `curl -o /dev/null -sk -w "%{http_code}\n" $NMS_URL/install/nginx-agent` = 200 ] ; then \
-	bash -c 'export DATA_PLANE_KEY="placeholder" && curl -k $NMS_URL/install/nginx-agent | sh' && echo "NGINX Agent installed"; else \
-	bash -c 'export DATA_PLANE_KEY="placeholder" && curl -k $NMS_URL/nginx-agent/install | sh || :' && echo "NGINX Agent installed"; fi
+# NGINX Agent
+        && if [ "$NGINX_AGENT" = "true" ] ; then \
+        apt-get -y install curl gnupg2 ca-certificates lsb-release debian-archive-keyring \
+        && curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg \
+        && echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://packages.nginx.org/nginx-agent/debian/ `lsb_release -cs` agent" > /etc/apt/sources.list.d/nginx-agent.list \
+        && apt-get -y update \
+        && apt-get -y install nginx-agent; fi
 
 # Startup script
 COPY ./container/start.sh /deployment/
