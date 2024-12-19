@@ -13,51 +13,45 @@ fi
 nginx
 sleep 2
 
-# NGINX Agent version detection, change in behaviour in v2.24.0+
-AGENT_VERSION=`nginx-agent -v|awk '{print $3}'`
-AGENT_VERSION_MAJOR=`echo $AGENT_VERSION | awk -F\. '{print $1}' | sed 's/v//'`
-AGENT_VERSION_MINOR=`echo $AGENT_VERSION | awk -F\. '{print $2}'`
+if [[ "$NGINX_AGENT_ENABLED" == "true" ]]; then
 
-echo "=> NGINX Agent version $AGENT_VERSION"
+  # NGINX Agent version detection, change in behaviour in v2.24.0+
+  AGENT_VERSION=`nginx-agent -v|awk '{print $3}'`
+  AGENT_VERSION_MAJOR=`echo $AGENT_VERSION | awk -F\. '{print $1}' | sed 's/v//'`
+  AGENT_VERSION_MINOR=`echo $AGENT_VERSION | awk -F\. '{print $2}'`
 
-PARM=""
+  echo "=> NGINX Agent version $AGENT_VERSION"
 
-yq -i '
-  .server.host=strenv(NIM_HOST) |
-  .server.grpcPort=strenv(NIM_GRPC_PORT)
-  ' /etc/nginx-agent/nginx-agent.conf
+  PARM=""
 
-if [[ ! -z "$NIM_INSTANCEGROUP" ]]; then
-   PARM="${PARM} --instance-group $NIM_INSTANCEGROUP"
-fi
+  yq -i '
+    .server.host=strenv(NGINX_AGENT_SERVER_HOST) |
+    .server.grpcPort=strenv(NGINX_AGENT_SERVER_GRPCPORT) |
+    .tls.enable=true |
+    .tls.skip_verify=true |
+    .tls.cert="" |
+    .tls.key=""
+    ' /etc/nginx-agent/nginx-agent.conf
 
-if [[ ! -z "$NIM_TAGS" ]]; then
-   PARM="${PARM} --tags $NIM_TAGS"
-fi
+  if [[ ! -z "$NGINX_AGENT_INSTANCE_GROUP" ]]; then
+     PARM="${PARM} --instance-group $NGINX_AGENT_INSTANCE_GROUP"
+  fi
 
-if [[ ! -z "$NIM_TOKEN" ]]; then
-      yq -i '
-	.server.token=strenv(NIM_TOKEN)
-	' /etc/nginx-agent/nginx-agent.conf
-fi
+  if [[ ! -z "$NGINX_AGENT_TAGS" ]]; then
+     PARM="${PARM} --tags $NGINX_AGENT_TAGS"
+  fi
 
-if [[ ! -z "$AGENT_LOGLEVEL" ]]; then
-      yq -i '
-	.log.level=strenv(AGENT_LOGLEVEL)
-	' /etc/nginx-agent/nginx-agent.conf
-fi
+  if [[ ! -z "$NGINX_AGENT_SERVER_TOKEN" ]]; then
+    yq -i '
+      .server.token=strenv(NGINX_AGENT_SERVER_TOKEN)
+      ' /etc/nginx-agent/nginx-agent.conf
+  fi
 
-if [[ "$NIM_ADVANCED_METRICS" == "true" ]]; then
-	yq -i '
-	.advanced_metrics.socket_path="/var/run/nginx-agent/advanced-metrics.sock" |
-	.advanced_metrics.aggregation_period="1s" |
-	.advanced_metrics.publishing_period="3s" |
-	.advanced_metrics.table_sizes_limits.staging_table_max_size=1000 |
-	.advanced_metrics.table_sizes_limits.staging_table_threshold=1000 |
-	.advanced_metrics.table_sizes_limits.priority_table_max_size=1000 |
-	.advanced_metrics.table_sizes_limits.priority_table_threshold= 1000 |
-	.extensions += ["advanced-metrics"]
-	' /etc/nginx-agent/nginx-agent.conf
+  if [[ ! -z "$NGINX_AGENT_LOG_LEVEL" ]]; then
+    yq -i '
+      .log.level=strenv(NGINX_AGENT_LOG_LEVEL)
+      ' /etc/nginx-agent/nginx-agent.conf
+  fi
 fi
 
 if [[ "$NAP_WAF" == "true" ]]; then
@@ -94,8 +88,12 @@ fi
 
 fi
 
-if [[ "$IS_UNPRIVILEGED" ]]; then
-  /usr/bin/nginx-agent $PARM
+if [[ "$NGINX_AGENT_ENABLED" == "true" ]]; then
+  if [[ "$IS_UNPRIVILEGED" ]]; then
+    /usr/bin/nginx-agent $PARM
+  else
+    sg nginx-agent "/usr/bin/nginx-agent $PARM"
+  fi
 else
-  sg nginx-agent "/usr/bin/nginx-agent $PARM"
+  while [ true ]; do sleep 3600; done
 fi
