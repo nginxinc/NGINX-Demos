@@ -15,7 +15,7 @@ RUN apt-get -y update \
 	&& wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq \
 	&& chmod +x /usr/bin/yq
 
-# Use certificate and key from kubernetes secret
+# Use certificate and key from secret
 RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644 \
 	--mount=type=secret,id=nginx-key,dst=/etc/ssl/nginx/nginx-repo.key,mode=0644 \
 	set -x \
@@ -37,8 +37,7 @@ RUN --mount=type=secret,id=nginx-crt,dst=/etc/ssl/nginx/nginx-repo.crt,mode=0644
 	&& ln -sf /dev/stderr /var/log/nginx/error.log \
 # NGINX Agent
         && if [ "$NGINX_AGENT" = "true" ] ; then \
-        apt-get -y install curl gnupg2 ca-certificates lsb-release debian-archive-keyring \
-        && curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg \
+        curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor > /usr/share/keyrings/nginx-archive-keyring.gpg \
         && echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://packages.nginx.org/nginx-agent/debian/ `lsb_release -cs` agent" > /etc/apt/sources.list.d/nginx-agent.list \
         && apt-get -y update \
         && apt-get -y install nginx-agent; fi
