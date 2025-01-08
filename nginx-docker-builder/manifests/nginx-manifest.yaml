@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: YOUR_REGISTRY/NGINX_DOCKER_IMAGE_NAME:TAG
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 80
+        env:
+          # NGINX Plus R33+ JWT license token - it is recommended to store this in a Kubernetes secret
+          - name: NGINX_LICENSE
+            value: "NGINX_JWT_LICENSE_TOKEN"
+
+          # NGINX Agent Configuration
+          - name: NGINX_AGENT_ENABLED
+            value: "true"
+          - name: NGINX_AGENT_SERVER_HOST
+            # NGINX Instance Manager / NGINX One Console hostname or IP address
+            value: "NGINX_CONTROL_PLANE_SERVER"
+          - name: NGINX_AGENT_SERVER_GRPCPORT
+            # NGINX Instance Manager / NGINX One Console gRPC port
+            value: "443"
+          # Optional parameters
+          - name: NGINX_AGENT_SERVER_TOKEN
+            # NGINX Instance Manager / NGINX One Console authentication token
+            value: "XYZ"
+          - name: NGINX_AGENT_INSTANCE_GROUP
+            # The Instance Group (NGINX Instance Manager) / Config Sync Group (NGINX One Console)
+            value: "lab"
+          - name: NGINX_AGENT_TAGS
+            # Comma-separated list of tags for the NGINX instance
+            value: "preprod,devops"
+          - name: NGINX_AGENT_LOG_LEVEL
+            # NGINX Agent loglevel - default is "info"
+            value: "info"
+
+          # Optional if NGINX App Protect WAF is available in the docker image - set to "true" to enable
+          #- name: NAP_WAF
+          #  value: "true"
+          #- name: NAP_WAF_PRECOMPILED_POLICIES
+          #  value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - name: http
+    port: 80
+  - name: api
+    port: 8080
+  selector:
+    app: nginx
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+  annotations:
+    nginx.org/proxy-connect-timeout: "30s"
+    nginx.org/proxy-read-timeout: "20s"
+    nginx.org/client-max-body-size: "4m"
+    nginx.com/health-checks: "true"
+  labels:
+    app: nginx
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: nginx.yourdomain.tld
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
