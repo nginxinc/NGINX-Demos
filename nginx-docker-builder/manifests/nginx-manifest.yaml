@@ -23,8 +23,15 @@ spec:
           containerPort: 80
         env:
           # NGINX Plus R33+ JWT license token - it is recommended to store this in a Kubernetes secret
+          # To create the secret using a license.jwt file, run:
+          #
+          # kubectl create secret generic nginx-license --from-literal=jwt=`cat license.jwt`
           - name: NGINX_LICENSE
-            value: "NGINX_JWT_LICENSE_TOKEN"
+            #value: "NGINX_JWT_LICENSE_TOKEN"
+            valueFrom:
+              secretKeyRef:
+                name: nginx-license
+                key: jwt
 
           # NGINX Agent Configuration
           - name: NGINX_AGENT_ENABLED
