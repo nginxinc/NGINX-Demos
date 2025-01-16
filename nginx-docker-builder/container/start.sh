@@ -57,18 +57,27 @@ fi
 if [[ "$NAP_WAF" == "true" ]]; then
   export FQDN=127.0.0.1
 
-  yq -i '
-    .nap_monitoring.collector_buffer_size=50000 |
-    .nap_monitoring.processor_buffer_size=50000 |
-    .nap_monitoring.syslog_ip=strenv(FQDN) |
-    .nap_monitoring.syslog_port=514 |
-    .extensions += ["nginx-app-protect","nap-monitoring"]
-    ' /etc/nginx-agent/nginx-agent.conf
-
   if [[ "$IS_UNPRIVILEGED" ]]; then
     /opt/app_protect/bin/bd_agent &
     /usr/share/ts/bin/bd-socket-plugin tmm_count 4 proc_cpuinfo_cpu_mhz 2000000 total_xml_memory 471859200 total_umu_max_size 3129344 sys_max_account_id 1024 no_static_config &
+
+    yq -i '
+      .nap_monitoring.collector_buffer_size=50000 |
+      .nap_monitoring.processor_buffer_size=50000 |
+      .nap_monitoring.syslog_ip=strenv(FQDN) |
+      .nap_monitoring.syslog_port=10514 |
+      .extensions += ["nginx-app-protect","nap-monitoring"]
+      ' /etc/nginx-agent/nginx-agent.conf
+
   else
+    yq -i '
+      .nap_monitoring.collector_buffer_size=50000 |
+      .nap_monitoring.processor_buffer_size=50000 |
+      .nap_monitoring.syslog_ip=strenv(FQDN) |
+      .nap_monitoring.syslog_port=514 |
+      .extensions += ["nginx-app-protect","nap-monitoring"]
+      ' /etc/nginx-agent/nginx-agent.conf
+
     su - nginx -s /bin/bash -c "/opt/app_protect/bin/bd_agent &"
     su - nginx -s /bin/bash -c "/usr/share/ts/bin/bd-socket-plugin tmm_count 4 proc_cpuinfo_cpu_mhz 2000000 total_xml_memory 471859200 total_umu_max_size 3129344 sys_max_account_id 1024 no_static_config &"
   fi
