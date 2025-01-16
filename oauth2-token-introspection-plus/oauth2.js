@@ -15,7 +15,7 @@
  * headers. These in turn are available to the auth_request location with the auth_request_set
  * directive. Each member of the response is available to nginx as $sent_http_token_<member name>
  *
- * Copyright (C) 2019 Nginx, Inc.
+ * Copyright (C) 2022 F5, Inc.
  */
 function introspectAccessToken(r) {
     if (r.variables.token_data) {
