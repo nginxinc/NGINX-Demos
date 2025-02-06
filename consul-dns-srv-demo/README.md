@@ -54,7 +54,10 @@ Install Vagrant using the necessary package for your OS:
     $ sudo su
     ```
 
-    The demo files will be in `/srv/NGINX-Demos/consul-dns-srv-demo`
+    The demo files will be in:
+    ```
+    $ cd /srv/NGINX-Demos/consul-dns-srv-demo
+    ```
 
 7.  Now simply follow the steps listed under section 'Running the demo'.
 
