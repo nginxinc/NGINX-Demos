@@ -1,6 +1,6 @@
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "ubuntu/bionic64"
+  config.vm.box = "bento/ubuntu-22.04"
   config.vm.network "private_network", :ip => "10.2.2.70"
 
   config.vm.synced_folder "../consul-dns-srv-demo/", "/srv/NGINX-Demos/consul-dns-srv-demo"
