@@ -269,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <td></th><td><i>Enter the URI after the domain or IP address.</i></td>
         </tr>
         <tr>
-            <td></th><td><i>For example, if the full URI is http://foo.com/abc/bar.ph, enter abc/bar.php.</i></td>
+            <td></th><td><i>For example, if the full URI is http://foo.com/abc/bar.php, enter abc/bar.php.</i></td>
         </tr>
 <?php
     } else {
