@@ -19,7 +19,7 @@ In this demo we will deploy a simple web application and then configure load bal
   ```
 1. Configure external load balancing for the application:
   ```
-  $ kubectl expose deployment hello-app --type="LoadBalancer"
+  $ kubectl expose pod hello-app --type="LoadBalancer"
   ```
   This steps allocates a cloud load balancer that gets configured to load balance our application. It works only if you run your Kubernetes cluster in a supported cloud provider.
 
