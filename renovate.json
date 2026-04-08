@@ -5,8 +5,8 @@
     "schedule:monthly"
   ],
   "kubernetes": {
-    "fileMatch": [
-      "kubernetes-demo-nginx-ingress-resources/.+\\.yaml$"
+    "managerFilePatterns": [
+      "/kubernetes-demo-nginx-ingress-resources/.+\\.yaml$/"
     ]
   },
   "ignorePresets": ["helpers:pinGitHubActionDigests"]
