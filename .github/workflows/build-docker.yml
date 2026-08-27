@@ -53,7 +53,7 @@ jobs:
           platforms: arm/v6,arm,arm64,amd64,ppc64le,s390x,386
         if: ${{ steps.update.outputs.needs-updating == 'true' || inputs.force == 'true' }}
       - name: Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4
         if: ${{ steps.update.outputs.needs-updating == 'true' || inputs.force == 'true' }}
       - name: DockerHub Login
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
