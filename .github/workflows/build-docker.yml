@@ -40,7 +40,7 @@ jobs:
           echo "image=${image}" >> $GITHUB_OUTPUT
       - name: Check if update needed for ${{ steps.variables.outputs.image }}
         id: update
-        uses: lucacome/docker-image-update-checker@a233de0585661c019fb71f9601328db37051cc66 # v2
+        uses: lucacome/docker-image-update-checker@f97e2a3cdbf2d8f9788fb87081a76542645a4252 # v3
         with:
           base-image: library/nginx:mainline-alpine
           image: ${{ steps.variables.outputs.image }}
