@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 MAINTAINER Kunal Pariani <kunal.pariani@nginx.com>
 ENV DEBIAN_FRONTEND noninteractive
 
