@@ -1,5 +1,5 @@
 # For Ubuntu 18
-FROM ubuntu:noble
+FROM ubuntu:resolute
 
 LABEL name="zookeeper" version="3.4.13"
 
