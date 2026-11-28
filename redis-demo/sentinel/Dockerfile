@@ -1,4 +1,4 @@
-FROM redis:3
+FROM redis:8
 
 MAINTAINER Kunal Pariani <kunal.pariani@nginx.com>
 
